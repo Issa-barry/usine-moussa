@@ -1,0 +1,72 @@
+ <div class="card">
+       <span class="block text-900 font-bold text-xl mb-4">Détail du Produit </span>
+
+
+    <p-toolbar styleClass="mb-4">
+                <ng-template pTemplate="left">
+                    <div class="my-2">
+                        <button pButton pRipple label="Modifier" icon="pi pi-pencil" class="p-button mr-2" ></button>
+                     </div>
+                </ng-template>
+                <ng-template pTemplate="right">
+                        <button pButton pRipple label="Retour" icon="pi pi-arrow-left" class="p-button p-button-outlined mr-2" (click)="onGoToProduits()"></button>
+                        <button pButton pRipple label="" icon="pi pi-trash" class="p-button-danger p-button-outlined mr-2" ></button>
+                 </ng-template>
+            </p-toolbar>
+        
+    <div class="grid grid-nogutter flex-wrap gap-3 p-fluid">
+        <div class="col-12 lg:col-8">
+            <div class="grid formgrid">
+                <div class="col-12 field">
+                    <input pInputText type="text" placeholder="Nom du produit" label="Nom du produit" [(ngModel)]="product.name">
+                </div>
+                <div class="col-12 lg:col-4 field">
+                    <input pInputText type="text" placeholder="Prix : 120 000 GNF" label="Prix" [(ngModel)]="product.price">
+                </div>
+                <div class="col-12 lg:col-4 field">
+                    <input pInputText type="text" placeholder="Coût : 1000 GNF" label="Coût" [(ngModel)]="product.code">
+                </div>
+                <div class="col-12 lg:col-4 field">
+                    <input pInputText type="text" placeholder="Quantité : " label="SKU" [(ngModel)]="product.sku">
+                </div>
+                
+                <div class="col-12 field">
+                    <p-fileUpload #fileUploader name="demo[]" url="./upload.php" (onUpload)="onUpload($event)" [customUpload]="true" [multiple]="true" (onSelect)="onUpload($event)" accept="image/*" [showUploadButton]="true" [showCancelButton]="false" [auto]="true" styleClass="border-1 surface-border surface-card border-round">
+                        <ng-template pTemplate="content">
+                            <div class="h-15rem overflow-y-auto py-3 border-round" style="cursor: copy" (click)="fileUploader.advancedFileInput.nativeElement.click()">
+                                <div *ngIf="!product.images.length" class="flex flex-column w-full h-full justify-content-center align-items-center">
+                                    <i class="pi pi-file text-4xl text-primary"></i>
+                                    <span class="block font-semibold text-900 text-lg mt-3">Déposer ou selectionner une image</span>
+                                </div>
+                                <div class="flex flex-wrap gap-3 border-round" *ngIf="product.images.length">
+                                    <div *ngFor="let file of product.images; let i = index;" class="h-full relative w-7rem h-7rem border-3 border-transparent border-round hover:bg-primary transition-duration-100 cursor-auto" (mouseenter)="onImageMouseOver(file)" (mouseleave)="onImageMouseLeave(file)" style="padding: 1px;">
+                                        <img [src]="file.objectURL" class="w-full h-full border-round shadow-2" [alt]="file.name">
+                                        <button [id]="file.name" #buttonEl pButton pRipple type="button" icon="pi pi-times" class="p-button-rounded p-button-primary text-sm absolute justify-content-center align-items-center cursor-pointer w-2rem h-2rem" style="top: -10px; right: -10px; display: none;" (click)="$event.stopPropagation(); removeImage(file)"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </p-fileUpload>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex-1 w-full lg:w-3 xl:w-4 flex flex-column row-gap-3"> 
+            <div class="border-1 surface-border border-round">
+                <span class="text-900 font-bold block border-bottom-1 surface-border p-3">Catégorie </span>
+                <div class="p-3">
+                    <p-dropdown [options]="categoryOptions" [(ngModel)]="product.category" placeholder="Sélectionner une catégorie"></p-dropdown>
+                </div>
+            </div>  
+
+            <div class="border-1 surface-border flex justify-content-between align-items-center py-2 px-3 border-round">
+                <span class="text-900 font-bold p-3">En stock</span>
+                <p-inputSwitch [(ngModel)]="product.inStock"></p-inputSwitch>
+            </div>
+
+            <div class="flex flex-column sm:flex-row justify-content-between align-items-center gap-3 py-2">
+                <button pButton pRipple class="p-button-primary flex-1 border-round" label="Enregistrer" icon="pi pi-fw pi-check"></button>
+            </div> 
+        </div>
+    </div>
+</div>
