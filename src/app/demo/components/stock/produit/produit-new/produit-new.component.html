@@ -1,62 +1,134 @@
 <div class="card">
-    <span class="block text-900 font-bold text-xl mb-4">Nouveau Produit </span>
-    <div class="grid grid-nogutter flex-wrap gap-3 p-fluid">
-        <div class="col-12 lg:col-8">
-            <div class="grid formgrid">
-                <div class="col-12 field">
-                    <input pInputText type="text" placeholder="Nom du produit" label="Nom du produit" [(ngModel)]="product.name">
-                </div>
-                <div class="col-12 lg:col-6 field">
-                    <input pInputText type="text" placeholder="Prix vente : 120 000 GNF" label="Prix" [(ngModel)]="product.price">
-                </div>
-                <div class="col-12 lg:col-6 field">
-                    <input pInputText type="text" placeholder="Quantité en stock : 1500 " label="SKU" [(ngModel)]="product.sku">
-                </div>
-                <div class="col-12 field">
-                    <p-fileUpload #fileUploader name="demo[]" url="./upload.php" (onUpload)="onUpload($event)" [customUpload]="true" [multiple]="true" (onSelect)="onUpload($event)" accept="image/*" [showUploadButton]="true" [showCancelButton]="false" [auto]="true" styleClass="border-1 surface-border surface-card border-round">
-                        <ng-template pTemplate="content">
-                            <div class="h-15rem overflow-y-auto py-3 border-round" style="cursor: copy" (click)="fileUploader.advancedFileInput.nativeElement.click()">
-                                <div *ngIf="!product.images.length" class="flex flex-column w-full h-full justify-content-center align-items-center">
-                                    <i class="pi pi-file text-4xl text-primary"></i>
-                                    <span class="block font-semibold text-900 text-lg mt-3">Déposer ou selectionner une image</span>
-                                </div>
-                                <div class="flex flex-wrap gap-3 border-round" *ngIf="product.images.length">
-                                    <div *ngFor="let file of product.images; let i = index;" class="h-full relative w-7rem h-7rem border-3 border-transparent border-round hover:bg-primary transition-duration-100 cursor-auto" (mouseenter)="onImageMouseOver(file)" (mouseleave)="onImageMouseLeave(file)" style="padding: 1px;">
-                                        <img [src]="file.objectURL" class="w-full h-full border-round shadow-2" [alt]="file.name">
-                                        <button [id]="file.name" #buttonEl pButton pRipple type="button" icon="pi pi-times" class="p-button-rounded p-button-primary text-sm absolute justify-content-center align-items-center cursor-pointer w-2rem h-2rem" style="top: -10px; right: -10px; display: none;" (click)="$event.stopPropagation(); removeImage(file)"></button>
-                                    </div>
-                                </div>
-                            </div>
-                        </ng-template>
-                    </p-fileUpload>
-                </div>
-            </div>
+  <span class="block text-900 font-bold text-xl mb-4">Nouveau Produit</span>
+
+  <div class="grid grid-nogutter flex-wrap gap-3 p-fluid">
+    <!-- FORMULAIRE GAUCHE -->
+    <div class="col-12 lg:col-8">
+      <div class="grid formgrid">
+        <!-- NOM -->
+        <div class="col-12 field">
+          <label class="font-medium text-900">Nom du produit</label>
+          <input
+            pInputText
+            [(ngModel)]="produit.nom"
+            [ngClass]="{
+              'ng-invalid ng-dirty': submitted && (!produit.nom || apiErrors['nom'])
+            }"
+          />
+          <small class="p-error" *ngIf="apiErrors['nom']">
+            {{ apiErrors['nom'][0] }}
+          </small>
         </div>
 
-        <div class="flex-1 w-full lg:w-3 xl:w-4 flex flex-column row-gap-3"> 
-            <div class="border-1 surface-border border-round">
-                <span class="text-900 font-bold block border-bottom-1 surface-border p-3">Catégorie </span>
-                <div class="p-3">
-                    <p-dropdown [options]="categoryOptions" [(ngModel)]="product.category" placeholder="Sélectionner une catégorie"></p-dropdown>
-                </div>
-            </div>   
-<!-- 
-             <div class="border-1 surface-border flex justify-content-between align-items-center py-2 px-3 border-round">
-                <span class="text-900 font-bold p-3">Achetable</span>
-                <p-inputSwitch [(ngModel)]="product.inStock"></p-inputSwitch>
-            </div> -->
-            <div class="flex flex-column sm:flex-row justify-content-between align-items-center gap-3 py-2">
-              <div class="flex-1 field">
-                    <input pInputText type="text" placeholder="Prix d'achat : " label="SKU" [(ngModel)]="product.sku">
-              </div>
-               <div class="flex-1 field">
-                    <input pInputText type="text" placeholder="Coût : " label="SKU" [(ngModel)]="product.sku">
-              </div>
-            </div>
-            <div class="flex flex-column sm:flex-row justify-content-between align-items-center gap-3 py-2">
-                <button pButton pRipple class="p-button-danger flex-1 p-button-outlined" label="Annuler" (click)="onGoToProduits()" icon="pi pi-fw pi-trash"></button>
-                <button pButton pRipple class="p-button-primary flex-1 border-round" label="Enregistrer" icon="pi pi-fw pi-check"></button>
-            </div>
+        <!-- PRIX DE VENTE -->
+        <div class="col-12 lg:col-6 field">
+          <label class="font-medium text-900">Prix de vente</label>
+          <input
+            pInputText
+            type="number"
+            [(ngModel)]="produit.prix_vente"
+            [ngClass]="{
+              'ng-invalid ng-dirty': submitted && apiErrors['prix_vente']
+            }"
+          />
+          <small class="p-error" *ngIf="apiErrors['prix_vente']">
+            {{ apiErrors['prix_vente'][0] }}
+          </small>
         </div>
+
+        <!-- QUANTITÉ -->
+        <div class="col-12 lg:col-6 field">
+          <label class="font-medium text-900">Quantité en stock</label>
+          <input
+            pInputText
+            type="number"
+            [(ngModel)]="produit.quantite_stock"
+            [ngClass]="{
+              'ng-invalid ng-dirty': submitted && apiErrors['quantite_stock']
+            }"
+          />
+          <small class="p-error" *ngIf="apiErrors['quantite_stock']">
+            {{ apiErrors['quantite_stock'][0] }}
+          </small>
+        </div>
+      </div>
     </div>
+
+    <!-- FORMULAIRE DROIT -->
+    <div class="flex-1 w-full lg:w-3 xl:w-4 flex flex-column row-gap-3">
+      <!-- CATÉGORIE -->
+      <div class="border-1 surface-border border-round">
+        <span class="text-900 font-bold block border-bottom-1 surface-border p-3">Catégorie</span>
+        <div class="p-3">
+          <p-dropdown
+            [options]="categoryOptions"
+            [(ngModel)]="produit.categorie"
+            placeholder="Sélectionner une catégorie"
+            [ngClass]="{
+              'ng-invalid ng-dirty': submitted && apiErrors['categorie']
+            }"
+          ></p-dropdown>
+          <small class="p-error" *ngIf="apiErrors['categorie']">
+            {{ apiErrors['categorie'][0] }}
+          </small>
+        </div>
+      </div>
+
+      <!-- PRIX ACHAT / COUT -->
+      <div class="flex flex-column sm:flex-row justify-content-between align-items-center gap-3 py-2">
+        <!-- PRIX ACHAT -->
+        <div class="flex-1 field">
+          <label class="font-medium text-900">Prix achat</label>
+          <input
+            pInputText
+            type="number"
+            [(ngModel)]="produit.prix_achat"
+            [ngClass]="{
+              'ng-invalid ng-dirty': submitted && apiErrors['prix_achat']
+            }"
+          />
+          <small class="p-error" *ngIf="apiErrors['prix_achat']">
+            {{ apiErrors['prix_achat'][0] }}
+          </small>
+        </div>
+
+        <!-- COUT -->
+        <div class="flex-1 field">
+          <label class="font-medium text-900">Coût</label>
+          <input
+            pInputText
+            type="number"
+            [(ngModel)]="produit.cout"
+            [ngClass]="{
+              'ng-invalid ng-dirty': submitted && apiErrors['cout']
+            }"
+          />
+          <small class="p-error" *ngIf="apiErrors['cout']">
+            {{ apiErrors['cout'][0] }}
+          </small>
+        </div>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="flex flex-column sm:flex-row justify-content-between align-items-center gap-3 py-2">
+        <button
+          pButton
+          pRipple
+          class="p-button-danger flex-1 p-button-outlined"
+          label="Annuler"
+          (click)="onGoToProduits()"
+          icon="pi pi-fw pi-trash"
+        ></button>
+
+        <button
+          pButton
+          pRipple
+          class="p-button-primary flex-1 border-round"
+          label="Enregistrer"
+          (click)="saveProduit()"
+          icon="pi pi-fw pi-check"
+        ></button>
+      </div>
+    </div>
+  </div>
 </div>

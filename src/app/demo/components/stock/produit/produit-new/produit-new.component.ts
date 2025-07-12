@@ -1,106 +1,66 @@
 import { Component, ViewChildren, QueryList, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { ProductService } from 'src/app/demo/service/product.service';
-
-interface Product {
-    name: string;
-    price: string;
-    code: string;
-    sku: string;
-    status: string;
-    tags: string[];
-    category: string;
-    colors: string[];
-    stock: string;
-    inStock: boolean;
-    description: string;
-    images: Image[];
-}
-
-interface Image {
-    name: string;
-    objectURL: string;
-}
+import { ProduitService } from 'src/app/demo/service/produit/produit.service';
+import { Produit } from 'src/app/demo/models/produit.model';
+import { Categorie } from 'src/app/demo/enums/categorie.enum';
 
 @Component({
   selector: 'app-produit-new',
   templateUrl: './produit-new.component.html',
-  styleUrl: './produit-new.component.scss'
+  styleUrls: ['./produit-new.component.scss'],
 })
 export class ProduitNewComponent {
   @ViewChildren('buttonEl') buttonEl!: QueryList<ElementRef>;
 
-    text: string = '';
+  produit: Produit = new Produit();
+ submitted: boolean = false;
+apiErrors: { [key: string]: string[] } = {};
+errorMessage: string = '';
 
-    categoryOptions = ['Sneakers', 'Apparel', 'Socks'];
+  uploadedFiles: any[] = [];
+  categoryOptions = Object.values(Categorie);
+  showRemove: boolean = false;
 
-    colorOptions: any[] = [
-        { name: 'Black', background: 'bg-gray-900' },
-        { name: 'Orange', background: 'bg-orange-500' },
-        { name: 'Navy', background: 'bg-blue-500' },
-    ];
+  constructor(
+    private produitService: ProduitService,
+    private router: Router
+  ) {}
 
-    product: Product = {
-        name: '',
-        price: '',
-        code: '',
-        sku: '',
-        status: 'Draft',
-        tags: ['Nike', 'Sneaker'],
-        category: 'Sneakers',
-        colors: ['Blue'],
-        stock: 'Sneakers',
-        inStock: true,
-        description: '',
-        images: [],
-    };
-
-    uploadedFiles: any[] = [];
-
-    showRemove: boolean = false;
-
-    constructor(
-        private productService: ProductService,
-        private router: Router
-    ) {}
-    onChipRemove(item: string) {
-        this.product.tags = this.product.tags.filter((i) => i !== item);
+  onUpload(event: any) {
+    for (let file of event.files) {
+      this.produit.image = file.name;
     }
+  }
 
-    onColorSelect(color: string) {
-        this.product.colors.indexOf(color) == -1
-            ? this.product.colors.push(color)
-            : this.product.colors.splice(this.product.colors.indexOf(color), 1);
-    }
+  removeImage() {
+    this.produit.image = '';
+  }
 
-    onUpload(event: any) {
-        for (let file of event.files) {
-            this.product.images.push(file);
-        }
-    }
+ saveProduit() {
+  this.submitted = true;
+  this.apiErrors = {};
+  this.errorMessage = '';
 
-    onImageMouseOver(file: Image) {
-        this.buttonEl.toArray().forEach((el) => {
-            el.nativeElement.id === file.name
-                ? (el.nativeElement.style.display = 'flex')
-                : null;
-        });
-    }
+  this.produitService.createProduit(this.produit).subscribe({
+    next: (res) => {
+      console.log('Produit enregistré avec succès', res);
+      this.router.navigate(['/dashboard/stock/produit/produit-liste']);
+    },
+    error: (err) => {
+      console.log('Erreur lors de la création du produit', err.error.data);
 
-    onImageMouseLeave(file: Image) {
-        this.buttonEl.toArray().forEach((el) => {
-            el.nativeElement.id === file.name
-                ? (el.nativeElement.style.display = 'none')
-                : null;
-        });
-    }
+      if (err.error && err.error.data) {
+        this.apiErrors = err.error.data; // ✅ important : c'est `data` ici
+      }
 
-    removeImage(file: Image) {
-        this.product.images = this.product.images.filter((i) => i !== file);
-    }
+      this.errorMessage = err.error?.message || 'Une erreur est survenue.';
+    },
+  });
+}
 
-    //iba
-    onGoToProduits() {
-        this.router.navigate(['/dashboard/stock/produit/produit-liste']);
-    }
+
+
+  onGoToProduits() {
+    this.router.navigate(['/dashboard/stock/produit/produit-liste']);
+  }
 }
