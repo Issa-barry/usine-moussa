@@ -2,12 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { SelectItem } from 'primeng/api';
 import { DataView } from 'primeng/dataview';
-import { Product } from 'src/app/demo/api/product';
 import { Produit } from 'src/app/demo/models/produit.model';
-import { ProductService } from 'src/app/demo/service/product.service';
 import { ProduitService } from 'src/app/demo/service/produit/produit.service';
-
-
 
 @Component({
   selector: 'app-produit-liste',
@@ -15,107 +11,70 @@ import { ProduitService } from 'src/app/demo/service/produit/produit.service';
   styleUrls: ['./produit-liste.component.scss'],
 })
 export class ProduitListeComponent implements OnInit {
-  
-      products: Product[] = [];
+  produits: Produit[] = [];
+  produit: Produit = new Produit();
 
-        produits: Produit[] = [];
-  
-      sortOptions: SelectItem[] = [];
-  
-      sortOrder: number = 0;
-  
-      sortField: string = '';
-  
-      sourceCities: any[] = [];
-  
-      targetCities: any[] = [];
-  
-      orderCities: any[] = [];
-  
-      constructor(private productService: ProductService, private router: Router, private produitServiceApi: ProduitService,) { }
-  
-      ngOnInit() {
-        this.loadProduits();
+  productDialog = false;
+  submitted = false;
 
-          this.productService.getProducts().then(data => this.products = data);
-  
-          this.sourceCities = [
-              { name: 'San Francisco', code: 'SF' },
-              { name: 'London', code: 'LDN' },
-              { name: 'Paris', code: 'PRS' },
-              { name: 'Istanbul', code: 'IST' },
-              { name: 'Berlin', code: 'BRL' },
-              { name: 'Barcelona', code: 'BRC' },
-              { name: 'Rome', code: 'RM' }];
-  
-          this.targetCities = [];
-  
-          this.orderCities = [
-              { name: 'San Francisco', code: 'SF' },
-              { name: 'London', code: 'LDN' },
-              { name: 'Paris', code: 'PRS' },
-              { name: 'Istanbul', code: 'IST' },
-              { name: 'Berlin', code: 'BRL' },
-              { name: 'Barcelona', code: 'BRC' },
-              { name: 'Rome', code: 'RM' }];
-  
-          this.sortOptions = [
-              { label: 'Price High to Low', value: '!price' },
-              { label: 'Price Low to High', value: 'price' }
-          ];
-      }
-  
-    //   IBA
-    loadProduits(): void {
-    this.produitServiceApi.getProduits().subscribe({
+  sortOptions: SelectItem[] = [];
+  sortOrder = 0;
+  sortField = '';
+
+  constructor(
+    private router: Router,
+    private produitService: ProduitService
+  ) {}
+
+  ngOnInit(): void {
+    this.loadProduits();
+    this.initSortOptions();
+  }
+
+  private loadProduits(): void {
+    this.produitService.getProduits().subscribe({
       next: (data) => {
         this.produits = data;
         console.log('Produits chargés avec succès :', data);
       },
       error: (err) => {
         console.error('Erreur lors du chargement des produits :', err);
-      }
+      },
     });
   }
 
-      ////////////////////////////////
-      onSortChange(event: any) {
-          const value = event.value;
-  
-          if (value.indexOf('!') === 0) {
-              this.sortOrder = -1;
-              this.sortField = value.substring(1, value.length);
-          } else {
-              this.sortOrder = 1;
-              this.sortField = value;
-          }
-      }
-  
-      onFilter(dv: DataView, event: Event) {
-          dv.filter((event.target as HTMLInputElement).value);
-      }
+  private initSortOptions(): void {
+    this.sortOptions = [
+      { label: 'Prix décroissant', value: '!prix_vente' },
+      { label: 'Prix croissant', value: 'prix_vente' },
+    ];
+  }
 
+  onSortChange(event: any): void {
+    const value = event.value;
+    this.sortOrder = value.startsWith('!') ? -1 : 1;
+    this.sortField = value.replace('!', '');
+  }
 
-      //toobal
- 
-    product: Product = {};
-     productDialog: boolean = false; 
-       submitted: boolean = false;
-       openNew() {
-        this.product = {};
-        this.submitted = false;
-        this.productDialog = true;
-    }
+  onFilter(dv: DataView, event: Event): void {
+    dv.filter((event.target as HTMLInputElement).value);
+  }
 
-    goTonewProduit() {
-        this.router.navigate(['/stock/produit/new']);
-    }
+  openNew(): void {
+    this.produit = new Produit();
+    this.submitted = false;
+    this.productDialog = true;
+  }
 
-    onGoToProductEdit(product: Product) {
-        this.router.navigate(['/stock/produit/edit', product.id]);
-    }
+  goTonewProduit(): void {
+    this.router.navigate(['/dashboard/stock/produit/produit-new']);
+  }
 
-    onGoProductDetail(product: Product) {
-        this.router.navigate(['/stock/produit', product.id]);
-    }
+  onGoToProductEdit(produit: Produit): void {
+    this.router.navigate(['/stock/produit/produit-edit', produit.id]);
+  }
+
+  onGoProductDetail(produit: Produit): void {
+    this.router.navigate(['/stock/produit', produit.id]);
+  }
 }

@@ -63,9 +63,9 @@
                                 <img
                                     [src]="
                                         'assets/demo/images/product/' +
-                                        product.image
+                                        produit.image
                                     "
-                                    [alt]="product.name"
+                                    [alt]="produit.nom"
                                     class="my-4 md:my-0 w-9 md:w-10rem shadow-2 mr-5"
                                 />
                                 <div
@@ -75,7 +75,7 @@
                                         {{ produit.nom }}
                                     </div>
                                     <div class="mb-2">
-                                        {{ produit.prix_achat }}
+                                       Stock : {{ produit.quantite_stock }}
                                     </div>
                                     <div class="flex align-items-center mt-2">
                                         <i class="pi pi-tag mr-2"></i>
@@ -89,24 +89,24 @@
                                 >
                                     <span
                                         class="text-2xl font-semibold mb-2 align-self-center md:align-self-end"
-                                        >${{ produit.prix_vente }}</span
+                                        >{{ produit.prix_vente }} GNF</span
                                     >
                                     <!-- <p-button
                                         icon="pi pi-shopping-cart"
                                         label="Add to Cart"
                                         [disabled]="
-                                            product.inventoryStatus ===
+                                            produit.statut ===
                                             'OUTOFSTOCK'
                                         "
                                         styleClass="mb-2 p-button-sm"
                                     ></p-button> -->
-                                    <!-- <span
+                                     <!-- <span
                                         [class]="
                                             'product-badge status-' +
-                                            produit.inventoryStatus.toLowerCase()
+                                            produit.statut
                                         "
-                                        >{{ produit.inventoryStatus }}</span
-                                    > -->
+                                        >{{ produit.statut }}</span
+                                    >  -->
                                 </div>
                             </div>
                         </div>
@@ -133,22 +133,22 @@
                                     <!-- <span
                                         [class]="
                                             'product-badge status-' +
-                                            produit.inventoryStatus.toLowerCase()
+                                            produit.statut 
                                         "
-                                        >{{ produit.inventoryStatus }}</span
+                                        >{{ produit.statut }}</span
                                     > -->
                                 </div>
                                 <div
                                     class="flex flex-column align-items-center text-center mb-3"
                                 >
-                                    <!-- <img
+                                    <img
                                         [src]="
                                             'assets/demo/images/product/' +
-                                            product.image
+                                            produit.image
                                         "
-                                        [alt]="product.name"
+                                        [alt]="produit.nom"
                                         class="w-9 shadow-2 my-3 mx-0"
-                                    /> -->
+                                    />
                                     <div class="text-2xl font-bold">
                                         {{ produit.nom }}
                                     </div>
@@ -162,13 +162,13 @@
                                     <span class="text-2xl font-semibold"
                                         >Prix : {{ produit.prix_vente }} GNF</span
                                     >
-                                    <p-button
+                                    <!-- <p-button
                                         icon="pi pi-shopping-cart"
                                         [disabled]="
-                                            produit.inventoryStatus ===
+                                            produit.statut ===
                                             'OUTOFSTOCK'
                                         "
-                                    ></p-button>
+                                    ></p-button> -->
                                 </div>
                             </div>
                         </div>
