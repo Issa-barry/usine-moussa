@@ -29,6 +29,8 @@ const routes: Routes = [
             { path: 'facturation', loadChildren: () => import('./demo/components/facturation/facturation.module').then(m => m.FacturationModule) },
             { path: 'parametre', loadChildren: () => import('./demo/components/parametre/parametre.module').then(m => m.ParametreModule) },
             { path: 'stock', loadChildren: () => import('./demo/components/stock/stock.module').then(m => m.StockModule) },
+            { path: 'ventes', loadChildren: () => import('./demo/components/ventes/ventes.module').then(m => m.VentesModule) },
+
 
         ]
     },

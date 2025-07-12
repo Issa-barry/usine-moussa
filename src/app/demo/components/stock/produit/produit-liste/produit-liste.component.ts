@@ -3,19 +3,22 @@ import { Router } from '@angular/router';
 import { SelectItem } from 'primeng/api';
 import { DataView } from 'primeng/dataview';
 import { Product } from 'src/app/demo/api/product';
+import { Produit } from 'src/app/demo/models/produit.model';
 import { ProductService } from 'src/app/demo/service/product.service';
+import { ProduitService } from 'src/app/demo/service/produit/produit.service';
+
+
 
 @Component({
   selector: 'app-produit-liste',
   templateUrl: './produit-liste.component.html',
-  styleUrl: './produit-liste.component.scss',
-   // standalone: true,
-  // imports: [],
+  styleUrls: ['./produit-liste.component.scss'],
 })
 export class ProduitListeComponent implements OnInit {
-
   
       products: Product[] = [];
+
+        produits: Produit[] = [];
   
       sortOptions: SelectItem[] = [];
   
@@ -29,9 +32,11 @@ export class ProduitListeComponent implements OnInit {
   
       orderCities: any[] = [];
   
-      constructor(private productService: ProductService, private router: Router) { }
+      constructor(private productService: ProductService, private router: Router, private produitServiceApi: ProduitService,) { }
   
       ngOnInit() {
+        this.loadProduits();
+
           this.productService.getProducts().then(data => this.products = data);
   
           this.sourceCities = [
@@ -60,6 +65,20 @@ export class ProduitListeComponent implements OnInit {
           ];
       }
   
+    //   IBA
+    loadProduits(): void {
+    this.produitServiceApi.getProduits().subscribe({
+      next: (data) => {
+        this.produits = data;
+        console.log('Produits chargés avec succès :', data);
+      },
+      error: (err) => {
+        console.error('Erreur lors du chargement des produits :', err);
+      }
+    });
+  }
+
+      ////////////////////////////////
       onSortChange(event: any) {
           const value = event.value;
   
@@ -89,17 +108,14 @@ export class ProduitListeComponent implements OnInit {
     }
 
     goTonewProduit() {
-        this.router.navigate(['/dashboard/stock/produit/produit-new']);
+        this.router.navigate(['/stock/produit/new']);
     }
 
-    onGoToProductDetail(product: Product) {
-        this.router.navigate(['/dashboard/stock/produit/produit-detail']);
-                // this.router.navigate(['/dashboard/stock/produit/produit-detail', product.id]);
-
+    onGoToProductEdit(product: Product) {
+        this.router.navigate(['/stock/produit/edit', product.id]);
     }
 
     onGoProductDetail(product: Product) {
-        this.router.navigate(['/dashboard/stock/produit', product.id]);
+        this.router.navigate(['/stock/produit', product.id]);
     }
-
 }
