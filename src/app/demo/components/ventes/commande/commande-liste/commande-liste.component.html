@@ -85,7 +85,7 @@
                             Prix <p-sortIcon field="price"></p-sortIcon>
                         </th>
                         <th pSortableColumn="category">
-                            Catégorie <p-sortIcon field="category"></p-sortIcon>
+                            Qté <p-sortIcon field="category"></p-sortIcon>
                         </th>
                         <th pSortableColumn="inventoryStatus">
                             Statut
@@ -127,7 +127,7 @@
                         </td>
                         <td style="width: 14%; min-width: 10rem">
                             <span class="p-column-title">Produit</span>
-                            {{ commande.lignes[0].produit.nom }}
+                            {{ commande.qte_total}}
                         </td>
 
                         <td style="width: 14%; min-width: 10rem">
@@ -197,6 +197,8 @@
       <div>{{ selectedCommande?.created_at | date:'medium' }}</div>
     </div>
 
+   <hr/>
+
     <div class="formgrid grid mb-4">
       <div class="field col">
         <label><strong>Total commande :</strong></label>
@@ -208,6 +210,8 @@
       </div>
     </div>
 
+   <hr/>
+   
     <div class="field">
       <label><strong>Produits commandés :</strong></label>
       <p-table
