@@ -6,6 +6,8 @@ import { Table } from 'primeng/table';
 import { Router } from '@angular/router';
 import { SelectItem } from 'primeng/api';
 import { CountryService } from 'src/app/demo/service/country.service';
+ import { CommandeService } from 'src/app/demo/service/ventes/commande/commande.service';
+import { Commande } from 'src/app/demo/models/commande.model';
 
 @Component({
   selector: 'app-commande-liste',
@@ -14,6 +16,14 @@ import { CountryService } from 'src/app/demo/service/country.service';
     providers: [MessageService, ConfirmationService]
 })
 export class CommandeListeComponent implements OnInit {
+    // iba
+    commandes : Commande[] = [];
+    selectedCommande: any = null;
+commandeDetailDialog: boolean = false;
+    loading = false;
+
+
+    // autre
 
     productDialog: boolean = false; 
 
@@ -35,7 +45,14 @@ export class CommandeListeComponent implements OnInit {
 
     rowsPerPageOptions = [5, 10, 20]; 
 
-    constructor( private countryService: CountryService,private router: Router, private productService: ProductService, private messageService: MessageService, private confirmationService: ConfirmationService) { }
+    constructor( 
+        private countryService: CountryService,
+        private router: Router, 
+        private productService: ProductService, 
+        private messageService: MessageService, 
+        private confirmationService: ConfirmationService,
+        private commandeService: CommandeService
+    ) { }
 
     ngOnInit() {
         this.productService.getProducts().then(data => this.products = data);
@@ -72,8 +89,35 @@ export class CommandeListeComponent implements OnInit {
             { name: 'Option 2', value: 2 },
             { name: 'Option 3', value: 3 }
         ];
-    }
 
+        this.getAllCommandes()
+    }
+//IBA
+
+  getAllCommandes(): void {
+    this.loading = true;
+    this.commandeService.getAllCommandes().subscribe({
+      next: (res) => {
+        this.commandes = res;
+        this.loading = false;  
+        console.log(this.commandes);
+        
+      },
+      error: (err) => {
+        console.error('Erreur lors de la récupération des contacts:', err);
+        this.loading = false;
+      }
+    });
+  }
+
+ viewCommande(commande: any) {
+  this.selectedCommande = commande;
+  this.commandeDetailDialog = true;
+}
+
+
+
+    //
     openNew() {
         this.product = {};
         this.submitted = false;
@@ -169,7 +213,7 @@ export class CommandeListeComponent implements OnInit {
       onGoToEditCommande() {
         this.router.navigate(['/dashboard/ventes/commande/commande-edit']);
     }
-
+ 
     countries: any[] = [];
 
     filteredCountries: any[] = [];

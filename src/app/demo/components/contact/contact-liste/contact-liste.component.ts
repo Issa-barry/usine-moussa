@@ -17,7 +17,7 @@ import { Statut } from 'src/app/demo/enums/statut.enum';
 })
 export class ContactListeComponent implements OnInit {
   contacts: Contact[] = [];
-  contact: Contact = new Contact();
+  contact: Contact = new Contact(); 
   roles: Role[] = [];
   optionPays = [
     { label: 'GUINEE-CONAKRY', value: 'Guinée-Conakry' },
