@@ -269,7 +269,7 @@ export class ContactDetailComponent implements OnInit, OnDestroy {
             icon: 'pi pi-exclamation-triangle',
             acceptLabel: 'Oui',
             rejectLabel: 'Non',
-            acceptButtonStyleClass: 'p-button-danger',
+            acceptButtonStyleClass: 'p-button-danger', 
             rejectButtonStyleClass: 'p-button-secondary',
             accept: () => this.affecterAgence(true),
             reject: () => this.showMessage('info', 'Annulation', "L'affectation a été annulée.")

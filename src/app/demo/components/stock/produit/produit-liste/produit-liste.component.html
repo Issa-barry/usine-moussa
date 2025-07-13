@@ -1,28 +1,36 @@
 <div class="grid">
     <div class="col-12">
         <div class="card">
-            <p-toolbar styleClass="mb-4">
+            <p-toolbar class="mb-4">
                 <ng-template pTemplate="left">
-                    <div class="my-2">
-                        <button
-                            pButton
-                            pRipple
-                            label="nouveau"
-                            icon="pi pi-plus"
-                            class="p-button-success mr-2"
-                            (click)="goToNewProduit()"
-                        ></button>
-                    </div>
-                </ng-template>
-
-                <ng-template pTemplate="right">
-                    <!-- <p-fileUpload mode="basic" accept="image/*" [maxFileSize]="1000000" label="Import" chooseLabel="Import" class="mr-2 inline-block"></p-fileUpload> -->
-                    <!-- <button pButton pRipple label="Export" icon="pi pi-upload" class="p-button-help" (click)="dt.exportCSV()"></button> -->
+                    <button
+                        pButton
+                        pRipple
+                        label="Nouveau"
+                        icon="pi pi-plus"
+                        class="p-button-success"
+                        (click)="goToNewProduit()"
+                    ></button>
                 </ng-template>
             </p-toolbar>
 
-            <h5>Liste des produits</h5>
+            <h5 class="mb-3">Liste des produits</h5>
+
+            <!-- Chargement Skeleton -->
+            <div *ngIf="isLoading" class="grid">
+                <div class="col-12 md:col-4" *ngFor="let _ of [1,2,3,4,5,6]">
+                    <div class="card m-3 border-1 surface-border">
+                        <p-skeleton height="150px" class="w-full mb-3"></p-skeleton>
+                        <p-skeleton height="1.5rem" class="mb-2 w-8"></p-skeleton>
+                        <p-skeleton height="1rem" class="mb-2 w-6"></p-skeleton>
+                        <p-skeleton height="1rem" class="w-4"></p-skeleton>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Affichage produits -->
             <p-dataView
+                *ngIf="!isLoading"
                 #dv
                 [value]="produits"
                 [paginator]="true"
@@ -33,12 +41,10 @@
                 layout="grid"
             >
                 <ng-template pTemplate="header">
-                    <div
-                        class="flex flex-column md:flex-row md:justify-content-between gap-2 "
-                    >
+                    <div class="flex flex-column md:flex-row md:justify-content-between gap-2">
                         <p-dropdown
                             [options]="sortOptions"
-                            placeholder="Sort By Price"
+                            placeholder="Trier par prix"
                             (onChange)="onSortChange($event)"
                         ></p-dropdown>
                         <span class="p-input-icon-left">
@@ -54,67 +60,41 @@
                     </div>
                 </ng-template>
 
-                <ng-template let-produits pTemplate="listItem">
-                    <div class="grid grid-nogutter ">
-                        <div class="col-12" *ngFor="let produit of produits"  (click)="onGoProductDetail(produit)">
-                            <div
-                                class="flex flex-column md:flex-row align-items-center p-3 w-full"
-                            >
+                <!-- Vue liste -->
+                <ng-template pTemplate="listItem" let-produits>
+                    <div class="grid grid-nogutter">
+                        <div
+                            class="col-12"
+                            *ngFor="let produit of produits"
+                            (click)="onGoProductDetail(produit)"
+                        >
+                            <div class="flex flex-column md:flex-row align-items-center p-3 w-full">
                                 <img
-                                    [src]="
-                                        'assets/demo/images/product/' +
-                                        produit.image
-                                    "
+                                    [src]="'assets/demo/images/product/' + produit.image"
                                     [alt]="produit.nom"
                                     class="my-4 md:my-0 w-9 md:w-10rem shadow-2 mr-5"
-                                      style="max-width: 50px; max-height: 80px; object-fit: cover"
+                                    style="max-width: 50px; max-height: 80px; object-fit: cover"
                                 />
-                                <div
-                                    class="cursor-pointer flex-1 flex flex-column align-items-center text-center md:text-left"
-                                >
-                                    <div class="font-bold text-2xl">
-                                        {{ produit.nom }}
-                                    </div>
-                                    <div class="mb-2">
-                                       Stock : {{ produit.quantite_stock }}
-                                    </div>
+                                <div class="flex-1 flex flex-column align-items-center text-center md:text-left cursor-pointer">
+                                    <div class="font-bold text-2xl">{{ produit.nom }}</div>
+                                    <div class="mb-2">Stock : {{ produit.quantite_stock }}</div>
                                     <div class="flex align-items-center mt-2">
                                         <i class="pi pi-tag mr-2"></i>
-                                        <span class="font-semibold">{{
-                                            produit.categorie
-                                        }}</span>
+                                        <span class="font-semibold">{{ produit.categorie }}</span>
                                     </div>
                                 </div>
-                                <div
-                                    class="flex flex-row md:flex-column justify-content-between w-full md:w-auto align-items-center md:align-items-end mt-5 md:mt-0"
-                                >
-                                    <span
-                                        class="text-2xl font-semibold mb-2 align-self-center md:align-self-end"
-                                        >{{ produit.prix_vente }} GNF</span
-                                    >
-                                    <!-- <p-button
-                                        icon="pi pi-shopping-cart"
-                                        label="Add to Cart"
-                                        [disabled]="
-                                            produit.statut ===
-                                            'OUTOFSTOCK'
-                                        "
-                                        styleClass="mb-2 p-button-sm"
-                                    ></p-button> -->
-                                     <!-- <span
-                                        [class]="
-                                            'product-badge status-' +
-                                            produit.statut
-                                        "
-                                        >{{ produit.statut }}</span
-                                    >  -->
+                                <div class="flex flex-row md:flex-column justify-content-between w-full md:w-auto align-items-center md:align-items-end mt-5 md:mt-0">
+                                    <span class="text-2xl font-semibold">
+                                        {{ produit.prix_vente }} GNF
+                                    </span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </ng-template>
 
-                <ng-template let-produits pTemplate="gridItem">
+                <!-- Vue grille -->
+                <ng-template pTemplate="gridItem" let-produits>
                     <div class="grid grid-nogutter">
                         <div
                             class="col-12 md:col-4 cursor-pointer"
@@ -122,55 +102,26 @@
                             (click)="onGoProductDetail(produit)"
                         >
                             <div class="card m-3 border-1 surface-border">
-                                <div
-                                    class="flex flex-wrap gap-2 align-items-center justify-content-between mb-2"
-                                >
+                                <div class="flex justify-content-between align-items-center mb-2">
                                     <div class="flex align-items-center">
                                         <i class="pi pi-tag mr-2"></i>
-                                        <span class="font-semibold">Catégorie: {{
-                                            produit.categorie
-                                        }}</span>
+                                        <span class="font-semibold">Catégorie: {{ produit.categorie }}</span>
                                     </div>
-                                    <!-- <span
-                                        [class]="
-                                            'product-badge status-' +
-                                            produit.statut 
-                                        "
-                                        >{{ produit.statut }}</span
-                                    > -->
                                 </div>
-                                <div
-                                    class="flex flex-column align-items-center text-center mb-3"
-                                >
+                                <div class="flex flex-column align-items-center text-center mb-3">
                                     <img
-                                        [src]="
-                                            'assets/demo/images/product/' +
-                                            produit.image
-                                        "
+                                        [src]="'assets/demo/images/product/' + produit.image"
                                         [alt]="produit.nom"
                                         class="w-9 shadow-2 my-3 mx-0"
-                                          style="max-width: 100px; max-height: 120px; object-fit: cover"
+                                        style="max-width: 100px; max-height: 120px; object-fit: cover"
                                     />
-                                    <div class="text-2xl font-bold">
-                                        {{ produit.nom }}
-                                    </div>
-                                    <div class="mb-3">
-                                        Stock : {{ produit.quantite_stock }}
-                                    </div>
+                                    <div class="text-2xl font-bold">{{ produit.nom }}</div>
+                                    <div class="mb-3">Stock : {{ produit.quantite_stock }}</div>
                                 </div>
-                                <div
-                                    class="flex align-items-center justify-content-between"
-                                >
-                                    <span class="text-2xl font-semibold"
-                                        >Prix : {{ produit.prix_vente }} GNF</span
-                                    >
-                                    <!-- <p-button
-                                        icon="pi pi-shopping-cart"
-                                        [disabled]="
-                                            produit.statut ===
-                                            'OUTOFSTOCK'
-                                        "
-                                    ></p-button> -->
+                                <div class="flex justify-content-between align-items-center">
+                                    <span class="text-2xl font-semibold">
+                                        Prix : {{ produit.prix_vente }} GNF
+                                    </span>
                                 </div>
                             </div>
                         </div>

@@ -15,6 +15,7 @@ import { ProduitDetailRoutingModule } from './produit-detail-routing.module';
 import { ProduitDetailComponent } from './produit-detail.component';
 import { ToastModule } from 'primeng/toast';
 import { SkeletonModule } from 'primeng/skeleton';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 
 @NgModule({
@@ -36,7 +37,9 @@ import { SkeletonModule } from 'primeng/skeleton';
         EditorModule,
         ToolbarModule,
         ToastModule,
-        SkeletonModule
+        SkeletonModule,
+        ConfirmDialogModule
+        
   ]
 })
 export class ProduitDetailModule { }

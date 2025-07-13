@@ -42,8 +42,10 @@ export class ProduitDetailComponent implements OnInit {
                 this.produit = data;
                 this.isLoading = false;
             },
-            error: (err) =>
+            error: (err) => {
                 console.error('Erreur lors de la récupération du produit', err),
+                    (this.isLoading = false);
+            },
         });
     }
 
@@ -102,15 +104,43 @@ export class ProduitDetailComponent implements OnInit {
 
         this.produitService.deleteProduit(this.produit.id).subscribe({
             next: () => {
-                console.log('Produit supprimé');
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Suppression réussie',
+                    detail: 'Le produit a été supprimé.',
+                    life: 3000,
+                });
+
                 this.router.navigate([
                     '/dashboard/stock/produit/produit-liste',
                 ]);
             },
-            error: (err) =>
-                console.error('Erreur lors de la suppression du produit', err),
+            error: (err) => {
+                console.error('Erreur lors de la suppression du produit', err);
+
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Erreur',
+                    detail: 'Impossible de supprimer le produit.',
+                });
+            },
         });
     }
+
+confirmDeleteProduit(): void {
+  this.confirmationService.confirm({
+    message: 'Voulez-vous vraiment supprimer ce produit ?',
+    header: 'Confirmation',
+    icon: 'pi pi-exclamation-triangle',
+    acceptLabel: 'Oui',
+    rejectLabel: 'Non',
+    acceptButtonStyleClass: 'p-button-danger',
+    accept: () => {
+      this.onDeleteProduit();
+    },
+  });
+}
+
 
     onGoToProduits(): void {
         this.router.navigate(['/dashboard/stock/produit/produit-liste']);

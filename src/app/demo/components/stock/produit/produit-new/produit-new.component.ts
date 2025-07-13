@@ -45,28 +45,33 @@ onUpload(event: any) {
     this.produit.image = '';
   }
 
- saveProduit() {
+saveProduit() {
   this.submitted = true;
   this.apiErrors = {};
   this.errorMessage = '';
 
   this.produitService.createProduit(this.produit).subscribe({
-    next: (res) => {
-      console.log('Produit enregistré avec succès', res);
-      this.router.navigate(['/dashboard/stock/produit/produit-liste']);
-    },
+    next: (produit: Produit) => {
+  const newId = produit.id;
+  if (newId) {
+    this.router.navigate(['/dashboard/stock/produit/produit-detail', newId]);
+  } else {
+    this.router.navigate(['/dashboard/stock/produit/produit-liste']);
+  }
+}
+,
     error: (err) => {
-      console.log('Erreur lors de la création du produit', err.error.data);
+      console.log('Erreur lors de la création du produit', err.error?.data);
 
       if (err.error && err.error.data) {
-        this.apiErrors = err.error.data; // ✅ important : c'est `data` ici
+        this.apiErrors = err.error.data;
       }
 
       this.errorMessage = err.error?.message || 'Une erreur est survenue.';
     },
   });
 }
- 
+
 
 
   onGoToProduits() {

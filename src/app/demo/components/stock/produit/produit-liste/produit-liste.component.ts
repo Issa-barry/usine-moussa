@@ -17,6 +17,7 @@ export class ProduitListeComponent implements OnInit {
   sortOptions: SelectItem[] = [];
   sortOrder: number = 0;
   sortField: string = '';
+  isLoading = true;
 
   productDialog: boolean = false;
   submitted: boolean = false;
@@ -34,9 +35,14 @@ export class ProduitListeComponent implements OnInit {
 
   private fetchProduits(): void {
     this.produitService.getProduits().subscribe({
-      next: (produits) => (this.produits = produits),
-      error: (err) =>
+      next: (produits) => {
+        this.produits = produits;
+        this.isLoading=false;
+      },
+      error: (err) =>{
         console.error('Erreur lors du chargement des produits :', err),
+      this.isLoading = false;
+    }
     });
   }
 

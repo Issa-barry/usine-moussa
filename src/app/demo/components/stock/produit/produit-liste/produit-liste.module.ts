@@ -12,6 +12,7 @@ import { ToolbarModule } from 'primeng/toolbar';
 
 import { ProduitListeRoutingModule } from './produit-liste-routing.module';
 import { ProduitListeComponent } from './produit-liste.component';
+import { SkeletonModule } from 'primeng/skeleton';
 
 
 @NgModule({
@@ -30,6 +31,7 @@ import { ProduitListeComponent } from './produit-liste.component';
         RatingModule,
         ButtonModule,
         ToolbarModule,
+        SkeletonModule
   ]
 })
 export class ProduitListeModule { }
