@@ -1,0 +1,209 @@
+<div class="card">
+    <div class="grid grid-nogutter">
+        <div class="col-12 px-4 mt-4 md:mt-6 md:px-6">
+            <span class="text-900 block font-bold text-xl"
+                >Créer une commande</span
+            >
+        </div>
+
+        <div class="col-12 lg:col-6 h-full px-4 py-4 md:px-6">
+            <!-- Étapes -->
+            <ul class="flex list-none flex-wrap p-0 mb-6">
+                <li class="flex align-items-center text-primary mr-2">
+                    Nouveau
+                    <i class="pi pi-chevron-right text-500 text-xs ml-2"></i>
+                </li>
+                <li class="flex align-items-center text-500 mr-2">
+                    Livraison en cours
+                    <i class="pi pi-chevron-right text-500 text-xs ml-2"></i>
+                </li>
+                <li class="flex align-items-center text-500 mr-2">
+                    Facturation
+                    <i class="pi pi-chevron-right text-500 text-xs ml-2"></i>
+                </li>
+                <li class="flex align-items-center text-500 mr-2">Clôturé</li>
+            </ul>
+
+            <div class="grid formgrid">
+                <!-- produit -->
+
+                <div class="col-12 field mb-4">
+                    <span class="text-800 text-m block font-normal mb-3"
+                        >Produit</span
+                    >
+                    <p-multiSelect
+                        [options]="countries"
+                        [(ngModel)]="selectedMulti"
+                        placeholder="Sélectionner un ou plusieurs pays"
+                        optionLabel="name"
+                        display="chip"
+                        styleClass="w-full"
+                    >
+                        <ng-template let-country pTemplate="item">
+                            <div class="flex align-items-center">
+                                <img
+                                    src="assets/demo/images/flag/flag_placeholder.png"
+                                    [class]="
+                                        'flag flag-' +
+                                        country.code.toLowerCase()
+                                    "
+                                    style="width: 21px"
+                                />
+                                <span class="ml-2">{{ country.name }}</span>
+                            </div>
+                        </ng-template>
+                    </p-multiSelect>
+                </div>
+                <!-- client -->
+                <div class="col-12 field mb-4">
+                    <span class="text-800 text-m block font-normal mb-3"
+                        >Client</span
+                    >
+                    <p-dropdown
+                        [options]="clients"
+                        [(ngModel)]="selectedClient"
+                        optionLabel="nom"
+                        placeholder="Sélectionner un client"
+                        [filter]="true"
+                        filterBy="nom telephone"
+                        [showClear]="true"
+                        styleClass="w-full"
+                    >
+                        <ng-template let-client pTemplate="selectedItem">
+                            <div *ngIf="client" class="flex flex-column">
+                                <div class="font-medium">{{ client.nom }}</div>
+                                <small class="text-500">{{
+                                    client.telephone
+                                }}</small>
+                            </div>
+                        </ng-template>
+                        <ng-template let-client pTemplate="item">
+                            <div class="flex flex-column">
+                                <div class="font-medium">{{ client.nom }}</div>
+                                <small class="text-500">{{
+                                    client.telephone
+                                }}</small>
+                            </div>
+                        </ng-template>
+                    </p-dropdown>
+                </div>
+
+                <!-- Livreur -->
+                <div class="col-12 field mb-4">
+                    <span class="text-800 text-m block font-normal mb-3"
+                        >Livreur</span
+                    >
+                    <p-dropdown
+                        [options]="livreurs"
+                        [(ngModel)]="selectedLivreur"
+                        optionLabel="nom"
+                        placeholder="Sélectionner un livreur"
+                        [filter]="true"
+                        filterBy="nom telephone"
+                        [showClear]="true"
+                        styleClass="w-full"
+                    >
+                        <ng-template let-person pTemplate="selectedItem">
+                            <div *ngIf="person" class="flex flex-column">
+                                <div class="font-medium">{{ person.nom }}</div>
+                                <small class="text-500">{{
+                                    person.telephone
+                                }}</small>
+                            </div>
+                        </ng-template>
+                        <ng-template let-person pTemplate="item">
+                            <div class="flex flex-column">
+                                <div class="font-medium">{{ person.nom }}</div>
+                                <small class="text-500">{{
+                                    person.telephone
+                                }}</small>
+                            </div>
+                        </ng-template>
+                    </p-dropdown>
+                </div>
+
+                <!-- Dépôt -->
+                <div class="col-12 field mb-4">
+                    <span class="text-800 text-m block font-normal mb-3"
+                        >Dépôt</span
+                    >
+                    <p-dropdown
+                        [options]="depots"
+                        [(ngModel)]="selectedDepot"
+                        optionLabel="nom"
+                        placeholder="Sélectionner un dépôt"
+                        [filter]="true"
+                        filterBy="nom telephone"
+                        [showClear]="true"
+                        styleClass="w-full"
+                    >
+                        <ng-template let-person pTemplate="selectedItem">
+                            <div *ngIf="person" class="flex flex-column">
+                                <div class="font-medium">{{ person.nom }}</div>
+                                <small class="text-500">{{
+                                    person.telephone
+                                }}</small>
+                            </div>
+                        </ng-template>
+                        <ng-template let-person pTemplate="item">
+                            <div class="flex flex-column">
+                                <div class="font-medium">{{ person.nom }}</div>
+                                <small class="text-500">{{
+                                    person.telephone
+                                }}</small>
+                            </div>
+                        </ng-template>
+                    </p-dropdown>
+                </div>
+
+                <!-- Total + Qté -->
+                <div class="col-12 lg:col-6 mb-4">
+                    <span class="text-800 text-m block font-normal mb-3"
+                        >Total</span
+                    >
+                    <p-inputNumber
+                        [(ngModel)]="total"
+                        placeholder="Prix :"
+                        mode="currency"
+                        currency="USD"
+                        locale="en-US"
+                        class="w-full"
+                    ></p-inputNumber>
+                </div>
+
+                <div class="col-12 lg:col-6 field mb-4">
+                    <span class="text-800 text-m block font-normal mb-3"
+                        >Qté</span
+                    >
+                    <input
+                        type="number"
+                        [(ngModel)]="quantite"
+                        placeholder="Qté : 5"
+                        class="p-inputtext w-full"
+                    />
+                </div>
+
+                <!-- Boutons -->
+                <div
+                    class="col-12 flex flex-column lg:flex-row justify-content-center align-items-center lg:justify-content-end my-6"
+                >
+                    <button
+                        pButton
+                        pRipple
+                        class="p-button-secondary p-button-outlined mt-3 lg:mt-0 w-full lg:w-auto flex-order-2 lg:flex-order-1 lg:mr-4"
+                        label="Annuler"
+                        icon="pi pi-fw pi-arrow-left"
+                        (click)="onGoToListeCommande()"
+                    ></button>
+                    <button
+                        pButton
+                        pRipple
+                        class="p-button-primary w-full lg:w-auto flex-order-1 lg:flex-order-2"
+                        label="Valider la commande"
+                        icon="pi pi-fw pi-check"
+                    ></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

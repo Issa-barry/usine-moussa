@@ -31,11 +31,17 @@ export class AppMenuComponent implements OnInit {
                 label: 'MENU',
                 icon: 'pi pi-fw pi-star-fill',
                 items: [
-                    {
-                        label: 'Transfert',
-                        icon: 'pi pi-fw pi-arrow-right-arrow-left',
-                        routerLink: ['/dashboard/transfert']
+                     {
+                        label: 'Ventes',
+                        icon: 'pi pi-fw pi-map-marker',
+                        routerLink: ['/dashboard/ventes']
                     },
+                     {
+                        label: 'Stock',
+                        icon: 'pi pi-fw pi-map-marker',
+                        routerLink: ['/dashboard/stock']
+                    },
+                     
                     {
                         label: 'Contact',
                         icon: 'pi pi-fw pi-users',

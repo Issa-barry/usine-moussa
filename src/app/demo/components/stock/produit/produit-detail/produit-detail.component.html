@@ -1,0 +1,245 @@
+<div class="card">
+    <p-toast></p-toast>
+    <p-confirmDialog></p-confirmDialog>
+    <span class="block text-900 font-bold text-xl mb-4">{{ pageTitle }}</span>
+
+    <p-toolbar styleClass="mb-4">
+        <ng-template pTemplate="left">
+            <button
+                *ngIf="!isEditMode"
+                pButton
+                pRipple
+                label="Modifier"
+                icon="pi pi-pencil"
+                class="p-button mr-2"
+                (click)="enableEditMode()"
+            ></button>
+        </ng-template>
+
+        <ng-template pTemplate="right">
+            <button
+                *ngIf="!isEditMode"
+                pButton
+                pRipple
+                label="Retour"
+                icon="pi pi-arrow-left"
+                class="p-button-outlined p-button-secondary mr-2"
+                (click)="onGoToProduits()"
+            ></button>
+            <button
+                *ngIf="!isEditMode"
+                pButton
+                pRipple
+                label="Supprimer"
+                icon="pi pi-trash"
+                class="p-button-danger p-button-outlined"
+                (click)="confirmDeleteProduit()"
+            ></button>
+        </ng-template>
+    </p-toolbar>
+
+    <div class="grid grid-nogutter flex-wrap gap-3 p-fluid">
+        <!-- FORMULAIRE GAUCHE -->
+        <div class="col-12 lg:col-8">
+            <div class="grid formgrid">
+                <!-- NOM -->
+                <div class="col-12 field">
+                    <label class="font-medium text-900">Nom du produit</label>
+                    <ng-container *ngIf="!isLoading; else skeletonNom">
+                        <input
+                            pInputText
+                            [(ngModel)]="produit.nom"
+                            [readonly]="!isEditMode"
+                            [ngClass]="{
+                                'ng-invalid ng-dirty':
+                                    submitted &&
+                                    (!produit.nom || apiErrors['nom']),
+                                'field-disabled': !isEditMode, 
+                            }"
+                        />
+                        <small class="p-error" *ngIf="apiErrors['nom']">
+                            {{ apiErrors["nom"][0] }}
+                        </small>
+                    </ng-container>
+                    <ng-template #skeletonNom>
+                        <p-skeleton height="2rem" class="w-full"></p-skeleton>
+                    </ng-template>
+                </div>
+
+                <!-- PRIX VENTE -->
+                <div class="col-12 lg:col-6 field">
+                    <label class="font-medium text-900">Prix de vente</label>
+                    <ng-container *ngIf="!isLoading; else skeletonPrixVente">
+                        <input
+                            pInputText
+                            type="number"
+                            [(ngModel)]="produit.prix_vente"
+                            [readonly]="!isEditMode"
+                            [ngClass]="{
+                                'ng-invalid ng-dirty':
+                                    submitted && apiErrors['prix_vente'],
+                                'field-disabled': !isEditMode
+                            }"
+                        />
+                        <small class="p-error" *ngIf="apiErrors['prix_vente']">
+                            {{ apiErrors["prix_vente"][0] }}
+                        </small>
+                    </ng-container>
+                    <ng-template #skeletonPrixVente>
+                        <p-skeleton height="2rem" class="w-full"></p-skeleton>
+                    </ng-template>
+                </div>
+
+                <!-- PRIX ACHAT -->
+                <div class="col-12 lg:col-6 field">
+                    <label class="font-medium text-900">Prix d'achat</label>
+                    <ng-container *ngIf="!isLoading; else skeletonPrixAchat">
+                        <input
+                            pInputText
+                            type="number"
+                            [(ngModel)]="produit.prix_achat"
+                            [readonly]="!isEditMode"
+                            [ngClass]="{
+                                'ng-invalid ng-dirty':
+                                    submitted && apiErrors['prix_achat'],
+                                'field-disabled': !isEditMode
+                            }"
+                        />
+                        <small class="p-error" *ngIf="apiErrors['prix_achat']">
+                            {{ apiErrors["prix_achat"][0] }}
+                        </small>
+                    </ng-container>
+                    <ng-template #skeletonPrixAchat>
+                        <p-skeleton height="2rem" class="w-full"></p-skeleton>
+                    </ng-template>
+                </div>
+
+                <!-- QUANTITÉ -->
+                <div class="col-12 lg:col-6 field">
+                    <label class="font-medium text-900"
+                        >Quantité en stock</label
+                    >
+                    <ng-container *ngIf="!isLoading; else skeletonStock">
+                        <input
+                            pInputText
+                            type="number"
+                            [(ngModel)]="produit.quantite_stock"
+                            [readonly]="!isEditMode"
+                            [ngClass]="{
+                                'ng-invalid ng-dirty':
+                                    submitted && apiErrors['quantite_stock'],
+                                'field-disabled': !isEditMode
+                            }"
+                        />
+                        <small
+                            class="p-error"
+                            *ngIf="apiErrors['quantite_stock']"
+                        >
+                            {{ apiErrors["quantite_stock"][0] }}
+                        </small>
+                    </ng-container>
+                    <ng-template #skeletonStock>
+                        <p-skeleton height="2rem" class="w-full"></p-skeleton>
+                    </ng-template>
+                </div>
+
+                <!-- COÛT -->
+                <div class="col-12 lg:col-6 field">
+                    <label class="font-medium text-900">Coût</label>
+                    <ng-container *ngIf="!isLoading; else skeletonCout">
+                        <input
+                            pInputText
+                            type="number"
+                            [(ngModel)]="produit.cout"
+                            [readonly]="!isEditMode"
+                            [ngClass]="{
+                                'ng-invalid ng-dirty':
+                                    submitted && apiErrors['cout'],
+                                'field-disabled': !isEditMode
+                            }"
+                        />
+                        <small class="p-error" *ngIf="apiErrors['cout']">
+                            {{ apiErrors["cout"][0] }}
+                        </small>
+                    </ng-container>
+                    <ng-template #skeletonCout>
+                        <p-skeleton height="2rem" class="w-full"></p-skeleton>
+                    </ng-template>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORMULAIRE DROIT -->
+        <div
+            class="flex-1 w-full lg:w-3 xl:w-4 flex flex-column row-gap-3 mt-5"
+        >
+            <!-- CATÉGORIE -->
+            <div class="border-1 surface-border border-round">
+                <span
+                    class="text-900 font-bold block border-bottom-1 surface-border p-3"
+                    >Catégorie</span
+                >
+                <div class="p-3">
+                    <ng-container *ngIf="!isLoading; else skeletonCategorie">
+                        <p-dropdown
+                            [options]="categoryOptions"
+                            [(ngModel)]="produit.categorie"
+                            placeholder="Catégorie"
+                            [disabled]="!isEditMode"
+                            [ngClass]="{
+                                'ng-invalid ng-dirty':
+                                    submitted && apiErrors['categorie'],
+                                'field-disabled': !isEditMode
+                            }"
+                        ></p-dropdown>
+                        <small class="p-error" *ngIf="apiErrors['categorie']">
+                            {{ apiErrors["categorie"][0] }}
+                        </small>
+                    </ng-container>
+                    <ng-template #skeletonCategorie>
+                        <p-skeleton height="2rem" class="w-full"></p-skeleton>
+                    </ng-template>
+                </div>
+            </div>
+
+            <!-- STATUT -->
+            <div class="field">
+                <label class="font-medium text-900">Statut</label>
+                <ng-container *ngIf="!isLoading; else skeletonStatut">
+                    <input
+                        pInputText
+                        [(ngModel)]="produit.statut"
+                        readonly
+                        class="field-disabled"
+                    />
+                </ng-container>
+                <ng-template #skeletonStatut>
+                    <p-skeleton height="2rem" class="w-full"></p-skeleton>
+                </ng-template>
+            </div>
+
+            <!-- ACTIONS -->
+            <div
+                class="flex flex-column sm:flex-row justify-content-between align-items-center gap-3 py-2"
+                *ngIf="isEditMode"
+            >
+                <button
+                    pButton
+                    pRipple
+                    class="p-button-secondary p-button-outlined flex-1"
+                    label="Annuler"
+                    icon="pi pi-times"
+                    (click)="cancelEditMode()"
+                ></button>
+                <button
+                    pButton
+                    pRipple
+                    class="p-button-primary flex-1"
+                    label="Enregistrer"
+                    icon="pi pi-check"
+                    (click)="onSaveProduit()"
+                ></button>
+            </div>
+        </div>
+    </div>
+</div>

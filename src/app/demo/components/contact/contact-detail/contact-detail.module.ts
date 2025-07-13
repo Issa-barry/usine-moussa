@@ -40,7 +40,8 @@ import { SkeletonModule } from 'primeng/skeleton';
         PasswordModule, 
         ToastModule, 
         ProgressSpinnerModule,
-        DialogModule,ConfirmDialogModule,
+        DialogModule,
+        ConfirmDialogModule,
         DividerModule,
         PanelModule,
         SkeletonModule

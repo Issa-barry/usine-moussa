@@ -28,6 +28,10 @@ const routes: Routes = [
             { path: 'transfert',data: { breadcrumb: 'Transfert' }, loadChildren: () => import('./demo/components/transfert/transfert.module').then(m => m.TransfertModule) },
             { path: 'facturation', loadChildren: () => import('./demo/components/facturation/facturation.module').then(m => m.FacturationModule) },
             { path: 'parametre', loadChildren: () => import('./demo/components/parametre/parametre.module').then(m => m.ParametreModule) },
+            { path: 'stock', loadChildren: () => import('./demo/components/stock/stock.module').then(m => m.StockModule) },
+            { path: 'ventes', loadChildren: () => import('./demo/components/ventes/ventes.module').then(m => m.VentesModule) },
+
+
         ]
     },
     { path: '', loadChildren: () => import('./demo/components/landing/landing.module').then(m => m.LandingModule) },
