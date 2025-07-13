@@ -11,6 +11,7 @@ import { InputSwitchModule } from 'primeng/inputswitch';
 import { EditorModule } from 'primeng/editor';
  import { ProduitNewRoutingModule } from './produit-new-routing.module';
 import { ProduitNewComponent } from './produit-new.component';
+import { ToastModule } from 'primeng/toast';
 
 
 @NgModule({
@@ -28,7 +29,8 @@ import { ProduitNewComponent } from './produit-new.component';
 		ButtonModule,
 		RippleModule,
 		InputSwitchModule,
-		EditorModule
+		EditorModule,
+    ToastModule
   ] 
 })
 export class ProduitNewModule { } 

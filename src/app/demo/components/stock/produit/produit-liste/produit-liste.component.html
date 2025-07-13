@@ -10,7 +10,7 @@
                             label="nouveau"
                             icon="pi pi-plus"
                             class="p-button-success mr-2"
-                            (click)="goTonewProduit()"
+                            (click)="goToNewProduit()"
                         ></button>
                     </div>
                 </ng-template>
@@ -34,7 +34,7 @@
             >
                 <ng-template pTemplate="header">
                     <div
-                        class="flex flex-column md:flex-row md:justify-content-between gap-2"
+                        class="flex flex-column md:flex-row md:justify-content-between gap-2 "
                     >
                         <p-dropdown
                             [options]="sortOptions"
@@ -46,7 +46,7 @@
                             <input
                                 type="search"
                                 pInputText
-                                placeholder="Search by Name"
+                                placeholder="Recherche"
                                 (input)="onFilter(dv, $event)"
                             />
                         </span>
@@ -55,8 +55,8 @@
                 </ng-template>
 
                 <ng-template let-produits pTemplate="listItem">
-                    <div class="grid grid-nogutter">
-                        <div class="col-12" *ngFor="let produit of produits">
+                    <div class="grid grid-nogutter ">
+                        <div class="col-12" *ngFor="let produit of produits"  (click)="onGoProductDetail(produit)">
                             <div
                                 class="flex flex-column md:flex-row align-items-center p-3 w-full"
                             >
@@ -67,9 +67,10 @@
                                     "
                                     [alt]="produit.nom"
                                     class="my-4 md:my-0 w-9 md:w-10rem shadow-2 mr-5"
+                                      style="max-width: 50px; max-height: 80px; object-fit: cover"
                                 />
                                 <div
-                                    class="flex-1 flex flex-column align-items-center text-center md:text-left"
+                                    class="cursor-pointer flex-1 flex flex-column align-items-center text-center md:text-left"
                                 >
                                     <div class="font-bold text-2xl">
                                         {{ produit.nom }}
@@ -118,7 +119,7 @@
                         <div
                             class="col-12 md:col-4 cursor-pointer"
                             *ngFor="let produit of produits"
-                            (click)="onGoToProductEdit(produit)"
+                            (click)="onGoProductDetail(produit)"
                         >
                             <div class="card m-3 border-1 surface-border">
                                 <div
@@ -148,6 +149,7 @@
                                         "
                                         [alt]="produit.nom"
                                         class="w-9 shadow-2 my-3 mx-0"
+                                          style="max-width: 100px; max-height: 120px; object-fit: cover"
                                     />
                                     <div class="text-2xl font-bold">
                                         {{ produit.nom }}

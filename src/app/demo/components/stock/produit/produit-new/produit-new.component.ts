@@ -26,11 +26,20 @@ errorMessage: string = '';
     private router: Router
   ) {}
 
-  onUpload(event: any) {
-    for (let file of event.files) {
-      this.produit.image = file.name;
-    }
+onUpload(event: any) {
+  const file: File = event.files[0];
+
+  if (file) {
+    this.produit.image = file.name;
+
+    // Optionnel : aperçu
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.produit['imagePreview'] = e.target.result;
+    };
+    reader.readAsDataURL(file);
   }
+}
 
   removeImage() {
     this.produit.image = '';
@@ -57,7 +66,7 @@ errorMessage: string = '';
     },
   });
 }
-
+ 
 
 
   onGoToProduits() {

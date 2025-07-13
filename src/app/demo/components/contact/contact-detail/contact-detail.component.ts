@@ -63,7 +63,7 @@ export class ContactDetailComponent implements OnInit, OnDestroy {
     constructor(
         private contactService: ContactService,
         private agenceService: AgenceService,
-        private roleService: RoleService,
+        private roleService: RoleService, 
         private messageService: MessageService,
         private confirmationService: ConfirmationService,
         private activatedRoute: ActivatedRoute,

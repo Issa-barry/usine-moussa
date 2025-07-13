@@ -12,9 +12,9 @@ const routes: Routes = [
             ),
     },
     { path: 'produit-new', loadChildren: () => import('./produit-new/produit-new.module').then(m => m.ProduitNewModule) },
-    { path: 'produit-detail', loadChildren: () => import('./produit-detail/produit-detail.module').then(m => m.ProduitDetailModule) },
-];
-
+    { path: 'produit-detail/:id', loadChildren: () => import('./produit-detail/produit-detail.module').then(m => m.ProduitDetailModule) },
+]; 
+ 
 @NgModule({
     imports: [RouterModule.forChild(routes)],
     exports: [RouterModule],

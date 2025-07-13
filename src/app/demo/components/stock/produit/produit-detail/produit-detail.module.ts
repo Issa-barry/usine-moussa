@@ -13,6 +13,8 @@ import { ToolbarModule } from 'primeng/toolbar';
 
 import { ProduitDetailRoutingModule } from './produit-detail-routing.module';
 import { ProduitDetailComponent } from './produit-detail.component';
+import { ToastModule } from 'primeng/toast';
+import { SkeletonModule } from 'primeng/skeleton';
 
 
 @NgModule({
@@ -33,6 +35,8 @@ import { ProduitDetailComponent } from './produit-detail.component';
         InputSwitchModule,
         EditorModule,
         ToolbarModule,
+        ToastModule,
+        SkeletonModule
   ]
 })
 export class ProduitDetailModule { }
