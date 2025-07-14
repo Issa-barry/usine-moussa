@@ -3,7 +3,7 @@ import { CommandeLigne } from './commande-ligne.model';
 import { Contact } from './contact';
  
 
-export interface Commande {
+export class Commande {
   id?: number;
   numero: string;
   contact_id: number;
@@ -13,4 +13,12 @@ export interface Commande {
   updated_at?: string;
   qte_total: number;
   reduction:number;
+
+  constructor(){
+      this.numero = '';
+      this.contact_id=0;
+      this.lignes=[];
+      this.qte_total=0;
+      this.reduction=0;
+  }
 }

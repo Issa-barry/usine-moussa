@@ -82,7 +82,7 @@ createCommande(commande: CreateCommandeDto): Observable<Commande> {
     .post<{ success: boolean; data: Commande }>(`${this.apiUrl}/create`, commande, httpOptions)
     .pipe(
       map((res) => res.data),
-      catchError(this.handleError)
+      // catchError(this.handleError)
     );
 }
 

@@ -6,6 +6,7 @@ import { ProduitService } from 'src/app/demo/service/produit/produit.service';
 import { Produit } from 'src/app/demo/models/produit.model';
 import { ContactService } from 'src/app/demo/service/contact/contact.service';
 import { Contact } from 'src/app/demo/models/contact';
+import { CreateCommandeDto } from 'src/app/demo/models/commande-create.dto';
 
 @Component({
   selector: 'app-commande-new',
@@ -21,11 +22,15 @@ export class CommandeNewComponent implements OnInit {
   }[] = [];
 
   reduction: number = 0;
-  totalCommande: number = 0;
+  totalCommande: number = 0; 
+  totalBrut: number = 0;
   selectedLivreur: Contact | null = null;
 
   produits: Produit[] = [];
   contacts: Contact[] = [];
+
+  errorMessage: string = '';
+  apiErrors: { [key: string]: string[] } = {};
 
   constructor(
     private router: Router,
@@ -46,7 +51,7 @@ export class CommandeNewComponent implements OnInit {
     this.contactService.getContacts().subscribe({
       next: (res) => {
         this.contacts = res;
-       },
+      },
       error: (err) => {
         console.error('Erreur lors de la récupération des contacts:', err);
       },
@@ -57,7 +62,7 @@ export class CommandeNewComponent implements OnInit {
     this.produitService.getProduits().subscribe({
       next: (data) => {
         this.produits = data;
-       },
+      },
       error: (err) => {
         this.messageService.add({
           severity: 'error',
@@ -91,6 +96,7 @@ export class CommandeNewComponent implements OnInit {
       const prix = ligne.prix_vente || 0;
       return total + quantite * prix;
     }, 0);
+    this.totalBrut = brut;
     this.totalCommande = brut - this.reduction;
   }
 
@@ -98,45 +104,54 @@ export class CommandeNewComponent implements OnInit {
     this.router.navigate(['/dashboard/ventes/commande']);
   }
 
-
   onSubmit(): void {
-    // if (!this.selectedLivreur || this.lignes.length === 0 || this.lignes.some(l => !l.produit)) {
-    //   this.messageService.add({
-    //     severity: 'warn',
-    //     summary: 'Champs requis',
-    //     detail: 'Veuillez remplir tous les champs obligatoires.',
-    //   });
-    //   return;
-    // }
+  this.errorMessage = '';
+  this.apiErrors = {};
 
-    // const lignesPayload = this.lignes.map(ligne => ({
-    //   produit_id: ligne.produit!.id,
-    //   quantite: ligne.quantite,
-    //   prix_vente: ligne.prix_vente
-    // }));
+  const lignesValides = this.lignes.filter(l => l.produit !== null);
 
-    // const payload = {
-    //   contact_id: this.selectedLivreur.id,
-    //   reduction: this.reduction,
-    //   lignes: lignesPayload
-    // };
+  // if (!this.selectedLivreur || lignesValides.length === 0) {
+  //   this.messageService.add({
+  //     severity: 'warn',
+  //     summary: 'Champs requis',
+  //     detail: 'Veuillez sélectionner un livreur et au moins un produit.'
+  //   });
+  //   return;
+  // }
 
-    // this.commandeService.createCommande(payload).subscribe({
-    //   next: () => {
-    //     this.messageService.add({
-    //       severity: 'success',
-    //       summary: 'Succès',
-    //       detail: 'Commande créée avec succès.'
-    //     });
-    //     this.router.navigate(['/dashboard/ventes/commande']);
-    //   },
-    //   error: (err) => {
-    //     this.messageService.add({
-    //       severity: 'error',
-    //       summary: 'Erreur',
-    //       detail: err.message
-    //     });
-    //   }
-    // });
-  }
+  const lignesPayload = lignesValides.map(ligne => ({
+    produit_id: ligne.produit!.id!,
+    quantite: ligne.quantite,
+    prix_vente: ligne.prix_vente
+  }));
+
+  const payload: CreateCommandeDto = {
+    contact_id: this.selectedLivreur!.id!,
+    reduction: this.reduction,
+    lignes: lignesPayload
+  };
+
+  this.commandeService.createCommande(payload).subscribe({
+    next: () => {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Succès',
+        detail: 'Commande créée avec succès.'
+      });
+      this.router.navigate(['/dashboard/ventes/commande']);
+    },
+    error: (err) => {
+      console.error('IBA ERREUR', err);
+
+      if (err.error && err.error.data) {
+        this.apiErrors = err.error.data;
+        console.log("mon iba", this.apiErrors);
+        
+      }
+ 
+      this.errorMessage = err.error?.message || 'Données invalides';
+    }
+  });
+}
+
 }

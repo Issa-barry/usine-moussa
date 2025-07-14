@@ -83,7 +83,7 @@ commandeDetailDialog: boolean = false;
         this.router.navigate(['/dashboard/ventes/commande/commande-new']);
     }
       onGoToDetailCommande(commande: Commande) {
-        this.router.navigate(['/dashboard/ventes/commande/commande-detail', commande.id]);
+        this.router.navigate(['/dashboard/ventes/commande/commande-detail', commande.numero]);
     }
  
 

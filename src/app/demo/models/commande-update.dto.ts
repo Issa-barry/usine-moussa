@@ -1,4 +1,4 @@
-export interface CreateCommandeDto {
+export interface UpdateCommandeDto {
   contact_id: number;
   reduction: number;
   lignes: {
