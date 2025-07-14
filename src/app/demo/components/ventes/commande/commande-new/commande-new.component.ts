@@ -46,8 +46,7 @@ export class CommandeNewComponent implements OnInit {
     this.contactService.getContacts().subscribe({
       next: (res) => {
         this.contacts = res;
-        console.log(this.contacts);
-      },
+       },
       error: (err) => {
         console.error('Erreur lors de la récupération des contacts:', err);
       },
@@ -58,8 +57,7 @@ export class CommandeNewComponent implements OnInit {
     this.produitService.getProduits().subscribe({
       next: (data) => {
         this.produits = data;
-        console.log(this.produits);
-      },
+       },
       error: (err) => {
         this.messageService.add({
           severity: 'error',
