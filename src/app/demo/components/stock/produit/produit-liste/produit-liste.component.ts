@@ -84,5 +84,5 @@ export class ProduitListeComponent implements OnInit {
 
   onGoProductDetail(produit: Produit): void {
     this.router.navigate(['/dashboard/stock/produit/produit-detail', produit.id]);
-  }
+  } 
 }

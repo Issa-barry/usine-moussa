@@ -1,6 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable, throwError } from 'rxjs';
+import { CreateCommandeDto } from 'src/app/demo/models/commande-create.dto';
 import { Commande } from 'src/app/demo/models/commande.model';
 import { environment } from 'src/environements/environment.dev';
 
@@ -66,14 +67,24 @@ export class CommandeService {
       );
   }
 
-  createCommande(commande: Commande): Observable<Commande> {
-    return this.http
-      .post<{ success: boolean; data: Commande }>(`${this.apiUrl}/create`, commande, httpOptions)
-      .pipe(
-        map((res) => res.data),
-        catchError(this.handleError)
-      );
-  }
+  // createCommande(commande: Commande): Observable<Commande> {
+  //   return this.http
+  //     .post<{ success: boolean; data: Commande }>(`${this.apiUrl}/create`, commande, httpOptions)
+  //     .pipe(
+  //       map((res) => res.data),
+  //       catchError(this.handleError)
+  //     );
+  // } 
+
+  
+createCommande(commande: CreateCommandeDto): Observable<Commande> {
+  return this.http
+    .post<{ success: boolean; data: Commande }>(`${this.apiUrl}/create`, commande, httpOptions)
+    .pipe(
+      map((res) => res.data),
+      catchError(this.handleError)
+    );
+}
 
   deleteCommande(id: number): Observable<void> {
     return this.http

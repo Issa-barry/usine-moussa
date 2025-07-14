@@ -11,4 +11,6 @@ export interface Commande {
   lignes: CommandeLigne[];
   created_at?: string;
   updated_at?: string;
+  qte_total: number;
+  reduction:number;
 }

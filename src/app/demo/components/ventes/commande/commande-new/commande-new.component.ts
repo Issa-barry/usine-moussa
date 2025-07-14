@@ -1,154 +1,117 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { SelectItem } from 'primeng/api';
-import { CountryService } from 'src/app/demo/service/country.service';
- 
+import { CommandeService } from 'src/app/demo/service/ventes/commande/commande.service';
+
+interface ProduitOption {
+  id: number;
+  nom: string;
+}
+
+interface ClientOption {
+  id: number;
+  nom: string;
+  telephone: string;
+}
 
 @Component({
   selector: 'app-commande-new',
   templateUrl: './commande-new.component.html',
-  styleUrl: './commande-new.component.scss',
-        providers: [MessageService, ConfirmationService]
-
+  styleUrls: ['./commande-new.component.scss'],
+  providers: [MessageService, ConfirmationService]
 })
 export class CommandeNewComponent implements OnInit {
-    titrePage: string = 'Créer une commande';
-    quantities: number[] = [1, 1, 1];
+  selectedClient: ClientOption | null = null;
+  lignes: {
+    produit: ProduitOption | null;
+    quantite: number;
+    prix_vente: number;
+  }[] = [];
+  reduction: number = 0;
+  totalCommande: number = 0;
 
-    value: string = '';
+  clients: ClientOption[] = [
+    { id: 1, nom: 'Issa Barry', telephone: '+224 622 000 000' },
+    { id: 2, nom: 'Aïssatou Diallo', telephone: '+224 622 111 111' },
+    { id: 3, nom: 'Mohamed Camara', telephone: '+224 622 222 222' },
+    { id: 4, nom: 'Fatoumata Bah', telephone: '+224 622 333 333' },
+  ];
 
-    checked: boolean = true;
+  produits: ProduitOption[] = [
+    { id: 7, nom: 'Eau Minérale 1L' },
+    { id: 8, nom: 'Pack Jus de Bissap' },
+    { id: 9, nom: 'Sac de Riz 25kg' },
+    { id: 10, nom: 'Boîte de Sardine' },
+  ];
 
-    checked2: boolean = true;
+  constructor(
+    private router: Router,
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService,
+    private commandeService: CommandeService
+  ) {}
 
-    // cities = [
-    //     { name: 'USA / New York', code: 'NY' },
-    //     { name: 'Italy / Rome', code: 'RM' },
-    //     { name: 'United Kingdoom / London', code: 'LDN' },
-    //     { name: 'Turkey / Istanbul', code: 'IST' },
-    //     { name: 'France / Paris', code: 'PRS' },
-    // ];
+  ngOnInit(): void {
+    this.ajouterLigne();
+  }
 
-    selectedCity: string = '';
+  onGoToListeCommande(): void {
+    this.router.navigate(['/dashboard/ventes/commande']);
+  }
 
-    constructor(
-        private router: Router,
-        private messageService: MessageService,
-        private confirmationService: ConfirmationService,
-        private countryService: CountryService
-    ) {}
+  ajouterLigne(): void {
+    this.lignes.push({ produit: null, quantite: 1, prix_vente: 0 });
+  }
 
-     onGoToListeCommande() {
-        this.router.navigate(['/ventes']);
+  supprimerLigne(index: number): void {
+    this.lignes.splice(index, 1);
+    this.recalculerTotal();
+  }
+
+  recalculerTotal(): void {
+    this.totalCommande = this.lignes.reduce((total, ligne) => {
+      return total + (ligne.quantite * ligne.prix_vente || 0);
+    }, 0);
+  }
+
+  onSubmit(): void {
+    if (!this.selectedClient || this.lignes.length === 0 || this.lignes.some(l => !l.produit)) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Champs requis',
+        detail: 'Veuillez remplir tous les champs obligatoires.'
+      });
+      return;
     }
 
-selectedClient: any = null;
-selectedProduit: any = null;
-selectedLivreur: any = null;
-selectedDepot: any = null;
+    const lignesPayload = this.lignes.map(ligne => ({
+      produit_id: ligne.produit!.id,
+      quantite: ligne.quantite,
+      prix_vente: ligne.prix_vente
+    }));
 
-total: number = 0;
-quantite: number = 1;
+    const payload = {
+      contact_id: this.selectedClient.id,
+      reduction: this.reduction,
+      lignes: lignesPayload
+    };
 
-clients = [
-    { nom: 'Issa Barry', telephone: '+224 622 000 000' },
-    { nom: 'Aïssatou Diallo', telephone: '+224 622 111 111' },
-    { nom: 'Mohamed Camara', telephone: '+224 622 222 222' },
-    { nom: 'Fatoumata Bah', telephone: '+224 622 333 333' },
-];
-
-produits = [
-    { nom: 'Eau Minérale 1L', reference: 'EAU-001' },
-    { nom: 'Pack Jus de Bissap', reference: 'JUS-012' },
-    { nom: 'Sac de Riz 25kg', reference: 'RIZ-025' },
-    { nom: 'Boîte de Sardine', reference: 'SAR-003' },
-];
-
-livreurs = [
-    { nom: 'Alpha Condé', telephone: '+224 622 444 444' },
-    { nom: 'Mamadou Sylla', telephone: '+224 622 555 555' },
-    { nom: 'Ibrahima Touré', telephone: '+224 622 666 666' },
-];
-
-depots = [
-    { nom: 'Dépôt Matoto', telephone: '+224 622 777 777' },
-    { nom: 'Dépôt Kipé', telephone: '+224 622 888 888' },
-    { nom: 'Dépôt Enco5', telephone: '+224 622 999 999' },
-];
-
-
-// multiselection : 
-countries: any[] = [];
-
-    filteredCountries: any[] = [];
-
-    selectedCountryAdvanced: any[] = [];
-
-    valSlider = 50;
-
-    valColor = '#424242';
-
-    valRadio: string = '';
-
-    valCheck: string[] = [];
-
-    valCheck2: boolean = false;
-
-    valSwitch: boolean = false;
-
-    cities: SelectItem[] = [];
-
-    selectedList: SelectItem = { value: '' };
-
-    selectedDrop: SelectItem = { value: '' };
-
-    selectedMulti: any[] = [];
-
-    valToggle = false;
-
-    paymentOptions: any[] = [];
-
-    valSelect1: string = "";
-
-    valSelect2: string = "";
-
-    valueKnob = 20;
-
-   
-
-    ngOnInit() {
-        this.countryService.getCountries().then(countries => {
-            this.countries = countries;
+    this.commandeService.createCommande(payload).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Succès',
+          detail: 'Commande créée avec succès.'
         });
-
-        this.cities = [
-            { label: 'Pack 5', value: { id: 1, name: 'New York', code: 'NY' } },
-            { label: 'Pack 10', value: { id: 2, name: 'Rome', code: 'RM' } },
-            { label: 'Pack 20', value: { id: 3, name: 'London', code: 'LDN' } },
-            { label: 'Rouleau sachet', value: { id: 4, name: 'Istanbul', code: 'IST' } },
-            { label: 'Emballage', value: { id: 5, name: 'Paris', code: 'PRS' } }
-        ];
-
-        this.paymentOptions = [
-            { name: 'Option 1', value: 1 },
-            { name: 'Option 2', value: 2 },
-            { name: 'Option 3', value: 3 }
-        ];
-    }
-
-    filterCountry(event: any) {
-        const filtered: any[] = [];
-        const query = event.query;
-        for (let i = 0; i < this.countries.length; i++) {
-            const country = this.countries[i];
-            if (country.name.toLowerCase().indexOf(query.toLowerCase()) == 0) {
-                filtered.push(country);
-            }
-        } 
-
-        this.filteredCountries = filtered;
-    }
-    
+        this.router.navigate(['/dashboard/ventes/commande']);
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erreur',
+          detail: err.message
+        });
+      }
+    });
+  }
 }
-
