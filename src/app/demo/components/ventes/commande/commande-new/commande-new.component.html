@@ -5,37 +5,38 @@
     </div>
 
     <div class="col-12 lg:col-10 h-full px-4 py-4 md:px-6">
-      <!-- Client -->
+      <!-- livreur -->
       <div class="field mb-4">
-        <label class="text-800 text-m block font-normal mb-2">Client</label>
+        <label class="text-800 text-m block font-normal mb-2">Livreur</label>
         <p-dropdown
-          [options]="clients"
-          [(ngModel)]="selectedClient"
-          optionLabel="nom"
-          placeholder="Sélectionner un client"
+          [options]="contacts"
+          [(ngModel)]="selectedLivreur"
+          optionLabel="nom_complet"
+          placeholder="Sélectionner un livreur"
           [filter]="true"
-          filterBy="nom telephone"
+          filterBy="nom_complet telephone"
           [showClear]="true"
           appendTo="body"
           styleClass="w-full"
         >
-          <ng-template let-client pTemplate="selectedItem">
-            <div *ngIf="client" class="flex flex-column">
-              <div class="font-medium">{{ client.nom }}</div>
-              <small class="text-500">{{ client.telephone }}</small>
+          <ng-template let-livreur pTemplate="selectedItem">
+            <div *ngIf="livreur" class="flex flex-column">
+              <div class="font-medium">{{ livreur.nom_complet }}</div>
+              <small class="text-500">{{ livreur.telephone }}</small>
             </div>
           </ng-template>
-          <ng-template let-client pTemplate="item">
+          <ng-template let-livreur pTemplate="item">
             <div class="flex flex-column">
-              <div class="font-medium">{{ client.nom }}</div>
-              <small class="text-500">{{ client.telephone }}</small>
+              <div class="font-medium">{{ livreur.nom_complet }}</div>
+              <small class="text-500">{{ livreur.telephone }}</small>
             </div>
           </ng-template>
         </p-dropdown>
       </div>
 
+
       <!-- Lignes de commande -->
-      <div class="overflow-auto">
+       <div class="overflow-auto">
         <table class="w-full text-sm text-left">
           <thead class="text-xs text-gray-700">
             <tr>
@@ -55,7 +56,7 @@
                   optionLabel="nom"
                   placeholder="Sélectionner un produit"
                   appendTo="body"
-                  (onChange)="recalculerTotal()"
+                  (onChange)="onProduitChange(i)"
                   styleClass="w-full"
                 ></p-dropdown>
               </td>
@@ -99,7 +100,7 @@
         label="Ajouter un produit"
         class="p-button-sm mt-3"
         (click)="ajouterLigne()"
-      ></button>
+      ></button> 
 
       <!-- Réduction -->
       <div class="field mt-4">
@@ -136,6 +137,6 @@
           (click)="onSubmit()"
         ></button>
       </div>
-    </div>
+    </div> 
   </div>
 </div>
