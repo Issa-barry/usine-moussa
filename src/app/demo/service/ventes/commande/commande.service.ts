@@ -79,14 +79,19 @@ createCommande(commande: CreateCommandeDto): Observable<Commande> {
     );
 }
 
-updateCommande(id: number, dto: UpdateCommandeDto): Observable<Commande> {
+updateCommande(numero: string, dto: UpdateCommandeDto): Observable<Commande> {
   return this.http
-    .put<{ success: boolean; data: Commande }>(`${this.apiUrl}/updateById/${id}`, dto, httpOptions)
+    .put<{ success: boolean; data: Commande }>(
+      `${this.apiUrl}/updateByNumero/${numero}`,
+      dto,
+      httpOptions
+    )
     .pipe(
       map((res) => res.data),
       catchError(this.handleError)
     );
 }
+
 
 
   deleteCommande(id: number): Observable<void> {

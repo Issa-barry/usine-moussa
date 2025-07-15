@@ -135,7 +135,7 @@ export class CommandeDetailComponent implements OnInit {
       }))
     };
 
-    this.commandeService.updateCommande(this.commande.id!, payload).subscribe({
+    this.commandeService.updateCommande(this.commande.numero, payload).subscribe({
       next: () => {
         this.messageService.add({
           severity: 'success',
