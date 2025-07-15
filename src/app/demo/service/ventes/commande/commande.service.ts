@@ -94,9 +94,9 @@ updateCommande(numero: string, dto: UpdateCommandeDto): Observable<Commande> {
 
 
 
-  deleteCommande(id: number): Observable<void> {
+  deleteCommande(numero: string): Observable<void> {
     return this.http
-      .delete<void>(`${this.apiUrl}/deleteById/${id}`, httpOptions)
+      .delete<void>(`${this.apiUrl}/deleteByNumero/${numero}`, httpOptions)
       .pipe(
         catchError(this.handleError)
       );
