@@ -20,7 +20,7 @@ export class TransfertListeComponent implements OnInit {
   transfert!: Transfert;
    loading = false;
    skeletonRows = Array.from({ length: 5 }, () => ({}));
-
+ 
   constructor(
     private router: Router, 
     private transfertService: TransfertService,

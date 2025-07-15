@@ -20,7 +20,8 @@
   icon="pi pi-pencil" 
   class="p-button-outlined p-button-primary mr-3" 
   (click)="goToEditTransfert()"
-  [disabled]="transfert?.statut === 'retiré'">
+  [disabled]="transfert.statut === 'retiré'"
+>
 </button>
             <button pButton pRipple label="Annuler le transfert" icon="pi pi-times-circle" class="p-button-outlined p-button-danger" 
                   (click)="confirmAnnulationTransfert()"
