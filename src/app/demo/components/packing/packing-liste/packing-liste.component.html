@@ -84,6 +84,7 @@
           </p-table>
         </div>
         <ng-template pTemplate="footer">
+          <button pButton pRipple icon="pi pi-pencil" class="p-button-text p-button-warning" label="Modifier" [routerLink]="['/dashboard/packing/packing-detail', selectedPacking?.id]" (click)="showDetailDialog = false"></button>
           <button pButton pRipple icon="pi pi-trash" class="p-button-text p-button-danger" label="Supprimer" (click)="deletePacking(selectedPacking!)"></button>
           <button pButton pRipple icon="pi pi-times" class="p-button-text" label="Fermer" (click)="showDetailDialog = false"></button>
         </ng-template>

@@ -67,7 +67,7 @@ export class PackingService {
 
   getById(id: number): Observable<Packing> {
     return this.http
-      .get<{ success: boolean; data: Packing }>(`${this.apiUrl}/show/${id}`)
+      .get<{ success: boolean; data: Packing }>(`${this.apiUrl}/getById/${id}`)
       .pipe(map((res) => res.data), catchError(this.handleError));
   }
 
