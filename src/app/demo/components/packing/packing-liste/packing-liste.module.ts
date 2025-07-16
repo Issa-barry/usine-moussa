@@ -29,7 +29,7 @@ import { PackingListeComponent } from './packing-liste.component';
     TableModule,
 		FileUploadModule,
 		FormsModule,
-		ButtonModule,
+		ButtonModule, 
 		RippleModule,
 		ToastModule, 
 		ToolbarModule,

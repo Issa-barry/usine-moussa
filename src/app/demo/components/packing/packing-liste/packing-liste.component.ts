@@ -1,143 +1,98 @@
 import { Component, OnInit } from '@angular/core';
-import { Product } from 'src/app/demo/api/product';
-import { ProductService } from 'src/app/demo/service/product.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
+import { Packing } from 'src/app/demo/models/packing.model';
+import { PackingService } from 'src/app/demo/service/packing/packing.service';
+
 @Component({
   selector: 'app-packing-liste',
   templateUrl: './packing-liste.component.html',
-  styleUrl: './packing-liste.component.scss',
+  styleUrls: ['./packing-liste.component.scss'],
   providers: [MessageService, ConfirmationService]
 })
-export class PackingListeComponent implements OnInit  {
+export class PackingListeComponent implements OnInit {
 
-productDialog: boolean = false;  
+  packings: Packing[] = [];
+  selectedPackings: Packing[] = [];
+  showDetailDialog = false;
+  selectedPacking: Packing | null = null;
 
-    deleteProductDialog: boolean = false;
+  packingDialog: boolean = false;
+  deletePackingDialog: boolean = false;
+  deletePackingsDialog: boolean = false;
 
-    deleteProductsDialog: boolean = false;
+  packing: Packing = new Packing();
+  submitted: boolean = false;
 
-    products: Product[] = [];
+  cols: any[] = [];
+  rowsPerPageOptions = [5, 10, 20];
 
-    product: Product = {};
+  constructor(
+    private packingService: PackingService,
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService
+  ) {}
 
-    selectedProducts: Product[] = [];
+  ngOnInit(): void {
+    this.loadPackings();
 
-    submitted: boolean = false;
+    this.cols = [
+      { field: 'reference', header: 'Référence' },
+      { field: 'employé', header: 'Employé' },
+      { field: 'date_packing', header: 'Date' },
+      { field: 'statut', header: 'Statut' },
+    ];
+  }
 
-    cols: any[] = [];
+  loadPackings(): void {
+    this.packingService.getAll().subscribe({
+      next: (data) => {
+        this.packings = data;
+        console.log(this.packings);
+        
+      },
+      error: (err) => this.messageService.add({
+        severity: 'error',
+        summary: 'Erreur',
+        detail: err.message
+      })
+    });
+  }
 
-    statuses: any[] = [];
+  openNew(): void {
+    this.packing = new Packing();
+    this.submitted = false;
+    this.packingDialog = true;
+  }
 
-    rowsPerPageOptions = [5, 10, 20];
+  deletePacking(p: Packing): void {
+    this.packing = p;
+    this.deletePackingDialog = true;
+  }
 
-    constructor(private productService: ProductService, private messageService: MessageService, private confirmationService: ConfirmationService) { }
+  confirmDelete(): void {
+    if (!this.packing.id) return;
 
-    ngOnInit() {
-        this.productService.getProducts().then(data => this.products = data);
+    this.packingService.delete(this.packing.id).subscribe({
+      next: () => {
+        this.packings = this.packings.filter(p => p.id !== this.packing.id);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Supprimé',
+          detail: 'Packing supprimé avec succès'
+        });
+        this.deletePackingDialog = false;
+        this.packing = new Packing();
+      },
+      error: (err) => this.messageService.add({
+        severity: 'error',
+        summary: 'Erreur',
+        detail: err.message
+      })
+    });
+  }
 
-        this.cols = [
-            { field: 'product', header: 'Product' },
-            { field: 'price', header: 'Price' },
-            { field: 'category', header: 'Category' },
-            { field: 'rating', header: 'Reviews' },
-            { field: 'inventoryStatus', header: 'Status' }
-        ];
-
-        this.statuses = [
-            { label: 'DISPONIBLE', value: 'disponible' },
-            { label: 'RUPTURE', value: 'rupture' },
-            { label: 'STOCK-BAS', value: 'stock-bas' }
-        ];
-    }
-
-    openNew() {
-        this.product = {};
-        this.submitted = false;
-        this.productDialog = true;
-    }
-
-    deleteSelectedProducts() {
-        this.deleteProductsDialog = true;
-    }
-
-    editProduct(product: Product) {
-        this.product = { ...product };
-        this.productDialog = true;
-    }
-
-    deleteProduct(product: Product) {
-        this.deleteProductDialog = true;
-        this.product = { ...product };
-    }
-
-    confirmDeleteSelected() {
-        this.deleteProductsDialog = false;
-        this.products = this.products.filter(val => !this.selectedProducts.includes(val));
-        this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 3000 });
-        this.selectedProducts = [];
-    }
-
-    confirmDelete() {
-        this.deleteProductDialog = false;
-        this.products = this.products.filter(val => val.id !== this.product.id);
-        this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
-        this.product = {};
-    }
-
-    hideDialog() {
-        this.productDialog = false;
-        this.submitted = false;
-    }
-
-    saveProduct() {
-        this.submitted = true;
-
-        if (this.product.name?.trim()) {
-            if (this.product.id) {
-                // @ts-ignore
-                this.product.inventoryStatus = this.product.inventoryStatus.value ? this.product.inventoryStatus.value : this.product.inventoryStatus;
-                this.products[this.findIndexById(this.product.id)] = this.product;
-                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
-            } else {
-                this.product.id = this.createId();
-                this.product.code = this.createId();
-                this.product.image = 'product-placeholder.svg';
-                // @ts-ignore
-                this.product.inventoryStatus = this.product.inventoryStatus ? this.product.inventoryStatus.value : 'INSTOCK';
-                this.products.push(this.product);
-                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
-            }
-
-            this.products = [...this.products];
-            this.productDialog = false;
-            this.product = {};
-        }
-    }
-
-    findIndexById(id: string): number {
-        let index = -1;
-        for (let i = 0; i < this.products.length; i++) {
-            if (this.products[i].id === id) {
-                index = i;
-                break;
-            }
-        }
-
-        return index; 
-    }
-
-    createId(): string {
-        let id = '';
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        for (let i = 0; i < 5; i++) {
-            id += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return id;
-    }
-
-    onGlobalFilter(table: Table, event: Event) {
-        table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
-    }
+  onGlobalFilter(table: Table, event: Event): void {
+    table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+  }
 }
-

@@ -18,7 +18,7 @@ import { RatingModule } from 'primeng/rating';
 @NgModule({
 	imports: [
 		CommonModule,
-		TableDemoRoutingModule,
+		TableDemoRoutingModule, 
 		FormsModule,
 		TableModule,
 		RatingModule,
