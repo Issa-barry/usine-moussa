@@ -1,206 +1,202 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { SelectItem } from 'primeng/api';
-import { CountryService } from 'src/app/demo/service/country.service';
- 
-
+import { UpdateCommandeDto } from 'src/app/demo/models/commande-update.dto';
+import { Commande } from 'src/app/demo/models/commande.model';
+import { Contact } from 'src/app/demo/models/contact';
+import { Produit } from 'src/app/demo/models/produit.model';
+import { ContactService } from 'src/app/demo/service/contact/contact.service';
+import { ProduitService } from 'src/app/demo/service/produit/produit.service';
+import { CommandeService } from 'src/app/demo/service/ventes/commande/commande.service';
 
 @Component({
-  selector: 'app-commande-detail',
-  templateUrl: './commande-detail.component.html',
-  styleUrl: './commande-detail.component.scss',
-   providers: [MessageService, ConfirmationService]
+    selector: 'app-commande-detail',
+    templateUrl: './commande-detail.component.html',
+    styleUrls: ['./commande-detail.component.scss'],
+    providers: [MessageService, ConfirmationService],
 })
 export class CommandeDetailComponent implements OnInit {
-   quantities: number[] = [1, 1, 1];
-   titrePage: string = 'Détail de la commande: CO-01151';
+    titrePage: string = 'Détail de la commande';
+    isEditMode = false;
+    errorMessage: string = '';
+    apiErrors: { [key: string]: string[] } = {};
+    produits: Produit[] = [];
+    contacts: Contact[] = [];
+    commande: Commande = new Commande();
+    numeroCommande: string = this.activatedRoute.snapshot.params['id'];
 
-    value: string = '';
+    lignes: {
+        produit: Produit | null;
+        quantite: number;
+        prix_vente: number;
+    }[] = [];
 
-    checked: boolean = true;
+    reduction: number = 0;
+    totalCommande: number = 0;
+    totalBrut: number = 0;
 
-    checked2: boolean = true;
+    constructor(
+        private router: Router,
+        private messageService: MessageService,
+        private confirmationService: ConfirmationService,
+        private commandeService: CommandeService,
+        private produitService: ProduitService,
+        private contactService: ContactService,
+        private activatedRoute: ActivatedRoute
+    ) {}
 
-    // cities = [
-    //     { name: 'USA / New York', code: 'NY' },
-    //     { name: 'Italy / Rome', code: 'RM' },
-    //     { name: 'United Kingdoom / London', code: 'LDN' },
-    //     { name: 'Turkey / Istanbul', code: 'IST' },
-    //     { name: 'France / Paris', code: 'PRS' }
-    // ];
-
-    selectedCity: string = '';
-
-    // IBA
-    
-
-      constructor(
-            private router: Router,
-            private messageService: MessageService,
-            private confirmationService: ConfirmationService,
-            private countryService: CountryService
-        ) {}
-
-          onGoToListeCommande() {
-        this.router.navigate(['/ventes']);
+    ngOnInit(): void {
+        this.loadProduits();
+        this.loadContacts();
+        this.loadCommande();
     }
 
-
-    // iba
-    
-selectedClient: any = null;
-selectedProduit: any = null;
-selectedLivreur: any = null;
-selectedDepot: any = null;
-
-total: number = 0;
-quantite: number = 1;
-
-clients = [
-    { nom: 'Issa Barry', telephone: '+224 622 000 000' },
-    { nom: 'Aïssatou Diallo', telephone: '+224 622 111 111' },
-    { nom: 'Mohamed Camara', telephone: '+224 622 222 222' },
-    { nom: 'Fatoumata Bah', telephone: '+224 622 333 333' },
-];
-
-produits = [
-    { nom: 'Eau Minérale 1L', reference: 'EAU-001' },
-    { nom: 'Pack Jus de Bissap', reference: 'JUS-012' },
-    { nom: 'Sac de Riz 25kg', reference: 'RIZ-025' },
-    { nom: 'Boîte de Sardine', reference: 'SAR-003' },
-];
-
-livreurs = [
-    { nom: 'Alpha Condé', telephone: '+224 622 444 444' },
-    { nom: 'Mamadou Sylla', telephone: '+224 622 555 555' },
-    { nom: 'Ibrahima Touré', telephone: '+224 622 666 666' },
-];
-
-depots = [
-    { nom: 'Dépôt Matoto', telephone: '+224 622 777 777' },
-    { nom: 'Dépôt Kipé', telephone: '+224 622 888 888' },
-    { nom: 'Dépôt Enco5', telephone: '+224 622 999 999' },
-];
-
-    isEditMode: boolean = false;
-    //  editProduct(product: Product) {
-//     this.product = { ...product };
-//     this.isEditMode = true;
-//     this.productDialog = true;
-// }
-
- editProduct() {
-    this.isEditMode = true;
-   this.titrePage = 'Modifier cette commande : CO-01151'; 
-   }
-
-   saveCommande() {
-
-        // Logique pour sauvegarder la commande
-        this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Commande enregistrée avec succès !' });
-        this.isEditMode = false;
-        this.titrePage = 'Modifier cette commande : CO-01151';
-
-   }
-   
-   cancelEdit() {
-    this.isEditMode = false;
-    this.titrePage = 'Modifier cette commande : CO-01151';
-    this.selectedClient = null;
-    this.selectedProduit = null;
-    this.selectedLivreur = null;
-    this.selectedDepot = null;
-    this.quantite = 1;
-    this.total = 0;
-    this.messageService.add({ severity: 'info', summary: 'Annulation', detail: 'Édition annulée.' });
-   }
-   confirmDelete() {
-    this.confirmationService.confirm({
-        message: 'Êtes-vous sûr de vouloir supprimer cette commande ?',
-        header: 'Confirmation',
-        icon: 'pi pi-exclamation-triangle',
-        accept: () => {
-            // Logique pour supprimer la commande
-            this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Commande supprimée avec succès !' });
-            this.router.navigate(['/ventes']);
-        },
-        reject: () => {
-            this.messageService.add({ severity: 'info', summary: 'Annulation', detail: 'Suppression annulée.' });
-        }
-    });
-   }
-
-   
-// multiselection : 
-countries: any[] = [];
-
-    filteredCountries: any[] = [];
-
-    selectedCountryAdvanced: any[] = [];
-
-    valSlider = 50;
-
-    valColor = '#424242';
-
-    valRadio: string = '';
-
-    valCheck: string[] = [];
-
-    valCheck2: boolean = false;
-
-    valSwitch: boolean = false;
-
-    cities: SelectItem[] = [];
-
-    selectedList: SelectItem = { value: '' };
-
-    selectedDrop: SelectItem = { value: '' };
-
-    selectedMulti: any[] = [];
-
-    valToggle = false;
-
-    paymentOptions: any[] = [];
-
-    valSelect1: string = "";
-
-    valSelect2: string = "";
-
-    valueKnob = 20;
-
-   
-
-    ngOnInit() {
-        this.countryService.getCountries().then(countries => {
-            this.countries = countries;
+    loadProduits(): void {
+        this.produitService.getProduits().subscribe({
+            next: (data) => (this.produits = data),
+            error: (err) => console.error('Erreur chargement produits:', err),
         });
-
-        this.cities = [
-            { label: 'Pack 5', value: { id: 1, name: 'New York', code: 'NY' } },
-            { label: 'Pack 10', value: { id: 2, name: 'Rome', code: 'RM' } },
-            { label: 'Pack 20', value: { id: 3, name: 'London', code: 'LDN' } },
-            { label: 'Rouleau sachet', value: { id: 4, name: 'Istanbul', code: 'IST' } },
-            { label: 'Emballage', value: { id: 5, name: 'Paris', code: 'PRS' } }
-        ];
-
-        this.paymentOptions = [
-            { name: 'Option 1', value: 1 },
-            { name: 'Option 2', value: 2 },
-            { name: 'Option 3', value: 3 }
-        ];
     }
 
-    filterCountry(event: any) {
-        const filtered: any[] = [];
-        const query = event.query;
-        for (let i = 0; i < this.countries.length; i++) {
-            const country = this.countries[i];
-            if (country.name.toLowerCase().indexOf(query.toLowerCase()) == 0) {
-                filtered.push(country);
-            }
-        } 
+    loadContacts(): void {
+        this.contactService.getContacts().subscribe({
+            next: (data) => (this.contacts = data),
+            error: (err) => console.error('Erreur chargement contacts:', err),
+        });
+    }
 
-        this.filteredCountries = filtered;
+    loadCommande(): void {
+        this.commandeService
+            .getCommandeByNumero(this.numeroCommande)
+            .subscribe({
+                next: (res) => {
+                    this.commande = res;
+                    this.commande.contact = this.contacts.find(
+                        (c) => c.id === res.contact?.id
+                    );
+                    this.reduction = parseFloat(res.reduction as any) || 0;
+                    this.lignes = res.lignes.map((l: any) => ({
+                        produit:
+                            this.produits.find((p) => p.id === l.produit?.id) ||
+                            null,
+                        quantite: l.quantite,
+                        prix_vente: parseFloat(l.prix_vente),
+                    }));
+                    this.recalculerTotal();
+                    this.titrePage = `Détail de la commande : ${res.numero}`;
+                },
+                error: (err) => {
+                    this.errorMessage =
+                        'Erreur lors du chargement de la commande.';
+                    console.error(err);
+                },
+            });
+    }
+
+    ajouterLigne(): void {
+        this.lignes.push({ produit: null, quantite: 1, prix_vente: 0 });
+    }
+
+    supprimerLigne(index: number): void {
+        this.lignes.splice(index, 1);
+        this.recalculerTotal();
+    }
+
+    onProduitChange(index: number): void {
+        const produit = this.lignes[index].produit;
+        if (produit?.prix_vente) {
+            this.lignes[index].prix_vente = parseFloat(
+                produit.prix_vente as any
+            );
+        }
+        this.recalculerTotal();
+    }
+
+    recalculerTotal(): void {
+        const brut = this.lignes.reduce((total, ligne) => {
+            const quantite = ligne.quantite || 0;
+            const prix = ligne.prix_vente || 0;
+            return total + quantite * prix;
+        }, 0);
+        this.totalBrut = brut;
+        this.totalCommande = brut - this.reduction;
+    }
+
+    editProduct(): void {
+        this.isEditMode = true;
+        this.titrePage = `Modification de la commande : ${this.commande.numero}`;
+    }
+
+    cancelEdit(): void {
+        this.isEditMode = false;
+        this.loadCommande();
+        this.apiErrors = {};
+        this.errorMessage = '';
+    }
+
+    saveCommande(): void {
+        const payload: UpdateCommandeDto = {
+            contact_id: this.commande.contact?.id!,
+            reduction: this.reduction,
+            lignes: this.lignes.map((ligne) => ({
+                produit_id: ligne.produit?.id!,
+                quantite: ligne.quantite,
+                prix_vente: ligne.prix_vente,
+            })),
+        };
+
+        this.commandeService
+            .updateCommande(this.commande.numero, payload)
+            .subscribe({
+                next: () => {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Succès',
+                        detail: 'Commande mise à jour avec succès.',
+                    });
+                    this.isEditMode = false;
+                    this.loadCommande();
+                },
+                error: (err: any) => {
+                    this.apiErrors = err.error?.data || {};
+                    this.errorMessage =
+                        err.error?.message || 'Erreur lors de la mise à jour';
+                },
+            });
+    }
+
+    confirmDelete(): void {
+        this.confirmationService.confirm({
+            message: 'Êtes-vous sûr de vouloir supprimer cette commande ?',
+            header: 'Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                this.commandeService
+                    .deleteCommande(this.commande.numero)
+                    .subscribe({
+                        next: () => {
+                            this.messageService.add({
+                                severity: 'success',
+                                summary: 'Succès',
+                                detail: 'Commande supprimée avec succès.',
+                                life: 3000,
+                            });
+                            setTimeout(() => {
+                                this.router.navigate([
+                                    '/dashboard/ventes/commande',
+                                ]);
+                            }, 1500);
+                        },
+                        error: (err) => {
+                            this.messageService.add({
+                                severity: 'error',
+                                summary: 'Erreur',
+                                detail: 'La suppression a échoué.',
+                            });
+                            console.error(err);
+                        },
+                    });
+            },
+        });
     }
 }

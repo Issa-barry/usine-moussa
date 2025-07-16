@@ -18,6 +18,9 @@ import { MultiSelectModule } from 'primeng/multiselect';
 
 import { CommandeListeRoutingModule } from './commande-liste-routing.module';
 import { CommandeListeComponent } from './commande-liste.component';
+import { MessageModule } from 'primeng/message';
+import { ConfirmPopupModule } from 'primeng/confirmpopup';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 
 @NgModule({
@@ -37,11 +40,14 @@ import { CommandeListeComponent } from './commande-liste.component';
         RatingModule,
         InputTextModule,
         InputTextareaModule,
-        DropdownModule,
+        DropdownModule, 
         RadioButtonModule,
         InputNumberModule,
         DialogModule,
         MultiSelectModule,
+        MessageModule,
+           ConfirmPopupModule,
+              ConfirmDialogModule,
   ]
 })
 export class CommandeListeModule { }

@@ -1,180 +1,193 @@
-<p-toast></p-toast>
-<p-confirmPopup></p-confirmPopup>
 <div class="card">
-    <div class="grid grid-nogutter">
-        <div class="col-12 px-4 mt-4 md:mt-6 md:px-6">
-            <span class="text-900 block font-bold text-xl">{{ titrePage }}</span>
-        </div>
-
-        <div class="col-12 lg:col-6 h-full px-4 py-4 md:px-6">
-            <!-- Étapes -->
-           <div class="flex justify-between align-items-center mb-6">
-    <!-- Fil d'Ariane -->
-    <ul class="flex list-none flex-wrap p-0 m-0">
-        <li class="flex align-items-center text-primary mr-2">
-            Nouveau <i class="pi pi-chevron-right text-500 text-xs ml-2"></i>
-        </li>
-        <li class="flex align-items-center text-500 mr-2">
-            Livraison en cours <i class="pi pi-chevron-right text-500 text-xs ml-2"></i>
-        </li>
-        <li class="flex align-items-center text-500 mr-2">
-            Facturation <i class="pi pi-chevron-right text-500 text-xs ml-2"></i>
-        </li>
-        <li class="flex align-items-center text-500 mr-2">Clôturé</li>
-    </ul>
-
-    <!-- Bouton Modifier -->
-    <button
-        *ngIf="!isEditMode"
-        pButton
-        icon="pi pi-pencil"
-        label="Modifier"
-        class="p-button-text p-button-sm"
-        (click)="editProduct()"
-    ></button>
-</div>
-
-
-            <div class="grid formgrid">
-                <div class="col-12 field mb-4">
-                    <span class="text-800 text-m block font-normal mb-3"
-                        >Produit</span
-                    >
-                    <p-multiSelect
-                        [options]="countries"
-                        [(ngModel)]="selectedMulti"
-                        placeholder="Sélectionner un ou plusieurs pays"
-                        optionLabel="name"
-                        display="chip"
-                        styleClass="w-full"
-                    >
-                        <ng-template let-country pTemplate="item">
-                            <div class="flex align-items-center">
-                                <img
-                                    src="assets/demo/images/flag/flag_placeholder.png"
-                                    [class]="
-                                        'flag flag-' +
-                                        country.code.toLowerCase()
-                                    "
-                                    style="width: 21px"
-                                />
-                                <span class="ml-2">{{ country.name }}</span>
-                            </div>
-                        </ng-template>
-                    </p-multiSelect>
-                </div>
-                <!-- Client -->
-                <div class="col-12 field mb-4">
-                    <span class="text-800 text-m block font-normal mb-3">Client</span>
-                    <p-dropdown
-                        [options]="clients"
-                        [(ngModel)]="selectedClient"
-                        optionLabel="nom"
-                        placeholder="Sélectionner un client"
-                        [filter]="true"
-                        filterBy="nom telephone"
-                        [showClear]="true"
-                        styleClass="w-full"
-                    >
-                        <ng-template let-client pTemplate="selectedItem">
-                            <div *ngIf="client" class="flex flex-column">
-                                <div class="font-medium">{{ client.nom }}</div>
-                                <small class="text-500">{{ client.telephone }}</small>
-                            </div>
-                        </ng-template>
-                        <ng-template let-client pTemplate="item">
-                            <div class="flex flex-column">
-                                <div class="font-medium">{{ client.nom }}</div>
-                                <small class="text-500">{{ client.telephone }}</small>
-                            </div>
-                        </ng-template>
-                    </p-dropdown>
-                </div>
-
-                <!-- Produit -->
-                <div class="col-12 field mb-4">
-                    <span class="text-800 text-m block font-normal mb-3">Produit</span>
-                    <p-dropdown
-                        [options]="cities"
-                        [(ngModel)]="selectedCity"
-                        placeholder="Sélectionner un produit"
-                        optionLabel="name"
-                        [showClear]="true"
-                        styleClass="w-full"
-                    ></p-dropdown>
-                </div>
-
-                <!-- Livreur -->
-                <div class="col-12 field mb-4">
-                    <span class="text-800 text-m block font-normal mb-3">Livreur</span>
-                    <p-dropdown
-                        [options]="cities"
-                        [(ngModel)]="selectedCity"
-                        placeholder="Sélectionner un livreur"
-                        optionLabel="name"
-                        [showClear]="true"
-                        styleClass="w-full"
-                    ></p-dropdown>
-                </div>
-
-                <!-- Dépôt -->
-                <div class="col-12 field mb-4">
-                    <span class="text-800 text-m block font-normal mb-3">Dépôt</span>
-                    <p-dropdown
-                        [options]="cities"
-                        [(ngModel)]="selectedCity"
-                        placeholder="Sélectionner un dépôt"
-                        optionLabel="name"
-                        [showClear]="true"
-                        styleClass="w-full"
-                    ></p-dropdown>
-                </div>
-
-                <!-- Total + Qté -->
-                <div class="col-12 lg:col-6 mb-4">
-                    <span class="text-800 text-m block font-normal mb-3">Total</span>
-                    <p-inputNumber
-                        placeholder="Prix :"
-                        mode="currency"
-                        currency="USD"
-                        locale="en-US"
-                        class="w-full"
-                    ></p-inputNumber>
-                </div>
-                <div class="col-12 lg:col-6 field mb-4">
-                    <span class="text-800 text-m block font-normal mb-3">Qté</span>
-                    <input type="text" placeholder="Qté: 5" class="p-inputtext w-full" />
-                </div>
-
-                <!-- Boutons -->
-                <div class="col-12 flex flex-column lg:flex-row justify-content-center align-items-center lg:justify-content-end my-6">
-                    <button
-                        pButton
-                        pRipple
-                        class="p-button-secondary p-button-outlined mt-3 lg:mt-0 w-full lg:w-auto flex-order-2 lg:flex-order-1 lg:mr-4"
-                        label="Annuler"
-                        icon="pi pi-fw pi-arrow-left"
-                        (click)="onGoToListeCommande()"
-                    ></button>
-                     <button
-                        pButton
-                        pRipple
-                        class="p-button-primary w-full lg:w-auto flex-order-1 lg:flex-order-2 "
-                        label="Valider la livraison"
-                        icon="pi pi-fw pi-check"
-                        *ngIf="!isEditMode"
-                    ></button>
-                    <button
-                        pButton
-                        pRipple
-                        class="p-button-primary w-full lg:w-auto flex-order-1 lg:flex-order-2"
-                        label="Enregistrer"
-                        icon="pi pi-fw pi-check"
-                        *ngIf="isEditMode"
-                        (click)="saveCommande()"
-                    ></button>
-                </div>
-            </div>
-        </div>
+  <p-toast></p-toast>
+   <p-confirmDialog></p-confirmDialog> 
+  <div class="grid grid-nogutter">
+    <div class="col-12 px-4 mt-4 md:mt-6 md:px-6">
+      <span class="text-900 block font-bold text-xl">{{ titrePage }}</span>
+      <p-message *ngIf="errorMessage" severity="error" text="{{ errorMessage }}"></p-message>
     </div>
+
+    <div class="col-12 lg:col-10 h-full px-4 py-4 md:px-6">
+      <!-- Livreur -->
+      <div class="field mb-4">
+        <label class="text-800 text-m block font-normal mb-2">Livreur</label>
+
+        <p-dropdown
+          *ngIf="isEditMode"
+          [options]="contacts"
+          [(ngModel)]="commande.contact"
+          optionLabel="nom_complet"
+          placeholder="Sélectionner un livreur"
+          [filter]="true"
+          filterBy="nom_complet telephone"
+          [showClear]="true"
+          appendTo="body" 
+          styleClass="w-full"
+        >
+          <ng-template let-livreur pTemplate="selectedItem">
+            <div *ngIf="livreur" class="flex flex-column">
+              <div class="font-medium">{{ livreur.nom_complet }}</div>
+            </div>
+          </ng-template>
+          <ng-template let-livreur pTemplate="item">
+            <div class="flex flex-column">
+              <div class="font-medium">{{ livreur.nom_complet }}</div>
+            </div>
+          </ng-template>
+        </p-dropdown>
+
+        <div *ngIf="!isEditMode" class="p-2 border-1 border-round surface-border text-sm">
+          <div class="font-medium text-900">
+            {{ commande.contact?.nom_complet || 'Non renseigné' }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Lignes de commande -->
+      <div class="overflow-auto">
+        <table class="w-full text-sm text-left">
+          <thead class="text-xs text-gray-700">
+            <tr>
+              <th class="py-2">Produit</th>
+              <th class="py-2">Quantité</th>
+              <th class="py-2">Prix unitaire</th>
+              <th class="py-2">Sous-total</th>
+              <th class="py-2" *ngIf="isEditMode"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let ligne of lignes; let i = index">
+              <td class="py-2">
+                <p-dropdown
+                  *ngIf="isEditMode"
+                  [options]="produits"
+                  [(ngModel)]="ligne.produit"
+                  optionLabel="nom"
+                  placeholder="Sélectionner un produit"
+                  appendTo="body"
+                  (onChange)="onProduitChange(i)"
+                  styleClass="w-full"
+                ></p-dropdown>
+                <div *ngIf="!isEditMode">
+                  {{ ligne.produit?.nom || 'N/A' }}
+                </div>
+                <div *ngIf="apiErrors?.['lignes.' + i + '.produit_id']" class="text-red-500 text-xs mt-1">
+                  {{ apiErrors['lignes.' + i + '.produit_id'][0] }}
+                </div>
+              </td>
+
+              <td class="py-2">
+                <input
+                  *ngIf="isEditMode"
+                  type="number"
+                  class="p-inputtext w-full"
+                  [(ngModel)]="ligne.quantite"
+                  (input)="recalculerTotal()"
+                  min="1"
+                />
+                <div *ngIf="!isEditMode">
+                  {{ ligne.quantite }}
+                </div>
+                <div *ngIf="apiErrors?.['lignes.' + i + '.quantite']" class="text-red-500 text-xs mt-1">
+                  {{ apiErrors['lignes.' + i + '.quantite'][0] }}
+                </div>
+              </td>
+
+              <td class="py-2">
+                <input
+                  *ngIf="isEditMode"
+                  type="number"
+                  class="p-inputtext w-full"
+                  [(ngModel)]="ligne.prix_vente"
+                  (input)="recalculerTotal()"
+                  min="0"
+                />
+                <div *ngIf="!isEditMode">
+                  {{ ligne.prix_vente | number: '1.0-0' }} GNF
+                </div>
+              </td>
+
+              <td class="py-2">
+                {{ ligne.quantite * ligne.prix_vente | number: '1.0-0' }} GNF
+              </td>
+
+              <td class="py-2 text-right" *ngIf="isEditMode">
+                <button
+                  pButton
+                  icon="pi pi-trash"
+                  class="p-button-danger p-button-sm"
+                  (click)="lignes.splice(i, 1); recalculerTotal()"
+                ></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Ajouter produit -->
+      <button
+        *ngIf="isEditMode"
+        pButton
+        icon="pi pi-plus"
+        label="Ajouter un produit"
+        class="p-button-sm mt-3"
+        (click)="ajouterLigne()"
+      ></button>
+
+      <!-- Totaux -->
+      <div class="text-right font-bold mt-4">
+        Total : {{ totalCommande | number: '1.0-0' }} GNF
+      </div>
+
+      <!-- Actions -->
+      <div
+        class="col-12 flex flex-column lg:flex-row justify-content-center align-items-center lg:justify-content-end my-6"
+      >
+        <!-- Annuler -->
+        <button
+          *ngIf="isEditMode"
+          pButton
+          pRipple
+          class="p-button-secondary p-button-outlined mt-3 lg:mt-0 w-full lg:w-auto flex-order-2 lg:flex-order-1 lg:mr-4"
+          label="Annuler"
+          icon="pi pi-fw pi-times"
+          (click)="cancelEdit()"
+        ></button>
+
+        <!-- Enregistrer -->
+        <button
+          *ngIf="isEditMode"
+          pButton
+          pRipple
+          class="p-button-primary w-full lg:w-auto flex-order-1 lg:flex-order-2"
+          label="Enregistrer"
+          icon="pi pi-fw pi-check"
+          (click)="saveCommande()"
+        ></button>
+
+        <!-- Modifier -->
+        <button
+          *ngIf="!isEditMode"
+          pButton
+          pRipple
+          class="p-button-warning mt-3 lg:mt-0 w-full lg:w-auto mr-3"
+          label="Modifier"
+          icon="pi pi-pencil"
+          (click)="editProduct()"
+        ></button>
+
+        <!-- Supprimer -->
+        <button
+          *ngIf="!isEditMode"
+          pButton
+          pRipple
+          class="p-button-danger w-full lg:w-auto"
+          label="Supprimer"
+          icon="pi pi-trash"
+          (click)="confirmDelete()"
+        ></button>
+      </div>
+    </div>
+  </div>
 </div>
+ 

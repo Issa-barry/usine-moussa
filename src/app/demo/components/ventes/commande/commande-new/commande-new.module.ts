@@ -13,6 +13,9 @@ import { MultiSelectModule } from 'primeng/multiselect';
 
 import { CommandeNewRoutingModule } from './commande-new-routing.module';
 import { CommandeNewComponent } from './commande-new.component';
+import { TableModule } from 'primeng/table';
+import { MessageModule } from 'primeng/message';
+import { ToastModule } from 'primeng/toast';
 
 
 @NgModule({
@@ -32,6 +35,9 @@ import { CommandeNewComponent } from './commande-new.component';
         InputGroupModule,
         InputGroupAddonModule,
         MultiSelectModule,
+        TableModule,
+        MessageModule,
+        ToastModule,
   ]
 })
 export class CommandeNewModule { }

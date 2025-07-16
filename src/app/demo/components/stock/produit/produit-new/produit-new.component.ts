@@ -7,15 +7,15 @@ import { Categorie } from 'src/app/demo/enums/categorie.enum';
 @Component({
   selector: 'app-produit-new',
   templateUrl: './produit-new.component.html',
-  styleUrls: ['./produit-new.component.scss'],
+  styleUrls: ['./produit-new.component.scss']
 })
 export class ProduitNewComponent {
   @ViewChildren('buttonEl') buttonEl!: QueryList<ElementRef>;
 
   produit: Produit = new Produit();
- submitted: boolean = false;
-apiErrors: { [key: string]: string[] } = {};
-errorMessage: string = '';
+  submitted: boolean = false;
+  apiErrors: { [key: string]: string[] } = {};
+  errorMessage: string = '';
 
   uploadedFiles: any[] = [];
   categoryOptions = Object.values(Categorie);
@@ -26,53 +26,49 @@ errorMessage: string = '';
     private router: Router
   ) {}
 
-onUpload(event: any) {
-  const file: File = event.files[0];
+  onUpload(event: any) {
+    const file: File = event.files[0];
 
-  if (file) {
-    this.produit.image = file.name;
+    if (file) {
+      this.produit.image = file.name;
 
-    // Optionnel : aperçu
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      this.produit['imagePreview'] = e.target.result;
-    };
-    reader.readAsDataURL(file);
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.produit['imagePreview'] = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
   }
-}
 
   removeImage() {
     this.produit.image = '';
   }
 
-saveProduit() {
-  this.submitted = true;
-  this.apiErrors = {};
-  this.errorMessage = '';
+  saveProduit() {
+    this.submitted = true;
+    this.apiErrors = {};
+    this.errorMessage = '';
 
-  this.produitService.createProduit(this.produit).subscribe({
-    next: (produit: Produit) => {
-  const newId = produit.id;
-  if (newId) {
-    this.router.navigate(['/dashboard/stock/produit/produit-detail', newId]);
-  } else {
-    this.router.navigate(['/dashboard/stock/produit/produit-liste']);
-  }
-}
-,
-    error: (err) => {
-      console.log('Erreur lors de la création du produit', err.error?.data);
+    this.produitService.createProduit(this.produit).subscribe({
+      next: (produit: Produit) => {
+        const newId = produit.id;
+        if (newId) {
+          this.router.navigate(['/dashboard/stock/produit/produit-detail', newId]);
+        } else {
+          this.router.navigate(['/dashboard/stock/produit/produit-liste']);
+        }
+      },
+      error: (err) => {
+        console.error('Erreur lors de la création du produit', err.error?.data);
 
-      if (err.error && err.error.data) {
-        this.apiErrors = err.error.data;
+        if (err.error && err.error.data) {
+          this.apiErrors = err.error.data;
+        }
+
+        this.errorMessage = err.error?.message || 'Une erreur est survenue.';
       }
-
-      this.errorMessage = err.error?.message || 'Une erreur est survenue.';
-    },
-  });
-}
-
-
+    }); 
+  }
 
   onGoToProduits() {
     this.router.navigate(['/dashboard/stock/produit/produit-liste']);

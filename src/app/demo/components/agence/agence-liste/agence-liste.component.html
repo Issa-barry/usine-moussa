@@ -97,8 +97,8 @@
                         <td>{{ agence.reference }}</td>
                         <td>{{ agence.nom_agence }}</td>
                         <td>{{ agence.phone }}</td>
-                        <td>{{ agence.adresse?.adresse }}</td>
-                        <td>{{ agence.responsable?.nom_complet }}</td>
+                        <td>{{ agence.adresse.adresse }}</td>
+                        <td>{{ agence.responsable.nom_complet }}</td>
                         <td>
                             <span [ngClass]="'product-badge status-' + agence.statut.toLowerCase()">
                                 {{ agence.statut }}
@@ -150,11 +150,11 @@
                     <p><strong>Nom :</strong> {{ agence.nom_agence }}</p>
                     <p><strong>Email :</strong> {{ agence.email }}</p>
                     <p><strong>Téléphone :</strong> {{ agence.phone }}</p>
-                    <p><strong>Pays :</strong> {{ agence.adresse?.pays }}</p>
-                    <p><strong>Ville :</strong> {{ agence.adresse?.ville }}</p>
-                    <p><strong>Quartier :</strong> {{ agence.adresse?.quartier }}</p>
-                    <p><strong>Adresse :</strong> {{ agence.adresse?.adresse }}</p>
-                    <p><strong>Code Postal :</strong> {{ agence.adresse?.code_postal }}</p>
+                    <p><strong>Pays :</strong> {{ agence.adresse.pays }}</p>
+                    <p><strong>Ville :</strong> {{ agence.adresse.ville }}</p>
+                    <p><strong>Quartier :</strong> {{ agence.adresse.quartier }}</p>
+                    <p><strong>Adresse :</strong> {{ agence.adresse.adresse }}</p>
+                    <p><strong>Code Postal :</strong> {{ agence.adresse.code_postal }}</p>
                 </ng-container>
             </ng-template>
 

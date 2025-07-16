@@ -18,7 +18,7 @@ import { Role } from "./Role";
     agence_id?:number;
     statut: string;
     role?: any;
-    adresse: Adresse;
+    adresse: Adresse; 
 
     constructor()
     {

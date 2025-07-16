@@ -1,154 +1,157 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { SelectItem } from 'primeng/api';
-import { CountryService } from 'src/app/demo/service/country.service';
- 
+import { CommandeService } from 'src/app/demo/service/ventes/commande/commande.service';
+import { ProduitService } from 'src/app/demo/service/produit/produit.service';
+import { Produit } from 'src/app/demo/models/produit.model';
+import { ContactService } from 'src/app/demo/service/contact/contact.service';
+import { Contact } from 'src/app/demo/models/contact';
+import { CreateCommandeDto } from 'src/app/demo/models/commande-create.dto';
 
 @Component({
   selector: 'app-commande-new',
   templateUrl: './commande-new.component.html',
-  styleUrl: './commande-new.component.scss',
-        providers: [MessageService, ConfirmationService]
-
+  styleUrls: ['./commande-new.component.scss'],
+  providers: [MessageService, ConfirmationService],
 })
 export class CommandeNewComponent implements OnInit {
-    titrePage: string = 'Créer une commande';
-    quantities: number[] = [1, 1, 1];
+  lignes: {
+    produit: Produit | null;
+    quantite: number;
+    prix_vente: number;
+  }[] = [];
 
-    value: string = '';
+  reduction: number = 0;
+  totalCommande: number = 0; 
+  totalBrut: number = 0;
+  selectedLivreur: Contact | null = null;
 
-    checked: boolean = true;
+  produits: Produit[] = [];
+  contacts: Contact[] = [];
 
-    checked2: boolean = true;
+  errorMessage: string = '';
+  apiErrors: { [key: string]: string[] } = {};
 
-    // cities = [
-    //     { name: 'USA / New York', code: 'NY' },
-    //     { name: 'Italy / Rome', code: 'RM' },
-    //     { name: 'United Kingdoom / London', code: 'LDN' },
-    //     { name: 'Turkey / Istanbul', code: 'IST' },
-    //     { name: 'France / Paris', code: 'PRS' },
-    // ];
+  constructor(
+    private router: Router,
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService,
+    private commandeService: CommandeService,
+    private produitService: ProduitService,
+    private contactService: ContactService
+  ) {}
 
-    selectedCity: string = '';
+  ngOnInit(): void {
+    this.loadProduits();
+    this.loadContacts();
+    this.ajouterLigne();
+  }
 
-    constructor(
-        private router: Router,
-        private messageService: MessageService,
-        private confirmationService: ConfirmationService,
-        private countryService: CountryService
-    ) {}
+  loadContacts(): void {
+    this.contactService.getContacts().subscribe({
+      next: (res) => {
+        this.contacts = res;
+      },
+      error: (err) => {
+        console.error('Erreur lors de la récupération des contacts:', err);
+      },
+    });
+  }
 
-     onGoToListeCommande() {
-        this.router.navigate(['/ventes']);
-    }
-
-selectedClient: any = null;
-selectedProduit: any = null;
-selectedLivreur: any = null;
-selectedDepot: any = null;
-
-total: number = 0;
-quantite: number = 1;
-
-clients = [
-    { nom: 'Issa Barry', telephone: '+224 622 000 000' },
-    { nom: 'Aïssatou Diallo', telephone: '+224 622 111 111' },
-    { nom: 'Mohamed Camara', telephone: '+224 622 222 222' },
-    { nom: 'Fatoumata Bah', telephone: '+224 622 333 333' },
-];
-
-produits = [
-    { nom: 'Eau Minérale 1L', reference: 'EAU-001' },
-    { nom: 'Pack Jus de Bissap', reference: 'JUS-012' },
-    { nom: 'Sac de Riz 25kg', reference: 'RIZ-025' },
-    { nom: 'Boîte de Sardine', reference: 'SAR-003' },
-];
-
-livreurs = [
-    { nom: 'Alpha Condé', telephone: '+224 622 444 444' },
-    { nom: 'Mamadou Sylla', telephone: '+224 622 555 555' },
-    { nom: 'Ibrahima Touré', telephone: '+224 622 666 666' },
-];
-
-depots = [
-    { nom: 'Dépôt Matoto', telephone: '+224 622 777 777' },
-    { nom: 'Dépôt Kipé', telephone: '+224 622 888 888' },
-    { nom: 'Dépôt Enco5', telephone: '+224 622 999 999' },
-];
-
-
-// multiselection : 
-countries: any[] = [];
-
-    filteredCountries: any[] = [];
-
-    selectedCountryAdvanced: any[] = [];
-
-    valSlider = 50;
-
-    valColor = '#424242';
-
-    valRadio: string = '';
-
-    valCheck: string[] = [];
-
-    valCheck2: boolean = false;
-
-    valSwitch: boolean = false;
-
-    cities: SelectItem[] = [];
-
-    selectedList: SelectItem = { value: '' };
-
-    selectedDrop: SelectItem = { value: '' };
-
-    selectedMulti: any[] = [];
-
-    valToggle = false;
-
-    paymentOptions: any[] = [];
-
-    valSelect1: string = "";
-
-    valSelect2: string = "";
-
-    valueKnob = 20;
-
-   
-
-    ngOnInit() {
-        this.countryService.getCountries().then(countries => {
-            this.countries = countries;
+  loadProduits(): void {
+    this.produitService.getProduits().subscribe({
+      next: (data) => {
+        this.produits = data;
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erreur',
+          detail: err.message,
         });
+      },
+    });
+  }
 
-        this.cities = [
-            { label: 'Pack 5', value: { id: 1, name: 'New York', code: 'NY' } },
-            { label: 'Pack 10', value: { id: 2, name: 'Rome', code: 'RM' } },
-            { label: 'Pack 20', value: { id: 3, name: 'London', code: 'LDN' } },
-            { label: 'Rouleau sachet', value: { id: 4, name: 'Istanbul', code: 'IST' } },
-            { label: 'Emballage', value: { id: 5, name: 'Paris', code: 'PRS' } }
-        ];
+  ajouterLigne(): void {
+    this.lignes.push({ produit: null, quantite: 1, prix_vente: 0 });
+  }
 
-        this.paymentOptions = [
-            { name: 'Option 1', value: 1 },
-            { name: 'Option 2', value: 2 },
-            { name: 'Option 3', value: 3 }
-        ];
+  supprimerLigne(index: number): void {
+    this.lignes.splice(index, 1);
+    this.recalculerTotal();
+  }
+
+  onProduitChange(index: number): void {
+    const produit = this.lignes[index].produit;
+    if (produit && produit.prix_vente !== undefined) {
+      this.lignes[index].prix_vente = produit.prix_vente;
     }
+    this.recalculerTotal();
+  }
 
-    filterCountry(event: any) {
-        const filtered: any[] = [];
-        const query = event.query;
-        for (let i = 0; i < this.countries.length; i++) {
-            const country = this.countries[i];
-            if (country.name.toLowerCase().indexOf(query.toLowerCase()) == 0) {
-                filtered.push(country);
-            }
-        } 
+  recalculerTotal(): void {
+    const brut = this.lignes.reduce((total, ligne) => {
+      const quantite = ligne.quantite || 0;
+      const prix = ligne.prix_vente || 0;
+      return total + quantite * prix;
+    }, 0);
+    this.totalBrut = brut;
+    this.totalCommande = brut - this.reduction;
+  }
 
-        this.filteredCountries = filtered;
+  onGoToListeCommande(): void {
+    this.router.navigate(['/dashboard/ventes/commande']);
+  }
+
+  onSubmit(): void {
+  this.errorMessage = '';
+  this.apiErrors = {};
+
+  const lignesValides = this.lignes.filter(l => l.produit !== null);
+
+  // if (!this.selectedLivreur || lignesValides.length === 0) {
+  //   this.messageService.add({
+  //     severity: 'warn',
+  //     summary: 'Champs requis',
+  //     detail: 'Veuillez sélectionner un livreur et au moins un produit.'
+  //   });
+  //   return;
+  // }
+
+  const lignesPayload = lignesValides.map(ligne => ({
+    produit_id: ligne.produit!.id!,
+    quantite: ligne.quantite,
+    prix_vente: ligne.prix_vente
+  }));
+
+  const payload: CreateCommandeDto = {
+    contact_id: this.selectedLivreur!.id!,
+    reduction: this.reduction,
+    lignes: lignesPayload
+  };
+
+  this.commandeService.createCommande(payload).subscribe({
+    next: () => {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Succès',
+        detail: 'Commande créée avec succès.'
+      });
+      this.router.navigate(['/dashboard/ventes/commande']);
+    },
+    error: (err) => {
+      console.error('IBA ERREUR', err);
+
+      if (err.error && err.error.data) {
+        this.apiErrors = err.error.data;
+        console.log("mon iba", this.apiErrors);
+        
+      }
+ 
+      this.errorMessage = err.error?.message || 'Données invalides';
     }
-    
+  });
 }
 
+}

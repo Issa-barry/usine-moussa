@@ -30,6 +30,7 @@ const routes: Routes = [
             { path: 'parametre', loadChildren: () => import('./demo/components/parametre/parametre.module').then(m => m.ParametreModule) },
             { path: 'stock', loadChildren: () => import('./demo/components/stock/stock.module').then(m => m.StockModule) },
             { path: 'ventes', loadChildren: () => import('./demo/components/ventes/ventes.module').then(m => m.VentesModule) },
+            { path: 'packing', loadChildren: () => import('./demo/components/packing/packing.module').then(m => m.PackingModule) },
 
 
         ]

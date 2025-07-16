@@ -155,10 +155,10 @@
       <div class="mb-2"><strong>Nom :</strong> {{ agence.nom_agence }}</div>
       <div class="mb-2"><strong>Email :</strong> {{ agence.email }}</div>
       <div class="mb-2"><strong>Téléphone :</strong> {{ agence.phone }}</div>
-      <div class="mb-2"><strong>Pays :</strong> {{ agence.adresse?.pays }}</div>
-      <div class="mb-2"><strong>Adresse :</strong> {{ agence.adresse?.adresse }}</div>
-      <div class="mb-2"><strong>Ville :</strong> {{ agence.adresse?.ville }}</div>
-      <div class="mb-2"><strong>Code Postal :</strong> {{ agence.adresse?.code_postal }}</div>
+      <div class="mb-2"><strong>Pays :</strong> {{ agence.adresse.pays }}</div>
+      <div class="mb-2"><strong>Adresse :</strong> {{ agence.adresse.adresse }}</div>
+      <div class="mb-2"><strong>Ville :</strong> {{ agence.adresse.ville }}</div>
+      <div class="mb-2"><strong>Code Postal :</strong> {{ agence.adresse && agence.adresse.code_postal }}</div>
     </div>
   </ng-template>
 

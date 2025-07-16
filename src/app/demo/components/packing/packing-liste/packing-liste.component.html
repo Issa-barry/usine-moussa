@@ -1,0 +1,106 @@
+<div class="grid">
+  <div class="col-12">
+    <div class="card px-6 py-6">
+      <p-toast></p-toast>
+
+      <p-toolbar styleClass="mb-4">
+        <ng-template pTemplate="left">
+          <div class="my-2">
+            <button pButton pRipple label="Nouveau" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()"></button>
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="right">
+          <button pButton pRipple label="Export" icon="pi pi-upload" class="p-button-help" (click)="dt.exportCSV()"></button>
+        </ng-template>
+      </p-toolbar>
+
+      <p-table #dt [value]="packings" [columns]="cols" responsiveLayout="scroll" [rows]="10" [globalFilterFields]="['reference','statut']"
+               [paginator]="true" [rowsPerPageOptions]="rowsPerPageOptions" [showCurrentPageReport]="true"
+               currentPageReportTemplate="{first} à {last} sur {totalRecords}" [(selection)]="selectedPackings" selectionMode="multiple" dataKey="id">
+
+        <ng-template pTemplate="caption">
+          <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+            <h5 class="m-0">Liste des packings</h5>
+            <span class="block mt-2 md:mt-0 p-input-icon-left">
+              <i class="pi pi-search"></i>
+              <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Rechercher..." class="w-full sm:w-auto" />
+            </span>
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 3rem">
+              <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+            </th>
+            <th *ngFor="let col of cols" [pSortableColumn]="col.field">
+              {{ col.header }}
+              <p-sortIcon [field]="col.field"></p-sortIcon>
+            </th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-packing>
+          <tr>
+            <td>
+              <p-tableCheckbox [value]="packing"></p-tableCheckbox>
+            </td>
+            <td>{{ packing.reference }}</td>
+            <td>{{ packing.user?.nom_complet }}</td>
+            <td>{{ packing.date | date }}</td>
+            <td>{{ packing.statut }}</td>
+            <td>
+              <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-info" (click)="selectedPacking = packing; showDetailDialog = true"></button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      <p-dialog [(visible)]="showDetailDialog" header="Détails du packing" [modal]="true" [style]="{width: '700px'}">
+        <div *ngIf="selectedPacking">
+          <p><b>Référence :</b> {{ selectedPacking.reference }}</p>
+          <p><b>Employé :</b> {{ selectedPacking.user?.nom_complet }}</p>
+          <p><b>Date :</b> {{ selectedPacking.date | date }}</p>
+          <p><b>Heure début :</b> {{ selectedPacking.heure_debut }}</p>
+          <p><b>Heure fin :</b> {{ selectedPacking.heure_fin }}</p>
+          <p><b>Statut :</b> {{ selectedPacking.statut }}</p>
+          <p><b>Nombre de lignes :</b> {{ selectedPacking.lignes?.length || 0 }}</p>
+
+          <p-table [value]="selectedPacking.lignes" responsiveLayout="scroll">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Produit</th>
+                <th>Quantité utilisée</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-ligne>
+              <tr>
+                <td>{{ ligne.produit?.nom }}</td>
+                <td>{{ ligne.quantite_utilisee }}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+        <ng-template pTemplate="footer">
+          <!-- <button pButton pRipple icon="pi pi-pencil" class="p-button-text p-button-warning" label="Modifier" [routerLink]="['/dashboard/packing/packing-detail', selectedPacking?.id]" (click)="showDetailDialog = false"></button> -->
+          <button pButton pRipple icon="pi pi-pencil" class="p-button-text p-button-warning" label="Modifier" [routerLink]="['/dashboard/packing/packing-edit', selectedPacking?.id]" (click)="showDetailDialog = false"></button>
+          <button pButton pRipple icon="pi pi-trash" class="p-button-text p-button-danger" label="Supprimer" (click)="deletePacking(selectedPacking!)"></button>
+          <button pButton pRipple icon="pi pi-times" class="p-button-text" label="Fermer" (click)="showDetailDialog = false"></button>
+        </ng-template>
+      </p-dialog>
+
+      <p-dialog [(visible)]="deletePackingDialog" header="Confirmation" [modal]="true" [style]="{width: '450px'}">
+        <div class="flex align-items-center justify-content-center">
+          <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+          <span *ngIf="packing">Confirmer la suppression du packing <b>{{packing.reference}}</b> ?</span>
+        </div>
+        <ng-template pTemplate="footer">
+          <button pButton pRipple icon="pi pi-times" class="p-button-text" label="Non" (click)="deletePackingDialog = false"></button>
+          <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Oui" (click)="confirmDelete()"></button>
+        </ng-template>
+      </p-dialog>
+    </div>
+  </div>
+</div>
