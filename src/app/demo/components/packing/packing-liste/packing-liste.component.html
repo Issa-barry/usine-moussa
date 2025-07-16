@@ -58,7 +58,7 @@
         </ng-template>
       </p-table>
 
-      <p-dialog [(visible)]="showDetailDialog" header="Détails du packing" [modal]="true" [style]="{width: '600px'}">
+      <p-dialog [(visible)]="showDetailDialog" header="Détails du packing" [modal]="true" [style]="{width: '700px'}">
         <div *ngIf="selectedPacking">
           <p><b>Référence :</b> {{ selectedPacking.reference }}</p>
           <p><b>Employé :</b> {{ selectedPacking.user?.nom_complet }}</p>
@@ -67,6 +67,21 @@
           <p><b>Heure fin :</b> {{ selectedPacking.heure_fin }}</p>
           <p><b>Statut :</b> {{ selectedPacking.statut }}</p>
           <p><b>Nombre de lignes :</b> {{ selectedPacking.lignes?.length || 0 }}</p>
+
+          <p-table [value]="selectedPacking.lignes" responsiveLayout="scroll">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Produit</th>
+                <th>Quantité utilisée</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-ligne>
+              <tr>
+                <td>{{ ligne.produit?.nom }}</td>
+                <td>{{ ligne.quantite_utilisee }}</td>
+              </tr>
+            </ng-template>
+          </p-table>
         </div>
         <ng-template pTemplate="footer">
           <button pButton pRipple icon="pi pi-trash" class="p-button-text p-button-danger" label="Supprimer" (click)="deletePacking(selectedPacking!)"></button>
