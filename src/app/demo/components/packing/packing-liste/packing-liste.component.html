@@ -6,7 +6,7 @@
       <p-toolbar styleClass="mb-4">
         <ng-template pTemplate="left">
           <div class="my-2">
-            <button pButton pRipple label="Nouveau" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()"></button>
+            <button pButton pRipple label="Nouveau" [routerLink]="['/dashboard/packing/packing-new']" routerLinkActive="router-link-active"   icon="pi pi-plus" class="p-button-success mr-2"></button>
           </div>
         </ng-template>
 
