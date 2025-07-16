@@ -13,6 +13,7 @@ const routes: Routes = [
     },
     { path: 'packing-new', loadChildren: () => import('./packing-new/packing-new.module').then(m => m.PackingNewModule) },
     { path: 'packing-detail/:id', loadChildren: () => import('./packing-detail/packing-detail.module').then(m => m.PackingDetailModule) },
+    { path: 'packing-edit/:id', loadChildren: () => import('./packing-edit/packing-edit.module').then(m => m.PackingEditModule) },
 ];
 
 @NgModule({
