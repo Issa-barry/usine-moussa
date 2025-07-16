@@ -2,7 +2,7 @@
   <div class="col-12">
     <div class="card px-6 py-6">
       <p-toast></p-toast>
-
+      <p-confirmDialog></p-confirmDialog>
       <p-toolbar styleClass="mb-4">
         <ng-template pTemplate="left">
           <button
@@ -50,7 +50,7 @@
               <input
                 pInputText
                 type="text"
-                (input)="onGlobalFilter(dt, $event)"
+                (input)="onGlobalFilter(dt, $event)" 
                 placeholder="Recherche..."
                 class="w-full sm:w-auto"
               />
@@ -83,7 +83,7 @@
         </ng-template>
 
         <ng-template pTemplate="body" let-commande>
-          <tr>
+          <tr >
             <td>
               <p-tableCheckbox [value]="commande"></p-tableCheckbox>
             </td>
@@ -93,20 +93,83 @@
             <td>{{ commande.qte_total }}</td>
             <td>{{ commande.statut }}</td>
             <td>
-              <button
+             <!-- Bouton selon le statut -->
+<ng-container [ngSwitch]="commande.statut">
+   <button
                 pButton
                 pRipple
                 icon="pi pi-eye"
                 class="p-button-rounded p-button-suces mr-2"
                 (click)="viewCommande(commande)"
               ></button>
-               <button
-                pButton
-                pRipple
-                icon="pi pi-check"
-                class="p-button-rounded p-button-info mr-2"
-                (click)="viewCommande(commande)"
-              ></button>
+  <!-- Brouillon : bouton de validation -->
+  <button
+    *ngSwitchCase="'brouillon'"
+    pButton
+    pRipple
+    icon="pi pi-check"
+    class="p-button-rounded p-button-info mr-2"
+    tooltip="Valider la commande"
+    (click)="validerCommande(commande)"
+  ></button>
+
+  <!-- Livraison en cours -->
+  <button
+    *ngSwitchCase="'livraison_en_cours'"
+    pButton
+    pRipple
+    icon="pi pi-truck"
+    class="p-button-rounded p-button-warning mr-2"
+    tooltip="En livraison"
+    disabled
+  ></button>
+
+  <!-- Livré -->
+  <button
+    *ngSwitchCase="'livré'"
+    pButton
+    pRipple
+    icon="pi pi-box"
+    class="p-button-rounded p-button-success mr-2"
+    tooltip="Commande livrée"
+    disabled
+  ></button>
+
+  <!-- Payé -->
+  <button
+    *ngSwitchCase="'payé'"
+    pButton
+    pRipple
+    icon="pi pi-credit-card"
+    class="p-button-rounded p-button-success mr-2"
+    tooltip="Commande payée"
+    disabled
+  ></button>
+
+  <!-- Annulé -->
+  <button
+    *ngSwitchCase="'annulé'"
+    pButton
+    pRipple
+    icon="pi pi-ban"
+    class="p-button-rounded p-button-secondary mr-2"
+    tooltip="Commande annulée"
+    disabled
+  ></button>
+
+  <!-- Statut inconnu -->
+  <button
+    *ngSwitchDefault
+    pButton
+    pRipple
+    icon="pi pi-question"
+    class="p-button-rounded p-button-help mr-2"
+    tooltip="Statut inconnu"
+    disabled
+  ></button>
+
+</ng-container>
+
             </td>
           </tr>
         </ng-template>

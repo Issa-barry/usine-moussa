@@ -87,4 +87,40 @@ commandeDetailDialog: boolean = false;
     }
  
 
+    validerCommande(commande: Commande): void {
+
+  this.confirmationService.confirm({
+    message: 'Valider cette commande ?',
+    header: 'Confirmation',
+    icon: 'pi pi-exclamation-triangle',
+    accept: () => {
+      this.commandeService.validerCommande(commande.numero).subscribe({
+        next: (updatedCommande) => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Succès',
+            detail: 'Commande validée avec succès.'
+            
+          });
+           this.getAllCommandes()
+          // Met à jour la commande localement
+          // const index = this.commandes.findIndex(c => c.numero === updatedCommande.numero);
+          // if (index !== -1) {
+          //   this.commandes[index] = updatedCommande;
+          // }
+          this.commandeDetailDialog = false;
+        },
+        error: (err) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erreur',
+            detail: err.error?.message || 'Échec de la validation.'
+          });
+        }
+      });
+    }
+  });
+}
+
+
 }
