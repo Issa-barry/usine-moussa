@@ -4,6 +4,9 @@ import { PackingService } from 'src/app/demo/service/packing/packing.service';
 import { Packing } from 'src/app/demo/models/packing.model';
 import { ContactService } from 'src/app/demo/service/contact/contact.service';
 import { Contact } from 'src/app/demo/models/contact';
+import { ProduitService } from 'src/app/demo/service/produit/produit.service';
+import { Produit } from 'src/app/demo/models/produit.model';
+import { PackingLigne } from 'src/app/demo/models/packing-ligne.model';
 
 @Component({
   selector: 'app-packing-edit',
@@ -18,6 +21,7 @@ export class PackingEditComponent implements OnInit {
     { label: 'Annulé', value: 'annule' },
   ];
   contacts: Contact[] = [];
+  produits: Produit[] = [];
   loading = true;
   errorMessage = '';
 
@@ -25,10 +29,16 @@ export class PackingEditComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private packingService: PackingService,
-    private contactService: ContactService
+    private contactService: ContactService,
+    private produitService: ProduitService
   ) {}
 
   ngOnInit(): void {
+    this.produitService.getProduits().subscribe({
+      next: (data) => (this.produits = data),
+      error: (err) => (this.errorMessage = err.message),
+    });
+
     this.contactService.getContacts().subscribe({
       next: (data) => {
         this.contacts = data;
@@ -55,6 +65,19 @@ export class PackingEditComponent implements OnInit {
         }
       });
     }
+  }
+
+  addLigne(): void {
+    const ligne: PackingLigne = {
+      packing_id: this.packing.id || 0,
+      produit_id: 0,
+      quantite_utilisee: 1
+    };
+    this.packing.lignes.push(ligne);
+  }
+
+  removeLigne(index: number): void {
+    this.packing.lignes.splice(index, 1);
   }
 
   onSubmit(): void {
