@@ -68,12 +68,11 @@ export class PackingEditComponent implements OnInit {
   }
 
   addLigne(): void {
-    const ligne: PackingLigne = {
-      packing_id: this.packing.id || 0,
-      produit_id: 0,
-      quantite_utilisee: 1
-    };
-    this.packing.lignes.push(ligne);
+    this.packing.lignes.push({
+      produit_id: this.produits[0]?.id ?? 0,
+      quantite_utilisee: 1,
+      packing_id: this.packing.id!
+    });
   }
 
   removeLigne(index: number): void {
