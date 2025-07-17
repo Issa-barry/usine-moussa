@@ -46,6 +46,8 @@ export class PackingEditComponent implements OnInit {
       error: (err) => {
         this.errorMessage = err.message;
         this.loading = false;
+        console.log(err);
+        
       }
     });
 
@@ -68,12 +70,11 @@ export class PackingEditComponent implements OnInit {
   }
 
   addLigne(): void {
-    const ligne: PackingLigne = {
-      packing_id: this.packing.id || 0,
-      produit_id: 0,
-      quantite_utilisee: 1
-    };
-    this.packing.lignes.push(ligne);
+    this.packing.lignes.push({
+      produit_id: this.produits[0]?.id ?? 0,
+      quantite_packed: 1,
+      packing_id: this.packing.id!
+    });
   }
 
   removeLigne(index: number): void {
