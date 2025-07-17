@@ -49,7 +49,6 @@ export class PackingListeComponent implements OnInit {
       next: (data) => {
         this.packings = data;
         console.log(this.packings);
-        
       },
       error: (err) => this.messageService.add({
         severity: 'error',

@@ -8,7 +8,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { Livraison } from 'src/app/demo/models/livraison.model';
 import { LivraisonService } from 'src/app/demo/service/stock/livraison/livraison.service';
 import { Router } from '@angular/router';
-
+ 
 interface expandedRows {
     [key: string]: boolean;
 }
@@ -39,7 +39,7 @@ export class LivraisonListeComponent implements OnInit {
 
     rowGroupMetadata: any;
 
-    expandedRows: expandedRows = {};
+    // expandedRows: expandedRows = {};
 
     activityValues: number[] = [0, 100];
 
@@ -61,6 +61,7 @@ export class LivraisonListeComponent implements OnInit {
     submitted = false;
     selectedLivraison: any = null;
     livraisonDetailDialog: boolean = false;
+groupedLivraisons: any[] = [];
 
     constructor(
         private customerService: CustomerService, 
@@ -70,6 +71,8 @@ export class LivraisonListeComponent implements OnInit {
     private confirmationService: ConfirmationService,
     private router: Router, 
 ) { }
+
+
 
     ngOnInit() {
         this.customerService.getCustomersLarge().then(customers => {
@@ -109,23 +112,69 @@ export class LivraisonListeComponent implements OnInit {
         this.loadLivraisons();
     }
 // iba
+
 loadLivraisons(): void {
-    this.livraisonService.getAll().subscribe({
-      next: (data) => {
-        this.livraisons = data;
-        this.loading = false;
-        console.log(this.livraisons);
+  this.livraisonService.getAll().subscribe({
+    next: (data) => {
+      this.livraisons = data;
+
+      const grouped: { [key: string]: any[] } = {};
+
+      for (const livraison of this.livraisons) {
+        const numeroCommande = livraison.commande?.numero;
+        if (!numeroCommande) continue;
+
+        if (!grouped[numeroCommande]) {
+          grouped[numeroCommande] = [];
+        }
+
+        grouped[numeroCommande].push(livraison);
+      }
+
+      this.groupedLivraisons = Object.entries(grouped).map(([numero, livraisons]) => {
+        return {
+          numeroCommande: numero,
+          commande: livraisons[0].commande,
+          livreur: livraisons[0].commande?.contact,
+          livraisons: livraisons,
+          quantite_total: livraisons.reduce((sum, l) => sum + (l.quantite_total || 0), 0),
+          expanded: false, // pour le toggle dans le template
+        };
+      });
+
+      this.loading = false;
+
+      console.log(this.groupedLivraisons);
+    },
+
+    error: (err) =>
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Erreur',
+        detail: err.message,
+      }),
+
+    complete: () => (this.loading = false),
+  });
+}
+
+// loadLivraisons(): void {
+//     this.livraisonService.getAll().subscribe({
+//       next: (data) => {
+//         this.livraisons = data;
+//         this.loading = false;
+//         console.log(this.livraisons);
         
-      },
-      error: (err) =>
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erreur',
-          detail: err.message,
-        }),
-      complete: () => (this.loading = false),
-    });
-  }
+//       },
+//       error: (err) =>
+//         this.messageService.add({
+//           severity: 'error',
+//           summary: 'Erreur',
+//           detail: err.message,
+//         }),
+//       complete: () => (this.loading = false),
+//     });
+//   }
 
 
  viewLivraison(livraison: any) {
@@ -179,6 +228,24 @@ onGoToDetailLivraison(livraison: Livraison) {
         }
         this.isExpanded = !this.isExpanded;
     }
+
+    expandedRows: { [key: string]: boolean } = {};
+ 
+toggleExpandAll(): void {
+  if (this.isExpanded) {
+    // Réduire toutes les lignes
+    this.expandedRows = {};
+    this.isExpanded = false;
+  } else {
+    // Développer toutes les lignes
+    const expanded: { [key: string]: boolean } = {};
+    for (const group of this.groupedLivraisons) {
+      expanded[group.numeroCommande] = true;
+    }
+    this.expandedRows = expanded;
+    this.isExpanded = true;
+  }
+}
 
     formatCurrency(value: number) {
         return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });

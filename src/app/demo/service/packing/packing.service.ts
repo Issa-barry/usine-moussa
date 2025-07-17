@@ -74,7 +74,7 @@ export class PackingService {
   create(packing: Packing): Observable<Packing> {
     return this.http
       .post<{ success: boolean; data: Packing }>(
-        `${this.apiUrl}/store`,
+        `${this.apiUrl}/create`,
         packing,
         httpOptions
       )

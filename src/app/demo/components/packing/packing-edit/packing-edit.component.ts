@@ -46,6 +46,8 @@ export class PackingEditComponent implements OnInit {
       error: (err) => {
         this.errorMessage = err.message;
         this.loading = false;
+        console.log(err);
+        
       }
     });
 
@@ -70,7 +72,7 @@ export class PackingEditComponent implements OnInit {
   addLigne(): void {
     this.packing.lignes.push({
       produit_id: this.produits[0]?.id ?? 0,
-      quantite_utilisee: 1,
+      quantite_packed: 1,
       packing_id: this.packing.id!
     });
   }
