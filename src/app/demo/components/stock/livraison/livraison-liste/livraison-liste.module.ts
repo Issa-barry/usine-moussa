@@ -16,6 +16,7 @@ import { RatingModule } from 'primeng/rating';
 import { LivraisonListeRoutingModule } from './livraison-liste-routing.module';
 import { LivraisonListeComponent } from './livraison-liste.component';
 import { DialogModule } from 'primeng/dialog';
+import { SharedModule } from 'src/app/shared/pipes/shared.module';
 
 
 @NgModule({
@@ -37,7 +38,8 @@ import { DialogModule } from 'primeng/dialog';
         DropdownModule, 
         ProgressBarModule,
         ToastModule,
-        DialogModule
+        DialogModule,
+        SharedModule
   ]
 })
 export class LivraisonListeModule { }

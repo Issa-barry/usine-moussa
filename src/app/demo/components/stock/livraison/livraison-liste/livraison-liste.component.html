@@ -98,7 +98,7 @@
                     <tr>
                       <td>{{ liv.client?.nom_complet }}</td>
                       <td>{{ liv.reference }}</td>
-                      <td>{{ liv.date_livraison }}</td>
+                      <td>{{ liv.date_livraison | dateFr }}</td>
                       <td>{{ liv.quantite_total }}</td>
                       <td>{{ liv.statut }}</td>
                     </tr>
@@ -136,7 +136,7 @@
 
           <div class="field">
             <label><strong>Date :</strong></label>
-            <div>{{ selectedLivraison?.livraisons[0]?.created_at | date: 'medium' }}</div>
+            <div>{{ selectedLivraison?.livraisons[0]?.created_at | dateFr  }}</div>
           </div>
 
           <hr />

@@ -177,8 +177,11 @@ loadLivraisons(): void {
 //   }
 
 
- viewLivraison(livraison: any) {
-  this.selectedLivraison = livraison;
+viewLivraison(livraison: any) {
+  this.selectedLivraison = {
+    ...livraison,
+    createdAtDate: new Date(livraison.livraisons[0]?.created_at)
+  };
   this.livraisonDetailDialog = true;
 }
 

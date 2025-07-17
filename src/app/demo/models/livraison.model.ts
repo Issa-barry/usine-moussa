@@ -22,4 +22,6 @@ export class Livraison {
     constructor(init?: Partial<Livraison>) {
         Object.assign(this, init);
     }
+
+    
 }
