@@ -173,6 +173,13 @@
             class="p-button-text"
             (click)="livraisonDetailDialog = false"
           ></button>
+          <button
+            pButton
+            label="Détails"
+            icon="pi pi-arrow-right"
+            class="p-button-text"
+            (click)="onGoToDetailLivraison(selectedLivraison.livraisons[0])"
+          ></button>
         </ng-template>
       </p-dialog>
     </div>
