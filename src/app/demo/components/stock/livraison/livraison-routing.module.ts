@@ -12,7 +12,7 @@ const routes: Routes = [
             ),
     },
     {
-        path: 'livraison-new',
+        path: 'livraison-new/:id',
         loadChildren: () =>
             import('./livraison-new/livraison-new.module').then(
                 (m) => m.LivraisonNewModule

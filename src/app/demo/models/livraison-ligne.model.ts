@@ -6,6 +6,7 @@ export class LivraisonLigne {
     produit_id!: number;
     quantite!: number;
     montant_payer!: number;
+    updated_at?: string;
 
     // relation
     produit?: Produit;

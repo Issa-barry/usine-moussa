@@ -15,6 +15,7 @@ export class Produit {
   updated_at?: string;
   statut?:string;
    imagePreview?: string;
+    
 
   constructor()
       {
@@ -24,5 +25,6 @@ export class Produit {
           this.image ="defaut1.png";
           this.prix_achat = 0;
           this.cout = 0;
+          
       }
   }  
