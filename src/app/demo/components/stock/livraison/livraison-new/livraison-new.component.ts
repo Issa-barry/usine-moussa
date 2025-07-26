@@ -169,7 +169,8 @@ export class LivraisonNewComponent implements OnInit {
           summary: 'Succès',
           detail: 'Livraison validée et facture générée.'
         });
-        this.router.navigate(['/dashboard/ventes/livraison']);
+        // this.router.navigate(['/dashboard/ventes/livraison']);
+        this.loadCommande()
       },
       error: err => {
         console.error('Erreur validation livraison', err);

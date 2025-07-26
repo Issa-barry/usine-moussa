@@ -57,71 +57,84 @@
       <!-- Table des produits -->
       <div class="overflow-auto">
         <table class="w-full text-sm text-left">
-          <thead class="text-xs text-gray-700 border-b">
-            <tr>
-              <th class="py-2">Produit</th>
-              <th class="py-2">Qté Restante</th>
-              <th class="py-2">Prix unitaire</th>
-              <th class="py-2">Sous-total</th>
-              <th class="py-2"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let ligne of lignes; let i = index" class="border-b">
+  <thead class="text-xs text-gray-700 border-b">
+    <tr>
+      <th class="py-2">Produit</th>
+      <th class="py-2">Qté livrée</th>
+      <th class="py-2">Qté restante</th>
+      <th class="py-2">Prix unitaire</th>
+      <th class="py-2">Sous-total</th>
+      <th class="py-2"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let ligne of lignes; let i = index" class="border-b">
 
-              <!-- Produit -->
-              <td class="py-2">
-                <p-dropdown
-                  [options]="produits"
-                  [(ngModel)]="ligne.produit"
-                  optionLabel="nom"
-                  placeholder="Sélectionner un produit"
-                  appendTo="body"
-                  (onChange)="onProduitChange(i)"
-                  styleClass="w-full"
-                ></p-dropdown>
-                <div *ngIf="apiErrors?.['lignes.' + i + '.produit_id']" class="text-red-500 text-xs mt-1">
-                  {{ apiErrors['lignes.' + i + '.produit_id'][0] }}
-                </div>
-              </td>
+      <!-- Produit -->
+      <td class="py-2">
+        <p-dropdown
+          [options]="produits"
+          [(ngModel)]="ligne.produit"
+          optionLabel="nom"
+          placeholder="Sélectionner un produit"
+          appendTo="body"
+          (onChange)="onProduitChange(i)"
+          styleClass="w-full"
+        ></p-dropdown>
+        <div *ngIf="apiErrors?.['lignes.' + i + '.produit_id']" class="text-red-500 text-xs mt-1">
+          {{ apiErrors['lignes.' + i + '.produit_id'][0] }}
+        </div>
+      </td>
 
-              <!-- Quantité Restante (affichée) -->
-              <td class="py-2">
-                <input
-                  type="number"
-                  class="p-inputtext w-full"
-                  [value]="ligne.quantiteRestante"
-                  readonly
-                />
-              </td>
+      <!-- Qté livrée -->
+      <td class="py-2">
+        <input
+          type="number"
+          class="p-inputtext w-full"
+          [(ngModel)]="ligne.quantite"
+          (input)="recalculerTotal()"
+          min="1"
+          [max]="ligne.quantiteRestante"
+        />
+        <div *ngIf="apiErrors?.['lignes.' + i + '.quantite']" class="text-red-500 text-xs mt-1">
+          {{ apiErrors['lignes.' + i + '.quantite'][0] }}
+        </div>
+      </td>
 
-              <!-- Prix unitaire -->
-              <td class="py-2">
-                <input
-                  type="number"
-                  class="p-inputtext w-full"
-                  [(ngModel)]="ligne.prix_vente"
-                  min="0"
-                />
-              </td>
+      <!-- Qté restante (readonly) -->
+      <td class="py-2 text-center">
+        <span class="text-sm text-gray-700">{{ ligne.quantiteRestante }}</span>
+      </td>
 
-              <!-- Sous-total -->
-              <td class="py-2">
-                {{ ligne.quantiteRestante * ligne.prix_vente | number:'1.0-0' }} GNF
-              </td>
+      <!-- Prix unitaire -->
+      <td class="py-2">
+        <input
+          type="number"
+          class="p-inputtext w-full"
+          [(ngModel)]="ligne.prix_vente"
+          (input)="recalculerTotal()"
+          min="0"
+        />
+      </td>
 
-              <!-- Supprimer ligne -->
-              <td class="py-2 text-right">
-                <button
-                  pButton
-                  icon="pi pi-trash"
-                  class="p-button-danger p-button-sm"
-                  (click)="supprimerLigne(i)"
-                ></button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- Sous-total -->
+      <td class="py-2">
+        {{ ligne.quantite * ligne.prix_vente | number:'1.0-0' }} GNF
+      </td>
+
+      <!-- Supprimer -->
+      <td class="py-2 text-right">
+        <button
+          pButton
+          icon="pi pi-trash"
+          class="p-button-danger p-button-sm"
+          (click)="supprimerLigne(i)"
+        ></button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
       </div>
 
       <!-- Boutons -->
