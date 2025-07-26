@@ -100,4 +100,23 @@ export class LivraisonService {
             httpOption
         ).pipe(catchError(this.handleError));
     }
+
+    validerLivraison(data: {
+  commande_numero: string;
+  client_id: number;
+  date_livraison: string;
+  produits: { produit_id: number; quantite: number }[];
+}): Observable<{ livraison: Livraison; facture: any }> {
+  return this.http
+    .post<{ success: boolean; data: { livraison: Livraison; facture: any } }>(
+      `${this.apiUrl}/valider`,
+      data,
+      httpOption
+    )
+    .pipe(
+      map((res) => res.data),
+      catchError(this.handleError)
+    );
+}
+
 }

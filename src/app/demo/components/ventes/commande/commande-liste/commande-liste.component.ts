@@ -73,7 +73,7 @@ commandeDetailDialog: boolean = false;
     hideDialog() {
         this.commandeDetailDialog = false;
     }
- 
+  
 
     onGlobalFilter(table: Table, event: Event) {
         table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
@@ -85,9 +85,9 @@ commandeDetailDialog: boolean = false;
       onGoToDetailCommande(commande: Commande) {
         this.router.navigate(['/dashboard/ventes/commande/commande-detail', commande.numero]);
     }
- 
+  
 
-    validerCommande(commande: Commande): void {
+  validerCommande(commande: Commande): void {
 
   this.confirmationService.confirm({
     message: 'Valider cette commande ?',
@@ -100,7 +100,7 @@ commandeDetailDialog: boolean = false;
             severity: 'success',
             summary: 'Succès',
             detail: 'Commande validée avec succès.'
-            
+             
           });
            this.getAllCommandes()
           // Met à jour la commande localement

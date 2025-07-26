@@ -17,7 +17,9 @@ import { LivraisonListeRoutingModule } from './livraison-liste-routing.module';
 import { LivraisonListeComponent } from './livraison-liste.component';
 import { DialogModule } from 'primeng/dialog';
 import { SharedModule } from 'src/app/shared/pipes/shared.module';
-
+import { SkeletonModule } from 'primeng/skeleton';
+import { ToolbarModule } from 'primeng/toolbar';
+ 
 
 @NgModule({
   declarations: [
@@ -39,7 +41,9 @@ import { SharedModule } from 'src/app/shared/pipes/shared.module';
         ProgressBarModule,
         ToastModule,
         DialogModule,
-        SharedModule
+        SharedModule,
+        SkeletonModule,
+        ToolbarModule
   ]
 })
 export class LivraisonListeModule { }

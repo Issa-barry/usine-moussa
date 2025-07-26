@@ -63,6 +63,8 @@ export class LivraisonListeComponent implements OnInit {
     livraisonDetailDialog: boolean = false;
 groupedLivraisons: any[] = [];
 
+ skeletonRows = Array.from({ length: 5 }, () => ({}));
+
     constructor(
         private customerService: CustomerService, 
         private productService: ProductService,
@@ -114,6 +116,7 @@ groupedLivraisons: any[] = [];
 // iba
 
 loadLivraisons(): void {
+    this.loading = true;
   this.livraisonService.getAll().subscribe({
     next: (data) => {
       this.livraisons = data;
@@ -262,5 +265,9 @@ toggleExpandAll(): void {
         table.clear();
         this.filter.nativeElement.value = '';
     }
-    
+
+    onGoToNewLivraison(numero: string) {
+      this.router.navigate(['/dashboard/stock/livraison/livraison-new', numero]);
+    }
+ 
 }   
