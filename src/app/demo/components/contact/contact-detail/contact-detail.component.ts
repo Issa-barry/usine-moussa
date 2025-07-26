@@ -2,7 +2,7 @@ import {
     Component,
     Input,
     OnInit,
-    OnDestroy
+    OnDestroy 
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';

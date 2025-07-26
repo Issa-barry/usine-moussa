@@ -7,7 +7,7 @@ import {
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { environment } from 'src/environements/environment.dev';
 import { Livraison } from 'src/app/demo/models/livraison.model';
- 
+
 const httpOption = {
     headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -39,11 +39,11 @@ export class LivraisonService {
                     errorMessage = error.error.message || 'Requête invalide.';
                     break;
                 case 404:
-                    errorMessage = 'Livraison non trouvée.';
+                    errorMessage = error.error?.message || 'Ressource non trouvée.';
                     break;
                 case 422:
                     errorMessage = 'Validation échouée.';
-                    if (error.error && error.error.data?.errors) {
+                    if (error.error?.data?.errors) {
                         validationErrors = error.error.data.errors;
                     }
                     break;
@@ -66,17 +66,8 @@ export class LivraisonService {
     }
 
     getById(id: number): Observable<Livraison> {
-        return this.http.get<{ success: boolean; data: Livraison }>(`${this.apiUrl}/showById/${id}`).pipe(
-            map(res => res.data),
-            catchError(this.handleError)
-        );
-    }
-
-    create(livraison: Livraison): Observable<Livraison> {
-        return this.http.post<{ success: boolean; data: Livraison }>(
-            `${this.apiUrl}/store`,
-            livraison,
-            httpOption
+        return this.http.get<{ success: boolean; data: Livraison }>(
+            `${this.apiUrl}/byId/${id}`
         ).pipe(
             map(res => res.data),
             catchError(this.handleError)
@@ -85,7 +76,7 @@ export class LivraisonService {
 
     update(id: number, livraison: Livraison): Observable<Livraison> {
         return this.http.put<{ success: boolean; data: Livraison }>(
-            `${this.apiUrl}/update/${id}`,
+            `${this.apiUrl}/updateById/${id}`,
             livraison,
             httpOption
         ).pipe(
@@ -96,27 +87,37 @@ export class LivraisonService {
 
     delete(id: number): Observable<{ success: boolean; message: string }> {
         return this.http.delete<{ success: boolean; message: string }>(
-            `${this.apiUrl}/delete/${id}`,
+            `${this.apiUrl}/deleteById/${id}`,
             httpOption
         ).pipe(catchError(this.handleError));
     }
 
     validerLivraison(data: {
-  commande_numero: string;
-  client_id: number;
-  date_livraison: string;
-  produits: { produit_id: number; quantite: number }[];
-}): Observable<{ livraison: Livraison; facture: any }> {
-  return this.http
-    .post<{ success: boolean; data: { livraison: Livraison; facture: any } }>(
-      `${this.apiUrl}/valider`,
-      data,
-      httpOption
-    )
-    .pipe(
-      map((res) => res.data),
-      catchError(this.handleError)
-    );
-}
+        commande_numero: string;
+        client_id: number;
+        date_livraison: string;
+        produits: { produit_id: number; quantite: number }[];
+    }): Observable<{ livraison: Livraison; facture: any }> {
+        return this.http
+            .post<{ success: boolean; data: { livraison: Livraison; facture: any } }>(
+                `${this.apiUrl}/valider`,
+                data,
+                httpOption
+            )
+            .pipe(
+                map((res) => res.data),
+                catchError(this.handleError)
+            );
+    }
 
+    getLivraisonByCommandeNumero(numero: string): Observable<Livraison[]> {
+        return this.http
+            .get<{ success: boolean; data: Livraison[] }>(
+                `${this.apiUrl}/getLivraisonByCommandeNumero/${numero}`
+            )
+            .pipe(
+                map((res) => res.data),
+                catchError(this.handleError)
+            );
+    }
 }

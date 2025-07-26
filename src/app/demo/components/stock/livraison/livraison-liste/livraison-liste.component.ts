@@ -10,7 +10,7 @@ import { LivraisonService } from 'src/app/demo/service/stock/livraison/livraison
 import { Router } from '@angular/router';
  
 interface expandedRows {
-    [key: string]: boolean;
+    [key: string]: boolean; 
 }
 
 @Component({
