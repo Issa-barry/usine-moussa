@@ -85,6 +85,12 @@ commandeDetailDialog: boolean = false;
       onGoToDetailCommande(commande: Commande) {
         this.router.navigate(['/dashboard/ventes/commande/commande-detail', commande.numero]);
     }
+
+    onGoToLivraisonDetail(commande: Commande): void {
+  this.router.navigate(['/dashboard/stock/livraison/livraison-detail', commande.numero]);
+  
+}
+
   
 
   validerCommande(commande: Commande): void {

@@ -269,5 +269,6 @@ toggleExpandAll(): void {
     onGoToNewLivraison(numero: string) {
       this.router.navigate(['/dashboard/stock/livraison/livraison-new', numero]);
     }
+    
  
 }   

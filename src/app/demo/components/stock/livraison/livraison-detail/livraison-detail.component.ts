@@ -33,7 +33,7 @@ export class LivraisonDetailComponent {
             ]
         },
         {
-            orderNumber: '45126',
+            orderNumber: '45126', 
             orderDate: '9 February 2023',
             amount: '2 5000 GNF',
             products: [

@@ -115,15 +115,17 @@
   ></button>
 
   <!-- Livraison en cours -->
-  <button
-    *ngSwitchCase="'livraison_en_cours'"
-    pButton
-    pRipple
-    icon="pi pi-truck"
-    class="p-button-rounded p-button-warning mr-2"
-    tooltip="En livraison"
-    disabled
-  ></button>
+<!-- Livraison en cours : redirige vers la page de livraison -->
+<button
+  *ngSwitchCase="'livraison_en_cours'"
+  pButton
+  pRipple
+  icon="pi pi-truck"
+  class="p-button-rounded p-button-warning mr-2"
+  tooltip="Voir les livraisons"
+  (click)="onGoToLivraisonDetail(commande)"
+></button>
+
 
   <!-- Livré -->
   <button
