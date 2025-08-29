@@ -44,9 +44,9 @@
             </ng-template>
             <ng-template pTemplate="body" let-facture let-expanded="expanded">
                 <tr>
-                    <td>
+                    <!-- <td>
                         <button type="button" pButton pRipple [pRowToggler]="facture" class="p-button-text p-button-rounded p-button-plain" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
-                    </td>
+                    </td> -->
                     <td style="min-width: 12rem;">{{facture.numero}}</td>
                     <td style="min-width: 12rem;">{{facture.client.nom_complet}}</td>
                     <td style="min-width: 12rem;">{{facture.client.phone}}</td>
@@ -54,17 +54,12 @@
                     <td style="min-width: 8rem;">{{facture.total}} GNF</td>
                     <td style="min-width: 8rem;">{{facture.montant_du}} GNF</td>
                     <td style="min-width: 10rem;">{{facture.statut}}</td>
-
-                    <!-- <td style="min-width: 12rem;">{{product.name}}</td> -->
-                    <!--
-                    
-                    <td style="min-width: 8rem;">{{product.price | currency:'USD'}}</td>
-                    <td><span [class]="'product-badge status-' + product.inventoryStatus.toLowerCase()">{{product.inventoryStatus}}</span></td>
+                     <!-- <td><span [class]="'product-badge status-' + product.inventoryStatus.toLowerCase()">{{product.inventoryStatus}}</span></td> -->
                     <td>
                         <div class="flex">
                             <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" (click)="goToDetail()" ></button>
                          </div>
-                    </td> -->
+                    </td>  
 
                 </tr>
             </ng-template>

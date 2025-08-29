@@ -36,37 +36,37 @@ export class AppMenuComponent implements OnInit {
                         icon: 'pi pi-fw pi-map-marker',
                         routerLink: ['/dashboard/ventes']
                     },
-                       {
-                        label: 'Packing',
-                        icon: 'pi pi-fw pi-box',
-                        routerLink: ['/dashboard/packing']
-                    },
+                    //    {
+                    //     label: 'Packing',
+                    //     icon: 'pi pi-fw pi-box',
+                    //     routerLink: ['/dashboard/packing']
+                    // },
                      
-                     {
-                        label: 'Stock',
-                        icon: 'pi pi-fw pi-database',
-                        routerLink: ['/dashboard/stock']
-                    },
+                    //  {
+                    //     label: 'Stock',
+                    //     icon: 'pi pi-fw pi-database',
+                    //     routerLink: ['/dashboard/stock']
+                    // },
                      {
                         label: 'Facturation',
                         icon: 'pi pi-fw pi-database',
                         routerLink: ['/dashboard/facturation']
                     },
-                       {
-                        label: 'Achats',
-                        icon: 'pi pi-fw pi-map-marker',
-                        routerLink: ['/dashboard/ventes']
-                    },
+                    //    {
+                    //     label: 'Achats',
+                    //     icon: 'pi pi-fw pi-map-marker',
+                    //     routerLink: ['/dashboard/ventes']
+                    // },
                     {
                         label: 'Contact',
                         icon: 'pi pi-fw pi-users',
                         routerLink: ['/dashboard/contact']
                     },
-                    {
-                        label: 'Dépots',
-                        icon: 'pi pi-fw pi-map-marker',
-                        routerLink: ['/dashboard/agence']
-                    }
+                    // {
+                    //     label: 'Dépots',
+                    //     icon: 'pi pi-fw pi-map-marker',
+                    //     routerLink: ['/dashboard/agence']
+                    // }
                 ]
             },
             {
