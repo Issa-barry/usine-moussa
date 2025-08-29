@@ -35,7 +35,7 @@ export class ContactDetailComponent implements OnInit, OnDestroy {
     loading = false;
     loadingAgence = false;
     loadingRoles = false;
-    loadingContact = false;
+    loadingContact = false; 
     loadingAgenceSection = false;
     submitted = false;
     codeRecuperer = false;

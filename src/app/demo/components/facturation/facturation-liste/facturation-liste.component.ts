@@ -6,6 +6,8 @@ import { ProductService } from 'src/app/demo/service/product.service';
 import { Table } from 'primeng/table';
 import { MessageService, ConfirmationService, MenuItem } from 'primeng/api';
 import { Router } from '@angular/router';
+import { FactureService } from 'src/app/demo/service/comptabilite/facturation/facturation.service';
+import { Facture } from 'src/app/demo/models/Facture';
 
 interface expandedRows {
   [key: string]: boolean;
@@ -21,6 +23,10 @@ interface expandedRows {
 })
 
 export class FacturationListeComponent implements OnInit {
+   factures: Facture[] = [];
+
+
+    // 
 
   customers1: Customer[] = [];
 
@@ -57,6 +63,7 @@ export class FacturationListeComponent implements OnInit {
 
     constructor(
         public router: Router,
+        private factureService: FactureService,
         private customerService: CustomerService, 
         private productService: ProductService) { }
 
@@ -97,8 +104,21 @@ export class FacturationListeComponent implements OnInit {
             { label: 'Renewal', value: 'renewal' },
             { label: 'Proposal', value: 'proposal' }
         ];
+        // pour grouper les lignes
+        this.uploiadFacture();
     }
 
+     uploiadFacture(){
+      this.factureService.getAll().subscribe({
+        next: (data) => {
+            this.factures = data;
+          console.log(this.factures);          
+        },
+        error: (err) => console.error('Erreur chargement produits:', err),
+      });
+    }
+
+    // 
     onSort() {
         this.updateRowGroupMetaData();
     }

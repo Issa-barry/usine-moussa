@@ -4,18 +4,9 @@
             <p-toast></p-toast>
 
             <p-toolbar styleClass="mb-4">
-                <ng-template pTemplate="left">
-                    <div class="my-2">
-                        <button
-                            pButton
-                            pRipple
-                            label="Nouveau"
-                            icon="pi pi-plus"
-                            class="p-button-success mr-2"
-                            (click)="onGotToNewContact()"
-                        ></button>
-                    </div>
-                </ng-template>
+                <div class="p-toolbar-group-right">
+                    <p-splitButton label="Nouveau" icon="pi pi-check" [model]="items"></p-splitButton>
+                </div>
 
                 <ng-template pTemplate="right">
                     <button

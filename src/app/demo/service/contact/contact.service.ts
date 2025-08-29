@@ -92,12 +92,30 @@ export class ContactService {
             httpOption
         );
     }
-    // createContact(contact: Contact): Observable<Contact> {
-    //   return this.http.post<Contact>(`${this.apiUrl}/users`, contact, httpOption).pipe(
-    //     catchError(this.handleError)
-    //   );
-    // }
 
+     createClient(contact: any): Observable<Contact> {
+    return this.http
+        .post<{ success: boolean; data: Contact }>(
+            `${environment.apiUrl}/clients/create`,
+            contact,
+            httpOption
+        )
+        .pipe(
+            map((res) => res.data),
+            catchError(this.handleError)
+        );
+}
+
+    updateClient(id: number, contact: Contact): Observable<Contact> {
+        return this.http
+            .put<Contact>(
+                `${this.apiUrl}/clients/updateById/${id}`,
+                contact,
+                httpOption
+            )
+            .pipe(catchError(this.handleError));
+    }
+  
     updateContact(id: number, contact: Contact): Observable<Contact> {
         return this.http
             .put<Contact>(
@@ -107,6 +125,9 @@ export class ContactService {
             )
             .pipe(catchError(this.handleError));
     }
+
+   
+
 
     deleteContact(id: number): Observable<void> {
         return this.http

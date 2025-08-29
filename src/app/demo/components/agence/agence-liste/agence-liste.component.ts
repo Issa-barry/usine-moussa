@@ -15,7 +15,7 @@ import { Statut } from 'src/app/demo/enums/statut.enum';
 export class AgenceListeComponent implements OnInit {
     agences: Agence[] = [];
     selectedAgences: Agence[] = [];
-    agence: Agence = new Agence();
+    agence: Agence = new Agence(); 
 
     agenceDialog = false;
     deleteAgenceDialog = false;

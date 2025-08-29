@@ -99,4 +99,9 @@ export class PackingService {
       )
       .pipe(catchError(this.handleError));
   }
+
+  valider(id: number): Observable<Packing> {
+  return this.http.put<Packing>(`${this.apiUrl}/${id}/valider`, {});
+}
+
 }
