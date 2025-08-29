@@ -1,179 +1,111 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { Customer, Representative } from 'src/app/demo/api/customer';
-import { CustomerService } from 'src/app/demo/service/customer.service';
-import { Product } from 'src/app/demo/api/product';
-import { ProductService } from 'src/app/demo/service/product.service';
-import { Table } from 'primeng/table';
-import { MessageService, ConfirmationService, MenuItem } from 'primeng/api';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { Router } from '@angular/router';
+import { Table } from 'primeng/table';
+import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { FactureService } from 'src/app/demo/service/comptabilite/facturation/facturation.service';
 import { Facture } from 'src/app/demo/models/Facture';
 
-interface expandedRows {
-  [key: string]: boolean;
-}
- 
 @Component({
   selector: 'app-facturation-liste',
   standalone: false,
-  // imports: [],
   templateUrl: './facturation-liste.component.html',
   styleUrl: './facturation-liste.component.scss',
-  providers: [MessageService, ConfirmationService]
+  providers: [MessageService, ConfirmationService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-
 export class FacturationListeComponent implements OnInit {
-   factures: Facture[] = [];
+  @ViewChild('filter') filter!: ElementRef<HTMLInputElement>;
 
+  factures: Facture[] = [];
+  loading = true;
+  skeletonRows = Array(10).fill({});
 
-    // 
+  // menu filtre
+  itemsFiltre: MenuItem[] = [
+    { label: 'Payé', command: () => this.applyStatus('payé') },
+    { label: 'Partiel', command: () => this.applyStatus('partiel') },
+    { separator: true },
+    { label: 'Tous', command: () => this.clearStatus() },
+  ];
 
-  customers1: Customer[] = [];
+  expandedRows: Record<string, boolean> = {};
 
-    customers2: Customer[] = [];
+  constructor(
+    private router: Router,
+    private factureService: FactureService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
-    customers3: Customer[] = [];
+  ngOnInit() {
+    this.loadFactures();
+  }
 
-    selectedCustomers1: Customer[] = [];
+  private loadFactures() {
+    this.loading = true;
+    this.factureService.getAll().subscribe({
+      next: (res) => {
+        this.factures = res;
+        this.loading = false;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        console.error('Erreur chargement factures:', err);
+        this.factures = [];
+        this.loading = false;
+        this.cdr.markForCheck();
+      },
+    });
+  }
 
-    selectedCustomer: Customer = {};
+  // filtre global
+  onGlobalFilter(table: Table, event: Event) {
+    table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+  }
 
-    representatives: Representative[] = [];
+  clear(table: Table) {
+    table.clear();
+    if (this.filter?.nativeElement) this.filter.nativeElement.value = '';
+  }
 
-    statuses: any[] = [];
+  // filtres par statut (client-side). Si besoin -> faire appel API spécifique
+  private applyStatus(statut: string) {
+    this.loading = true;
+    this.factureService.getAll().subscribe({
+      next: (list) => {
+        this.factures = list.filter(
+          (f) => (f.statut || '').toLowerCase() === statut.toLowerCase()
+        );
+        this.loading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.factures = [];
+        this.loading = false;
+        this.cdr.markForCheck();
+      },
+    });
+  }
 
-    products: Product[] = [];
+  private clearStatus() {
+    this.loadFactures();
+  }
 
-    rowGroupMetadata: any;
+  trackById(_i: number, f: Facture) {
+    return f.id ?? f.numero;
+  }
 
-    expandedRows: expandedRows = {};
-
-    activityValues: number[] = [0, 100];
-
-    isExpanded: boolean = false;
-
-    idFrozen: boolean = false;
-
-    loading: boolean = true;
-
-    @ViewChild('filter') filter!: ElementRef;
-
-    //filtre 
-    itemsFiltre: MenuItem[] = [];
-
-    constructor(
-        public router: Router,
-        private factureService: FactureService,
-        private customerService: CustomerService, 
-        private productService: ProductService) { }
-
-    ngOnInit() {
-      this.itemsFiltre = [
-        { label: 'Payé', },
-        { label: 'Partiel',}
-    ];
-        this.customerService.getCustomersLarge().then(customers => {
-            this.customers1 = customers;
-            this.loading = false;
-
-            // @ts-ignore
-            this.customers1.forEach(customer => customer.date = new Date(customer.date));
-        });
-        this.customerService.getCustomersMedium().then(customers => this.customers2 = customers);
-        this.customerService.getCustomersLarge().then(customers => this.customers3 = customers);
-        this.productService.getProductsWithOrdersSmall().then(data => this.products = data);
-
-        this.representatives = [
-            { name: 'Amy Elsner', image: 'amyelsner.png' },
-            { name: 'Anna Fali', image: 'annafali.png' },
-            { name: 'Asiya Javayant', image: 'asiyajavayant.png' },
-            { name: 'Bernardo Dominic', image: 'bernardodominic.png' },
-            { name: 'Elwin Sharvill', image: 'elwinsharvill.png' },
-            { name: 'Ioni Bowcher', image: 'ionibowcher.png' },
-            { name: 'Ivan Magalhaes', image: 'ivanmagalhaes.png' },
-            { name: 'Onyama Limba', image: 'onyamalimba.png' },
-            { name: 'Stephen Shaw', image: 'stephenshaw.png' },
-            { name: 'XuXue Feng', image: 'xuxuefeng.png' }
-        ];
-
-        this.statuses = [
-            { label: 'Unqualified', value: 'unqualified' },
-            { label: 'Qualified', value: 'qualified' },
-            { label: 'New', value: 'new' },
-            { label: 'Negotiation', value: 'negotiation' },
-            { label: 'Renewal', value: 'renewal' },
-            { label: 'Proposal', value: 'proposal' }
-        ];
-        // pour grouper les lignes
-        this.uploiadFacture();
+  goToDetail(f?: Facture) {
+    if (f?.id) {
+      this.router.navigate(['/dashboard/facturation/detail', f.id]);
+    } else {
+      this.router.navigate(['/dashboard/facturation/detail']);
     }
-
-     uploiadFacture(){
-      this.factureService.getAll().subscribe({
-        next: (data) => {
-            this.factures = data;
-          console.log(this.factures);          
-        },
-        error: (err) => console.error('Erreur chargement produits:', err),
-      });
-    }
-
-    // 
-    onSort() {
-        this.updateRowGroupMetaData();
-    }
-
-    updateRowGroupMetaData() {
-        this.rowGroupMetadata = {};
-
-        if (this.customers3) {
-            for (let i = 0; i < this.customers3.length; i++) {
-                const rowData = this.customers3[i];
-                const representativeName = rowData?.representative?.name || '';
-
-                if (i === 0) {
-                    this.rowGroupMetadata[representativeName] = { index: 0, size: 1 };
-                }
-                else {
-                    const previousRowData = this.customers3[i - 1];
-                    const previousRowGroup = previousRowData?.representative?.name;
-                    if (representativeName === previousRowGroup) {
-                        this.rowGroupMetadata[representativeName].size++;
-                    }
-                    else {
-                        this.rowGroupMetadata[representativeName] = { index: i, size: 1 };
-                    }
-                }
-            }
-        }
-    }
-
-    expandAll() {
-        if (!this.isExpanded) {
-            this.products.forEach(product => product && product.name ? this.expandedRows[product.name] = true : '');
-
-        } else {
-            this.expandedRows = {};
-        }
-        this.isExpanded = !this.isExpanded;
-    }
-
-    formatCurrency(value: number) {
-        return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-    }
-
-    onGlobalFilter(table: Table, event: Event) {
-        table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
-    }
-
-    clear(table: Table) {
-        table.clear();
-        this.filter.nativeElement.value = '';
-    }
-
-    // iba
-    goToDetail(){
-      this.router.navigate(['/dashboard/facturation/detail'])  
-    }
-  
+  }
 }
