@@ -8,6 +8,7 @@ import { ContactService } from 'src/app/demo/service/contact/contact.service';
 import { Produit } from 'src/app/demo/models/produit.model';
 import { Contact } from 'src/app/demo/models/contact';
 import { Commande } from 'src/app/demo/models/commande.model';
+import { Livraison } from 'src/app/demo/models/livraison.model';
 
 @Component({
   selector: 'app-livraison-new',
@@ -31,6 +32,8 @@ export class LivraisonNewComponent implements OnInit {
 
   produits: Produit[] = [];
   contacts: Contact[] = [];
+
+  livraison: Livraison = new Livraison();
 
   errorMessage: string = '';
   apiErrors: { [key: string]: string[] } = {};
@@ -120,56 +123,15 @@ export class LivraisonNewComponent implements OnInit {
   onSubmit(): void {
     this.errorMessage = '';
     this.apiErrors = {};
-
-    const lignesValides = this.lignes.filter(l =>
-      l.produit !== null && l.quantite > 0 && l.quantite <= l.quantiteRestante
-    );
-
-    if (!this.selectedLivreur) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Livreur requis',
-        detail: 'Veuillez sélectionner un livreur.'
-      });
-      return;
-    }
-
-    if (!this.selectedClient) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Client requis',
-        detail: 'Veuillez sélectionner le client à livrer.'
-      });
-      return;
-    }
-
-    if (lignesValides.length === 0) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Produits requis',
-        detail: 'Veuillez ajouter au moins un produit à livrer.'
-      });
-      return;
-    }
-
-    const payload = {
-      commande_numero: this.commandeNumero,
-      client_id: this.selectedClient!.id!,
-      date_livraison: new Date().toISOString().slice(0, 10),
-      produits: lignesValides.map(ligne => ({
-        produit_id: ligne.produit!.id!,
-        quantite: ligne.quantite
-      }))
-    };
-
-    this.livraisonService.validerLivraison(payload).subscribe({
+    
+    console.log(this.livraison);
+    this.livraisonService.validerLivraison(this.commandeNumero, this.livraison).subscribe({
       next: () => {
         this.messageService.add({
           severity: 'success',
           summary: 'Succès',
           detail: 'Livraison validée et facture générée.'
         });
-        // this.router.navigate(['/dashboard/ventes/livraison']);
         this.loadCommande()
       },
       error: err => {
@@ -178,8 +140,8 @@ export class LivraisonNewComponent implements OnInit {
         this.apiErrors = err.validationErrors || {};
       }
     });
-  }
-
+    
+  } 
   onGoToListeCommande(): void {
     this.router.navigate(['/dashboard/ventes/commande']);
   }

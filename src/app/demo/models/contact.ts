@@ -2,7 +2,7 @@ import { Civilite } from "../enums/civilite.enum";
 import { Adresse } from "./adresse";
 import { Role } from "./Role";
 
- 
+  
  export class Contact {
     id?: number;
     reference?:string;
@@ -18,7 +18,7 @@ import { Role } from "./Role";
     agence_id?:number;
     statut: string;
     role?: any;
-    adresse: Adresse; 
+    adresse: Adresse;  
 
     constructor()
     {

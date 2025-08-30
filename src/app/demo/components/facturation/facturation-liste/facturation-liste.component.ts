@@ -49,11 +49,14 @@ export class FacturationListeComponent implements OnInit {
 
   private loadFactures() {
     this.loading = true;
+    
     this.factureService.getAll().subscribe({
       next: (res) => {
         this.factures = res;
         this.loading = false;
         this.cdr.markForCheck();
+        // console.log('Factures chargées:', this.factures[0]?.commande?.contact);
+        
       },
       error: (err) => {
         console.error('Erreur chargement factures:', err);
@@ -79,6 +82,8 @@ export class FacturationListeComponent implements OnInit {
     this.loading = true;
     this.factureService.getAll().subscribe({
       next: (list) => {
+        
+        
         this.factures = list.filter(
           (f) => (f.statut || '').toLowerCase() === statut.toLowerCase()
         );

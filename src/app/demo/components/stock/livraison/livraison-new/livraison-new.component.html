@@ -4,7 +4,7 @@
   <div class="grid grid-nogutter">
     <!-- Titre -->
     <div class="col-12 px-4 mt-4 md:mt-6 md:px-6">
-      <span class="text-900 block font-bold text-xl">Créer une livraison</span>
+      <span class="text-900 block font-bold text-xl">Valider la livraison</span>
       <p-message *ngIf="errorMessage" severity="error" [text]="errorMessage"></p-message>
     </div>
 
@@ -21,47 +21,16 @@
           readonly
         />
       </div>
-
-      <!-- Client -->
-      <div class="field mb-4">
-        <label class="text-800 text-m block font-normal mb-2">Client à livrer</label>
-        <p-dropdown
-          [options]="contacts"
-          [(ngModel)]="selectedClient"
-          optionLabel="nom_complet"
-          placeholder="Sélectionner un client"
-          [filter]="true"
-          filterBy="nom_complet telephone"
-          [showClear]="true"
-          appendTo="body"
-          styleClass="w-full"
-        >
-          <ng-template let-client pTemplate="selectedItem">
-            <div *ngIf="client" class="flex flex-column">
-              <div class="font-medium">{{ client.nom_complet }}</div>
-              <small class="text-500">{{ client.telephone }}</small>
-            </div>
-          </ng-template>
-          <ng-template let-client pTemplate="item">
-            <div class="flex flex-column">
-              <div class="font-medium">{{ client.nom_complet }}</div>
-              <small class="text-500">{{ client.telephone }}</small>
-            </div>
-          </ng-template>
-        </p-dropdown>
-        <div *ngIf="apiErrors?.['client_id']" class="text-red-500 text-sm mt-1">
-          {{ apiErrors['client_id'][0] }}
-        </div>
-      </div>
+ 
 
       <!-- Table des produits -->
       <div class="overflow-auto">
         <table class="w-full text-sm text-left">
   <thead class="text-xs text-gray-700 border-b">
     <tr>
-      <th class="py-2">Produit</th>
+      <th class="py-2">Produit</th> 
       <th class="py-2">Qté livrée</th>
-      <th class="py-2">Qté restante</th>
+      <th class="py-2">Qté livrable</th>
       <th class="py-2">Prix unitaire</th>
       <th class="py-2">Sous-total</th>
       <th class="py-2"></th>
@@ -91,7 +60,7 @@
         <input
           type="number"
           class="p-inputtext w-full"
-          [(ngModel)]="ligne.quantite"
+          [(ngModel)]="livraison.quantite_livree"
           (input)="recalculerTotal()"
           min="1"
           [max]="ligne.quantiteRestante"
@@ -122,15 +91,15 @@
         {{ ligne.quantite * ligne.prix_vente | number:'1.0-0' }} GNF
       </td>
 
-      <!-- Supprimer -->
-      <td class="py-2 text-right">
+      <!-- bouton Supprimer -->
+      <!-- <td class="py-2 text-right">
         <button
           pButton
           icon="pi pi-trash"
           class="p-button-danger p-button-sm"
           (click)="supprimerLigne(i)"
         ></button>
-      </td>
+      </td> -->
     </tr>
   </tbody>
 </table>

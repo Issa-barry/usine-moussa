@@ -58,8 +58,8 @@
         <ng-template pTemplate="header">
           <tr>
             <th pSortableColumn="numero">N° Facture <p-sortIcon field="numero" /></th>
-            <th pSortableColumn="client.nom_complet">Client <p-sortIcon field="client.nom_complet" /></th>
-            <th pSortableColumn="client.phone">Téléphone <p-sortIcon field="client.phone" /></th>
+            <th pSortableColumn="commande.contact.nom_complet">Client <p-sortIcon field="commande.contact.nom_complet" /></th>
+            <th pSortableColumn="commande.contact.phone">Téléphone <p-sortIcon field="commande.contact.phone" /></th>
             <th pSortableColumn="commande.numero">Commande <p-sortIcon field="commande.numero" /></th>
             <th pSortableColumn="total">Montant TTC <p-sortIcon field="total" /></th>
             <th pSortableColumn="montant_du">Reste à payer <p-sortIcon field="montant_du" /></th>
@@ -87,8 +87,8 @@
           <!-- Normal row -->
           <tr *ngIf="!loading">
             <td>{{ facture.numero }}</td>
-            <td>{{ facture.client?.nom_complet }}</td>
-            <td>{{ facture.client?.phone }}</td>
+            <td>{{ facture.commande.contact.nom_complet }}</td>
+            <td>{{ facture.commande.contact.phone }}</td>
             <td>{{ facture.commande?.numero }}</td>
             <td>{{ facture.total }} GNF</td>
             <td>{{ facture.montant_du }} GNF</td>

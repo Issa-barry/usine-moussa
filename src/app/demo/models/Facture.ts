@@ -1,3 +1,4 @@
+import { Commande } from "./commande.model";
 import { FactureLigne } from "./FactureLigne";
 
  
@@ -23,11 +24,14 @@ export interface Facture {
     name?: string;
     email?: string;
   };
-  commande?: {
-    id: number;
-    numero: string;
-    statut: string; // 'brouillon' | 'livraison_en_cours' | 'livré' | 'cloturé' | 'annulé'
-  };
+
+  commande?: Commande;
+
+  // commande?: {
+  //   id: number;
+  //   numero: string;
+  //   statut: string; // 'brouillon' | 'livraison_en_cours' | 'livré' | 'cloturé' | 'annulé'
+  // };
 }
 
 // Pour éviter les import circulaires, on déclare l'interface ici

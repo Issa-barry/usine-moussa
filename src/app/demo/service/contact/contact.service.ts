@@ -100,7 +100,7 @@ export class ContactService {
             contact,
             httpOption
         )
-        .pipe(
+        .pipe( 
             map((res) => res.data),
             catchError(this.handleError)
         );

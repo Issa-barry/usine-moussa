@@ -6,22 +6,23 @@ import { LivraisonLigne } from './livraison-ligne.model';
 export class Livraison {
     id?: number;
     commande_id!: number;
-    client_id!: number;
     date_livraison!: string;
-    statut!: 'en_cours' | 'livré' | 'en_attente' | 'annulé';
-    quantite?: number;
+    quantite_livree?: number;
     reference?: string;
-    quantite_total?: number;
-
+ 
     // relations
     commande?: Commande;
-    client?: Contact;
     livreur?: Contact;
     lignes: LivraisonLigne[] = [];
 
-    constructor(init?: Partial<Livraison>) {
-        Object.assign(this, init);
+    constructor( ) {
+        this.date_livraison = new Date().toISOString().split('T')[0]; // Date actuelle au format YYYY-MM-DD
+        this.quantite_livree = 0;
     }
+
+    // constructor(init?: Partial<Livraison>) {
+    //     Object.assign(this, init);
+    // }
 
     
 }
