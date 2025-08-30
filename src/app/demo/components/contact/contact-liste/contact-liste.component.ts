@@ -10,7 +10,7 @@ import { RoleService } from '../../../service/role/role.service';
 import { Statut } from 'src/app/demo/enums/statut.enum';
 import { MenuItem } from 'primeng/api';
 
-@Component({
+ @Component({
   selector: 'app-contact-liste',
   templateUrl: './contact-liste.component.html',
   styleUrls: ['./contact-liste.component.scss'],

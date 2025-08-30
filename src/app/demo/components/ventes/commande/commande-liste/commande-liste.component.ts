@@ -21,6 +21,7 @@ export class CommandeListeComponent implements OnInit {
     selectedCommande: any = null;
 commandeDetailDialog: boolean = false;
     loading = false;
+     skeletonRows = Array.from({ length: 5 }, () => ({}));
 
 
     // autre

@@ -12,7 +12,7 @@ import { Role } from 'src/app/demo/models/Role';
 import { ContactService } from 'src/app/demo/service/contact/contact.service';
 import { RoleService } from 'src/app/demo/service/role/role.service';
 
-@Component({
+@Component({ 
   selector: 'app-contact-detail-client',
   templateUrl: './contact-detail-client.component.html',
   styleUrl: './contact-detail-client.component.scss',
