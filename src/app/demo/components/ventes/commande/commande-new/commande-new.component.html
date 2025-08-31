@@ -1,15 +1,17 @@
 <div class="card">
-    <p-toast></p-toast>
+  <p-toast></p-toast>
+
   <div class="grid grid-nogutter">
     <div class="col-12 px-4 mt-4 md:mt-6 md:px-6">
       <span class="text-900 block font-bold text-xl">Créer une commande</span>
-      <p-message *ngIf="errorMessage" severity="error" text="{{ errorMessage }}"></p-message>
+      <p-message *ngIf="errorMessage" severity="error" [text]="errorMessage"></p-message>
     </div>
 
     <div class="col-12 lg:col-10 h-full px-4 py-4 md:px-6">
       <!-- livreur -->
       <div class="field mb-4">
         <label class="text-800 text-m block font-normal mb-2">Livreur</label>
+
         <p-dropdown
           [options]="contacts"
           [(ngModel)]="selectedLivreur"
@@ -20,7 +22,7 @@
           [showClear]="true"
           appendTo="body"
           styleClass="w-full"
-        > 
+          [ngClass]="{ 'p-invalid': hasError('contact_id') }">
           <ng-template let-livreur pTemplate="selectedItem">
             <div *ngIf="livreur" class="flex flex-column">
               <div class="font-medium">{{ livreur.nom_complet }}</div>
@@ -34,8 +36,9 @@
             </div>
           </ng-template>
         </p-dropdown>
-        <div *ngIf="apiErrors?.['contact_id']" class="text-red-500 text-sm mt-1">
-          {{ apiErrors['contact_id'][0] }}
+
+        <div *ngIf="getError('contact_id')" class="text-red-500 text-sm mt-1">
+          {{ getError('contact_id') }}
         </div>
       </div>
 
@@ -51,8 +54,10 @@
               <th class="py-2"></th>
             </tr>
           </thead>
+
           <tbody>
             <tr *ngFor="let ligne of lignes; let i = index">
+              <!-- Produit -->
               <td class="py-2">
                 <p-dropdown
                   [options]="produits"
@@ -62,12 +67,15 @@
                   appendTo="body"
                   (onChange)="onProduitChange(i)"
                   styleClass="w-full"
-                ></p-dropdown>
-                <div *ngIf="apiErrors?.['lignes.' + i + '.produit_id']" class="text-red-500 text-xs mt-1">
-                  {{ apiErrors['lignes.' + i + '.produit_id'][0] }}
-                <!-- {{ apiErrors['lignes][0] }} -->
+                  [ngClass]="{ 'p-invalid': hasError('produit_id', i) }">
+                </p-dropdown>
+
+                <div *ngIf="getError('produit_id', i)" class="text-red-500 text-xs mt-1">
+                  {{ getError('produit_id', i) }}
                 </div>
               </td>
+
+              <!-- Quantité -->
               <td class="py-2">
                 <input
                   type="number"
@@ -75,11 +83,13 @@
                   [(ngModel)]="ligne.quantite"
                   (input)="recalculerTotal()"
                   min="1"
-                />
-                <div *ngIf="apiErrors?.['lignes.' + i + '.quantite']" class="text-red-500 text-xs mt-1">
-                  {{ apiErrors['lignes.' + i + '.quantite'][0] }}
+                  [ngClass]="{ 'p-invalid': hasError('quantite', i) }" />
+                <div *ngIf="getError('quantite', i)" class="text-red-500 text-xs mt-1">
+                  {{ getError('quantite', i) }}
                 </div>
               </td>
+
+              <!-- Prix unitaire -->
               <td class="py-2">
                 <input
                   type="number"
@@ -87,31 +97,30 @@
                   [(ngModel)]="ligne.prix_vente"
                   (input)="recalculerTotal()"
                   min="0"
-                />
+                  step="0.01"
+                  [ngClass]="{ 'p-invalid': hasError('prix_vente', i) }" />
+                <div *ngIf="getError('prix_vente', i)" class="text-red-500 text-xs mt-1">
+                  {{ getError('prix_vente', i) }}
+                </div>
               </td>
+
+              <!-- Sous-total -->
               <td class="py-2">
                 {{ ligne.quantite * ligne.prix_vente | number:'1.0-0' }} GNF
               </td>
+
               <td class="py-2 text-right">
-                <button
-                  pButton
-                  icon="pi pi-trash"
-                  class="p-button-danger p-button-sm"
-                  (click)="supprimerLigne(i)"
-                ></button>
+                <!-- si tu veux réactiver la suppression de ligne -->
+                <!--
+                <button pButton icon="pi pi-trash"
+                        class="p-button-danger p-button-sm"
+                        (click)="supprimerLigne(i)"></button>
+                -->
               </td>
             </tr>
           </tbody>
         </table>
       </div>
-
-      <button
-        pButton
-        icon="pi pi-plus"
-        label="Ajouter un produit"
-        class="p-button-sm mt-3"
-        (click)="ajouterLigne()"
-      ></button>
 
       <!-- Total global -->
       <div class="text-right font-bold mt-4">
@@ -121,21 +130,21 @@
       <!-- Boutons -->
       <div class="col-12 flex flex-column lg:flex-row justify-content-center align-items-center lg:justify-content-end my-6">
         <button
-          pButton
-          pRipple
+          pButton pRipple
           class="p-button-secondary p-button-outlined mt-3 lg:mt-0 w-full lg:w-auto flex-order-2 lg:flex-order-1 lg:mr-4"
           label="Annuler"
           icon="pi pi-fw pi-arrow-left"
-          (click)="onGoToListeCommande()"
-        ></button>
+          (click)="onGoToListeCommande()">
+        </button>
+
         <button
-          pButton
-          pRipple
+          pButton pRipple
           class="p-button-primary w-full lg:w-auto flex-order-1 lg:flex-order-2"
-          label="Créer la commande"
-          icon="pi pi-fw pi-check"
-          (click)="onSubmit()"
-        ></button>
+          [label]="isSaving ? 'Création…' : 'Créer la commande'"
+          [icon]="isSaving ? 'pi pi-spinner pi-spin' : 'pi pi-fw pi-check'"
+          [disabled]="isSaving"
+          (click)="onSubmit()">
+        </button>
       </div>
     </div>
   </div>

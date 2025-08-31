@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { CommandeService } from 'src/app/demo/service/ventes/commande/commande.service';
+import { CommandeService, ApiErrorShape } from 'src/app/demo/service/ventes/commande/commande.service';
 import { ProduitService } from 'src/app/demo/service/produit/produit.service';
 import { Produit } from 'src/app/demo/models/produit.model';
 import { ContactService } from 'src/app/demo/service/contact/contact.service';
@@ -15,21 +15,18 @@ import { CreateCommandeDto } from 'src/app/demo/models/commande-create.dto';
   providers: [MessageService, ConfirmationService],
 })
 export class CommandeNewComponent implements OnInit {
-  lignes: {
-    produit: Produit | null;
-    quantite: number;
-    prix_vente: number;
-  }[] = [];
-
-  reduction: number = 0;
-  totalCommande: number = 0; 
-  totalBrut: number = 0;
+  lignes: { produit: Produit | null; quantite: number; prix_vente: number }[] = [];
+  reduction = 0;
+  totalCommande = 0;
+  totalBrut = 0;
   selectedLivreur: Contact | null = null;
 
   produits: Produit[] = [];
   contacts: Contact[] = [];
 
-  errorMessage: string = '';
+  isSaving = false;
+
+  errorMessage = '';
   apiErrors: { [key: string]: string[] } = {};
 
   constructor(
@@ -47,28 +44,27 @@ export class CommandeNewComponent implements OnInit {
     this.ajouterLigne();
   }
 
+  private resetErrors(): void {
+    this.errorMessage = '';
+    this.apiErrors = {};
+  }
+
   loadContacts(): void {
     this.contactService.getContacts().subscribe({
-      next: (res) => {
-        this.contacts = res;
-      },
-      error: (err) => {
-        console.error('Erreur lors de la récupération des contacts:', err);
+      next: (res) => (this.contacts = res),
+      error: (err: ApiErrorShape) => {
+        this.errorMessage = err?.message || 'Erreur lors de la récupération des contacts.';
+        this.messageService.add({ severity: 'error', summary: `Erreur ${err?.status ?? ''}`.trim(), detail: this.errorMessage });
       },
     });
   }
 
   loadProduits(): void {
     this.produitService.getProduits().subscribe({
-      next: (data) => {
-        this.produits = data;
-      },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erreur',
-          detail: err.message,
-        });
+      next: (data) => (this.produits = data),
+      error: (err: ApiErrorShape) => {
+        this.errorMessage = err?.message || 'Erreur lors du chargement des produits.';
+        this.messageService.add({ severity: 'error', summary: `Erreur ${err?.status ?? ''}`.trim(), detail: this.errorMessage });
       },
     });
   }
@@ -85,19 +81,19 @@ export class CommandeNewComponent implements OnInit {
   onProduitChange(index: number): void {
     const produit = this.lignes[index].produit;
     if (produit && produit.prix_vente !== undefined) {
-      this.lignes[index].prix_vente = produit.prix_vente;
+      this.lignes[index].prix_vente = Number(produit.prix_vente) || 0;
     }
     this.recalculerTotal();
   }
 
   recalculerTotal(): void {
     const brut = this.lignes.reduce((total, ligne) => {
-      const quantite = ligne.quantite || 0;
-      const prix = ligne.prix_vente || 0;
+      const quantite = Number(ligne.quantite) || 0;
+      const prix = Number(ligne.prix_vente) || 0;
       return total + quantite * prix;
     }, 0);
     this.totalBrut = brut;
-    this.totalCommande = brut - this.reduction;
+    this.totalCommande = brut - (Number(this.reduction) || 0);
   }
 
   onGoToListeCommande(): void {
@@ -105,53 +101,68 @@ export class CommandeNewComponent implements OnInit {
   }
 
   onSubmit(): void {
-  this.errorMessage = '';
-  this.apiErrors = {};
+    this.resetErrors();
 
-  const lignesValides = this.lignes.filter(l => l.produit !== null);
-
-  // if (!this.selectedLivreur || lignesValides.length === 0) {
-  //   this.messageService.add({
-  //     severity: 'warn',
-  //     summary: 'Champs requis',
-  //     detail: 'Veuillez sélectionner un livreur et au moins un produit.'
-  //   });
-  //   return;
-  // }
-
-  const lignesPayload = lignesValides.map(ligne => ({
-    produit_id: ligne.produit!.id!,
-    quantite: ligne.quantite,
-    prix_vente: ligne.prix_vente
-  }));
-
-  const payload: CreateCommandeDto = {
-    contact_id: this.selectedLivreur!.id!,
-    reduction: this.reduction,
-    lignes: lignesPayload
-  };
-
-  this.commandeService.createCommande(payload).subscribe({
-    next: () => {
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Succès',
-        detail: 'Commande créée avec succès.'
-      });
-      this.router.navigate(['/dashboard/ventes/commande']);
-    },
-    error: (err) => {
-      console.error('IBA ERREUR', err);
-
-      if (err.error && err.error.data) {
-        this.apiErrors = err.error.data;
-        console.log("mon iba", this.apiErrors);
-        
-      }
- 
-      this.errorMessage = err.error?.message || 'Données invalides';
+    // Pré-validation front
+    const lignesValides = this.lignes.filter(l => l.produit !== null);
+    if (!this.selectedLivreur) {
+      this.apiErrors['contact_id'] = ['Le livreur est requis.'];
+      this.messageService.add({ severity: 'warn', summary: 'Champs requis', detail: 'Veuillez sélectionner un livreur.' });
+      return;
     }
-  });
-}
+    if (lignesValides.length === 0) {
+      // on suppose qu’une ligne vide existe déjà (créée au ngOnInit)
+      this.apiErrors['lignes.0.produit_id'] = ['Sélectionnez un produit.'];
+      this.messageService.add({ severity: 'warn', summary: 'Champs requis', detail: 'Ajoutez au moins un produit.' });
+      return;
+    }
 
+    const lignesPayload = lignesValides.map((ligne, i) => ({
+      produit_id: ligne.produit!.id!,
+      quantite: Number(ligne.quantite) || 0,
+      prix_vente: Number(ligne.prix_vente) || 0,
+    }));
+
+    const payload: CreateCommandeDto = {
+      contact_id: this.selectedLivreur!.id!,
+      reduction: Number(this.reduction) || 0,
+      lignes: lignesPayload,
+    };
+
+    this.isSaving = true;
+    this.commandeService.createCommande(payload).subscribe({
+      next: () => {
+        this.isSaving = false;
+        this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Commande créée avec succès.' });
+        this.router.navigate(['/dashboard/ventes/commande']);
+      },
+      error: (err: ApiErrorShape) => {
+        this.isSaving = false;
+
+        // Erreurs validation (422)
+        this.apiErrors = (err?.errors as any) || {};
+
+        // Message global (ex: 500)
+        this.errorMessage = err?.message || 'Données invalides';
+
+        this.messageService.add({
+          severity: 'error',
+          summary: `Erreur ${err?.status ?? ''}`.trim(),
+          detail: this.errorMessage,
+        });
+
+        console.error('Erreur création commande:', err);
+      },
+    });
+  }
+
+  // ------- Helpers erreurs pour le template -------
+  getError(field: string, index?: number): string | null {
+    const key = index !== undefined ? `lignes.${index}.${field}` : field;
+    const msgs = this.apiErrors?.[key];
+    return Array.isArray(msgs) && msgs.length ? msgs[0] : null;
+  }
+  hasError(field: string, index?: number): boolean {
+    return !!this.getError(field, index);
+  }
 }
