@@ -220,6 +220,13 @@ export class CommandeDetailComponent implements OnInit {
     });
   }
 
+  // juste après les propriétés
+get isDelivered(): boolean {
+  const s = (this.commande?.statut || '').toLowerCase();
+  return s === 'livré';
+}
+
+
   // Optimize ngFor rendering of lignes
   trackByLigne(index: number, _ligne: { produit: Produit | null; quantite: number; prix_vente: number }) {
     return index;

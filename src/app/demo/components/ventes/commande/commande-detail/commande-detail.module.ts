@@ -17,6 +17,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { CommandeDetailRoutingModule } from './commande-detail-routing.module';
 import { CommandeDetailComponent } from './commande-detail.component';
 import { MessageModule } from 'primeng/message';
+import { TagModule } from 'primeng/tag';
 
 
 @NgModule({
@@ -39,7 +40,8 @@ import { MessageModule } from 'primeng/message';
             ConfirmPopupModule,
             ConfirmDialogModule,
             MultiSelectModule,
-            MessageModule
+            MessageModule,
+            TagModule
   ]
 })
 export class CommandeDetailModule { }

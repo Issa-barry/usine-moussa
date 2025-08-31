@@ -15,6 +15,7 @@ export class Commande {
   updated_at?: string;
   qte_total: number;
   reduction: number;
+  statut?: string; // ou status
 
   constructor() {
     this.numero = '';
