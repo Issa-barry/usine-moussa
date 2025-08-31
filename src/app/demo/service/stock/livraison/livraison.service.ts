@@ -30,36 +30,26 @@ export class LivraisonService {
 
   // ---- Erreurs : normalisation et extraction du 1er message 422 ----
   private handleError = (error: HttpErrorResponse) => {
-    console.error('Erreur API Livraison :', error);
+  console.error('Erreur API Livraison :', error);
 
-    const status = error?.status ?? 0;
-    let message = 'Une erreur inconnue est survenue';
-    let errors: ApiErrors = {};
+  const status = error.status ?? 0;
+  // 🔽 On essaie d'abord message, puis error, puis data.message
+  const apiMessage =
+    error?.error?.message ??
+    error?.error?.error ??
+    error?.error?.data?.message;
 
-    if (error.error instanceof ErrorEvent) {
-      message = `Erreur client : ${error.error.message}`;
-    } else {
-      if (status === 422) {
-        // Laravel => { data: { errors: {...} } } ou { errors: {...} }
-        const errs = error.error?.data?.errors || error.error?.errors || {};
-        errors = errs;
+  // 🔽 fallback propre
+  const message =
+    apiMessage ||
+    (status === 0 ? 'Connexion au serveur impossible.' : `Erreur ${status} : ${error.message}`);
 
-        // Premier message humain si disponible
-        let first = '';
-        for (const k of Object.keys(errs)) {
-          const arr = errs[k];
-          if (Array.isArray(arr) && arr.length) { first = arr[0]; break; }
-        }
-        message = first || error.error?.message || 'Validation échouée.';
-      } else if (status === 0) {
-        message = 'Connexion au serveur impossible.';
-      } else {
-        message = error.error?.message || `Erreur ${status} : ${error.message}`;
-      }
-    }
+  const errors = error?.error?.data?.errors || error?.error?.errors || {};
 
-    return throwError(() => ({ status, message, errors, raw: error }));
-  };
+  return throwError(() => ({ status, message, errors, raw: error.error }));
+};
+
+
 
   // ---- CRUD / Queries ----
   getAll(): Observable<Livraison[]> {

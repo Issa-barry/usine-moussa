@@ -216,17 +216,26 @@ export class LivraisonNewComponent implements OnInit {
           this.commandeNumero,
         ]);
       },
-      error: err => {
-        this.isSaving = false;
-        // err est normalisé par le service: { status, message, errors }
-        this.errorMessage = err?.message || 'Erreur lors de la validation.';
-        this.apiErrors = err?.errors || {};
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Validation échouée',
-          detail: this.errorMessage,
-        });
-      },
+      error: (err) => {
+  this.isSaving = false;
+  console.error('Erreur validation livraison', err);
+
+  // Le service garantit err.message + err.errors
+  this.errorMessage =
+    err?.message ||
+    // fallback si jamais on bypassait le service
+    err?.error?.message ||
+    err?.error?.error ||
+    'Erreur lors de la validation.';
+
+  this.apiErrors = err?.errors || {};
+  this.messageService.add({
+    severity: 'error',
+    summary: 'Validation échouée',
+    detail: this.errorMessage
+  });
+}
+
     });
   }
 
