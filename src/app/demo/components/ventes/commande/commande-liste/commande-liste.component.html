@@ -15,7 +15,7 @@
           ></button>
         </ng-template>
 
-        <ng-template pTemplate="right">
+        <!-- <ng-template pTemplate="right">
           <button
             pButton
             pRipple
@@ -24,7 +24,7 @@
             class="p-button-help"
             (click)="dt.exportCSV()"
           ></button>
-        </ng-template>
+        </ng-template> -->
       </p-toolbar>
 
       <p-table
@@ -73,7 +73,10 @@
               Total <p-sortIcon field="montant_total"></p-sortIcon>
             </th>
             <th>
-              Qté totale
+              Qté commandée
+            </th>
+            <th>
+              Qté livrée
             </th>
             <th pSortableColumn="statut">
               Statut <p-sortIcon field="statut"></p-sortIcon>
@@ -106,6 +109,7 @@
             <td>{{ commande.contact?.nom_complet }}</td>
             <td>{{ commande.montant_total | number: '1.0-0' }} GNF</td>
             <td>{{ commande.qte_total }}</td>
+            <td>{{ commande.qte_livree }}</td>
             <td>{{ commande.statut }}</td>
             <td>
              <!-- Bouton selon le statut -->
@@ -147,10 +151,11 @@
     *ngSwitchCase="'livré'"
     pButton
     pRipple
-    icon="pi pi-box"
+    icon="pi pi-truck"
     class="p-button-rounded p-button-success mr-2"
     tooltip="Commande livrée"
     disabled
+    (click)="onGoToLivraisonNew(commande)"
   ></button>
 
   <!-- Payé -->
@@ -223,10 +228,6 @@
               <label><strong>Total :</strong></label>
               <div>{{ selectedCommande?.montant_total | number }} GNF</div>
             </div>
-            <div class="field col">
-              <label><strong>Remise :</strong></label>
-              <div>{{ selectedCommande?.reduction | number }} GNF</div>
-            </div>
           </div>
 
           <hr />
@@ -245,9 +246,9 @@
               <ng-template pTemplate="body" let-ligne>
                 <tr>
                   <td>{{ ligne.produit?.nom }}</td>
-                  <td>{{ ligne.quantite }}</td>
+                  <td>{{ ligne.quantite_commandee }}</td>
                   <td>{{ ligne.prix_vente | number }} GNF</td>
-                  <td>{{ ligne.quantite * ligne.prix_vente | number }} GNF</td>
+                  <td>{{ ligne.quantite_commandee * ligne.prix_vente | number }} GNF</td>
                 </tr>
               </ng-template>
             </p-table>

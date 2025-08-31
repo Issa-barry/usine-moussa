@@ -4,14 +4,13 @@
   <div class="grid grid-nogutter">
     <div class="col-12 px-4 mt-4 md:mt-6 md:px-6">
       <span class="text-900 block font-bold text-xl">{{ titrePage }}</span>
-      <p-message *ngIf="errorMessage" severity="error" text="{{ errorMessage }}"></p-message>
+      <p-message *ngIf="errorMessage" severity="error" [text]="errorMessage"></p-message>
     </div>
 
     <div class="col-12 lg:col-10 h-full px-4 py-4 md:px-6">
       <!-- Livreur -->
       <div class="field mb-4">
         <label class="text-800 text-m block font-normal mb-2">Livreur</label>
-
         <p-dropdown
           *ngIf="isEditMode"
           [options]="contacts"
@@ -23,6 +22,7 @@
           [showClear]="true"
           appendTo="body" 
           styleClass="w-full"
+          [ngClass]="{ 'p-invalid': hasError('contact_id') }"
         >
           <ng-template let-livreur pTemplate="selectedItem">
             <div *ngIf="livreur" class="flex flex-column">
@@ -36,6 +36,10 @@
           </ng-template>
         </p-dropdown>
 
+        <div *ngIf="getError('contact_id')" class="text-red-500 text-xs mt-1">
+          {{ getError('contact_id') }}
+        </div>
+
         <div *ngIf="!isEditMode" class="p-2 border-1 border-round surface-border text-sm">
           <div class="font-medium text-900">
             {{ commande.contact?.nom_complet || 'Non renseigné' }}
@@ -48,15 +52,14 @@
         <table class="w-full text-sm text-left">
           <thead class="text-xs text-gray-700">
             <tr>
-              <th class="py-2">Produit</th>
-              <th class="py-2">Quantité</th>
-              <th class="py-2">Prix unitaire</th>
-              <th class="py-2">Sous-total</th>
-              <th class="py-2" *ngIf="isEditMode"></th>
+              <th class="py-2 text-left">Produit</th>
+              <th class="py-2 text-center">Qté commandée</th>
+              <th class="py-2 text-right">Prix unitaire</th>
+              <th class="py-2 text-right">Sous-total</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let ligne of lignes; let i = index">
+            <tr *ngFor="let ligne of lignes; let i = index; trackBy: trackByLigne">
               <td class="py-2">
                 <p-dropdown
                   *ngIf="isEditMode"
@@ -67,77 +70,89 @@
                   appendTo="body"
                   (onChange)="onProduitChange(i)"
                   styleClass="w-full"
+                  [ngClass]="{ 'p-invalid': hasError('produit_id', i) }"
                 ></p-dropdown>
                 <div *ngIf="!isEditMode">
                   {{ ligne.produit?.nom || 'N/A' }}
                 </div>
-                <div *ngIf="apiErrors?.['lignes.' + i + '.produit_id']" class="text-red-500 text-xs mt-1">
-                  {{ apiErrors['lignes.' + i + '.produit_id'][0] }}
+                <div *ngIf="getError('produit_id', i)" class="text-red-500 text-xs mt-1">
+                  {{ getError('produit_id', i) }}
                 </div>
               </td>
 
-              <td class="py-2">
+              <td class="py-2 text-center"> 
                 <input
                   *ngIf="isEditMode"
                   type="number"
-                  class="p-inputtext w-full"
+                  class="p-inputtext w-full text-center"
                   [(ngModel)]="ligne.quantite"
                   (input)="recalculerTotal()"
                   min="1"
+                  step="1"
+                  inputmode="numeric"
+                  [ngClass]="{ 'p-invalid': hasError('quantite', i) }"
                 />
                 <div *ngIf="!isEditMode">
                   {{ ligne.quantite }}
                 </div>
-                <div *ngIf="apiErrors?.['lignes.' + i + '.quantite']" class="text-red-500 text-xs mt-1">
-                  {{ apiErrors['lignes.' + i + '.quantite'][0] }}
+                
+                <div *ngIf="getError('quantite', i)" class="text-red-500 text-xs mt-1">
+                  {{ getError('quantite', i) }}
                 </div>
               </td>
-
-              <td class="py-2">
+ 
+              <td class="py-2 text-right">
                 <input
                   *ngIf="isEditMode"
                   type="number"
-                  class="p-inputtext w-full"
+                  class="p-inputtext w-full text-right"
                   [(ngModel)]="ligne.prix_vente"
                   (input)="recalculerTotal()"
                   min="0"
+                  step="0.01"
+                  inputmode="decimal"
+                  [ngClass]="{ 'p-invalid': hasError('prix_vente', i) }"
                 />
                 <div *ngIf="!isEditMode">
                   {{ ligne.prix_vente | number: '1.0-0' }} GNF
                 </div>
+                <div *ngIf="getError('prix_vente', i)" class="text-red-500 text-xs mt-1">
+                  {{ getError('prix_vente', i) }}
+                </div>
               </td>
 
-              <td class="py-2">
+              <td class="py-2 text-right">
                 {{ ligne.quantite * ligne.prix_vente | number: '1.0-0' }} GNF
               </td>
 
-              <td class="py-2 text-right" *ngIf="isEditMode">
+              <!-- <td class="py-2 text-right" *ngIf="isEditMode">
                 <button
                   pButton
                   icon="pi pi-trash"
                   class="p-button-danger p-button-sm"
                   (click)="lignes.splice(i, 1); recalculerTotal()"
                 ></button>
-              </td>
+              </td> -->
             </tr>
           </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3" class="py-3 text-right font-bold">Total TTC:</td>
+              <td class="py-3 text-right font-bold">{{ totalCommande | number: '1.0-0' }} GNF</td>
+            </tr>
+          </tfoot>
         </table>
       </div>
 
       <!-- Ajouter produit -->
-      <button
+      <!-- <button
         *ngIf="isEditMode"
         pButton
         icon="pi pi-plus"
         label="Ajouter un produit"
         class="p-button-sm mt-3"
         (click)="ajouterLigne()"
-      ></button>
-
-      <!-- Totaux -->
-      <div class="text-right font-bold mt-4">
-        Total : {{ totalCommande | number: '1.0-0' }} GNF
-      </div>
+      ></button> -->
 
       <!-- Actions -->
       <div
@@ -170,7 +185,7 @@
           *ngIf="!isEditMode"
           pButton
           pRipple
-          class="p-button-warning mt-3 lg:mt-0 w-full lg:w-auto mr-3"
+          class="p-button-primary mt-3 lg:mt-0 w-full lg:w-auto mr-3"
           label="Modifier"
           icon="pi pi-pencil"
           (click)="editProduct()"
