@@ -1,9 +1,9 @@
 
 <div class="card py-3 overflow-auto flex flex-row justify-content-between">
         <div class="mt-3">
-            <span class="font-semibold ">Total : 45 000 GNF</span>
-            <span class="font-semibold ml-4">Reste : 10 000 GNF</span>
-            <span class="font-semibold ml-4 text-primary">Partiel</span>
+            <span class="font-semibold ">Total : {{ facture.total }} GNF</span>
+            <span class="font-semibold ml-4">Reste : {{ facture.montant_du }} GNF</span>
+            <span class="font-semibold ml-4 text-primary">{{ facture.statut }}</span>
         </div>
 
      <div class="p-toolbar-group-right">
@@ -21,21 +21,21 @@
 			<div class="my-3 text-2xl font-bold text-900">EAU-LA-MAMAN</div>
 			<span class="mb-2">Matoto</span>
 			<span>Commune de Matoto, Conakry</span>
-		</div>
+		</div> 
 		<div class="flex flex-column mt-5 md:mt-0">
 			<div class="text-2xl font-semibold text-left md:text-right mb-3">FACTURE</div>
 			<div class="flex flex-column">
 				<div class="flex justify-content-between align-items-center mb-2">
 					<span class="font-semibold mr-6">DATE</span>
-					<span>30/08/2019</span>
+					<span>{{ facture.updated_at }}</span>
 				</div>
 				<div class="flex justify-content-between align-items-center mb-2">
 					<span class="font-semibold mr-6">N° #</span>
-					<span>8523</span>
+					<span>{{ facture.numero }}</span>
 				</div>
 				<div class="flex justify-content-between align-items-center">
-					<span class="font-semibold mr-6">CLIENT REF</span>
-					<span>C1613</span>
+					<span class="font-semibold mr-6">REFERENCE CLIENT </span>
+					<span>{{ facture.commande?.contact?.reference }}</span>
 				</div>
 			</div>
 		</div>	
@@ -43,8 +43,8 @@
  
 	<div class="mt-5 mb-8 flex flex-column">
 		<div class="mb-3 text-2xl font-medium">FACTURE DE</div>
-		<span class="mb-2">Nen dow</span>
-		<span>Wanindara, Conakry</span>
+		<span class="mb-2">{{ facture.commande?.contact?.nom_complet }}</span>
+		<span>{{ facture.commande?.contact?.phone }}</span>
 	</div>
 
 	<div class="overflow-x-auto">

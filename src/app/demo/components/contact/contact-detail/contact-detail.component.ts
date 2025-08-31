@@ -17,7 +17,7 @@ import { AgenceService } from 'src/app/demo/service/agence/agence.service';
 import { ContactService } from 'src/app/demo/service/contact/contact.service';
 import { RoleService } from 'src/app/demo/service/role/role.service';
 
-@Component({
+@Component({ 
     selector: 'app-contact-detail',
     templateUrl: './contact-detail.component.html',
     styleUrl: './contact-detail.component.scss',

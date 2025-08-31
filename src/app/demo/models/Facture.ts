@@ -5,33 +5,26 @@ import { FactureLigne } from "./FactureLigne";
 
 export type FactureStatut = 'brouillon' | 'partiel' | 'payé' | 'impayé';
 
-export interface Facture {
-  id: number;
-  numero: string;
-  client_id: number;
-  commande_id: number;
+export class Facture {
+  id?: number;
+  numero?: string;
+  // client_id: number;
+   commande?: Commande;
   total: number;
   montant_du: number;
-  statut: FactureStatut;
+  statut?: FactureStatut;
   created_at?: string;
   updated_at?: string;
-
-  // relations chargées par l’API (optionnelles)
+   
   lignes?: FactureLigne[];
   encaissements?: Encaissement[]; // déclaré ci-dessous via interface merging
-  client?: {
-    id: number;
-    name?: string;
-    email?: string;
-  };
-
-  commande?: Commande;
-
-  // commande?: {
-  //   id: number;
-  //   numero: string;
-  //   statut: string; // 'brouillon' | 'livraison_en_cours' | 'livré' | 'cloturé' | 'annulé'
-  // };
+  
+  constructor() {
+    this.lignes = [];
+    this.encaissements = [];
+    this.total = 0;
+    this.montant_du = 0;
+   }
 }
 
 // Pour éviter les import circulaires, on déclare l'interface ici

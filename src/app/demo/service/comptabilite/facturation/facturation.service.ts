@@ -93,7 +93,7 @@ export class FactureService {
       .pipe(map((res) => res.data), catchError(this.handleError));
   }
 
-  getById(id: number): Observable<Facture> {
+  getFactureById(id: number): Observable<Facture> {
     return this.http
       .get<{ success: boolean; data: Facture }>(`${this.apiUrl}/getByID/${id}`)
       .pipe(map((res) => res.data), catchError(this.handleError));
@@ -101,7 +101,7 @@ export class FactureService {
 
   create(payload: CreateFacturePayload): Observable<Facture> {
     return this.http
-      .post<{ success: boolean; data: Facture }>(
+      .post<{ success: boolean; data: Facture }>( 
         `${this.apiUrl}/create`,
         payload,
         httpOptions
