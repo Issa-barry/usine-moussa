@@ -16,6 +16,7 @@ import { MessageModule } from 'primeng/message';
 import { LivraisonNewRoutingModule } from './livraison-new-routing.module';
 import { LivraisonNewComponent } from './livraison-new.component';
 import { ToastModule } from 'primeng/toast';
+import { TagModule } from 'primeng/tag';
 
 
 @NgModule({
@@ -38,6 +39,7 @@ import { ToastModule } from 'primeng/toast';
             TableModule,
             MessageModule,
             ToastModule,
+            TagModule
   ]
 })
 export class LivraisonNewModule { }
