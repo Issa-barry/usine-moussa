@@ -13,6 +13,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { ToastModule } from 'primeng/toast';
 import { MessageModule } from 'primeng/message';
+import { SharedModule } from 'src/app/shared/pipes/shared.module';
+ 
  
 
 @NgModule({
@@ -31,7 +33,8 @@ import { MessageModule } from 'primeng/message';
   DialogModule,
   ButtonModule,
   ToastModule,
-  MessageModule
+  MessageModule,
+  SharedModule
 
   ]
 })

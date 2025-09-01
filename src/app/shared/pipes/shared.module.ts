@@ -1,16 +1,18 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DateFrPipe } from './date-fr.pipe';
- 
+import { DateFrPipe } from './date-fr.pipe'; // pipe standalone
+import { PhoneFormatPipe } from './phone-format.pipe';
+
 @NgModule({
-  declarations: [
-    DateFrPipe
-  ],
   imports: [
-    CommonModule // obligatoire pour *ngIf, *ngFor, etc.
+    CommonModule,
+    DateFrPipe,   // ✅ on l’importe
+    PhoneFormatPipe
   ],
   exports: [
-    DateFrPipe
-  ]
+    CommonModule,
+    DateFrPipe,   // ✅ on le ré-exporte
+    PhoneFormatPipe
+  ],
 })
-export class SharedModule { }
+export class SharedModule {}
