@@ -8,7 +8,7 @@
   </div>
 
   <div class="p-toolbar-group-right">
-    <button pButton pRipple icon="pi pi-money-bill" label="Encaissement" class="p-button mr-3" (click)="openEncaissement()"></button>
+    <button pButton pRipple icon="pi pi-money-bill" label="Encaissement" class="p-button mr-3" (click)="openEncaissement()" [disabled]="!canEncaisser"></button>
     <button pButton pRipple icon="pi pi-download" label="..." class="p-button"></button>
   </div>
 </div>
