@@ -1,4 +1,5 @@
 import { Commande } from "./commande.model";
+import { Encaissement } from "./Encaissement";
 import { FactureLigne } from "./FactureLigne";
 
  
@@ -25,17 +26,4 @@ export class Facture {
     this.total = 0;
     this.montant_du = 0;
    }
-}
-
-// Pour éviter les import circulaires, on déclare l'interface ici
-export interface Encaissement {
-  id: number;
-  facture_id: number;
-  montant: number;
-  mode: 'espèces' | 'orange-money' | 'dépot-banque';
-  reference?: string | null;
-  commentaire?: string | null;
-  date_encaissement: string; // ISO
-  created_at?: string;
-  updated_at?: string;
 }

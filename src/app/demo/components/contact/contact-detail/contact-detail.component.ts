@@ -178,7 +178,7 @@ export class ContactDetailComponent implements OnInit, OnDestroy {
         const sub = this.contactService.updateContact(this.id, this.contact).subscribe({
             next: resp => {
                 this.contact = resp;
-                this.submitted = false;
+                this.submitted = false; 
                 this.isEditing = false;
                 this.onGetContact();
                 this.showSuccess('Contact mis à jour avec succès.');

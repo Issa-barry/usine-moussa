@@ -1,33 +1,26 @@
 export type EncaissementMode = 'espèces' | 'orange-money' | 'dépot-banque';
 
-export interface Encaissement {
-  id: number;
-  facture_id: number;
+export class Encaissement {
+  id?: number;
+  facture_id?: number;
   montant: number;
-  mode: EncaissementMode;
+  mode_paiement: EncaissementMode;   // ✅ typé sur EncaissementMode
   reference?: string | null;
   commentaire?: string | null;
-  date_encaissement: string; // ISO
-  created_at?: string;
-  updated_at?: string;
+  date_encaissement: string;
 
-  // relation optionnelle (si tu fais with('facture'))
-  facture?: {
-    id: number;
-    numero: string;
-    statut: 'brouillon' | 'partiel' | 'payé' | 'impayé';
-    total: number;
-    montant_du: number;
-  };
+  constructor() {
+    this.montant = 0;
+    this.mode_paiement = 'espèces';   // ✅ défaut typé
+    this.date_encaissement = new Date().toISOString().slice(0, 10);
+  }
 }
 
 export interface CreateEncaissementDto {
   facture_id: number;
   montant: number;
-  mode?: EncaissementMode;
-  date_encaissement?: string; // ISO
+  mode?: EncaissementMode;           // ✅ le DTO prend EncaissementMode aussi
+  date_encaissement?: string;
   reference?: string;
   commentaire?: string;
 }
-
-export interface UpdateEncaissementDto extends Partial<CreateEncaissementDto> {}

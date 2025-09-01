@@ -9,7 +9,7 @@ import { ContactService } from 'src/app/demo/service/contact/contact.service';
 import { ProduitService } from 'src/app/demo/service/produit/produit.service';
 import { CommandeService, ApiErrorShape } from 'src/app/demo/service/ventes/commande/commande.service';
 import { forkJoin } from 'rxjs';
-
+ 
 @Component({
   selector: 'app-commande-detail',
   templateUrl: './commande-detail.component.html',
