@@ -16,7 +16,7 @@ export class PanelsDemoComponent implements OnInit {
             { label: 'Theming', icon: 'pi pi-bookmark', routerLink: ['/theming'] }
         ];
 
-        this.cardMenu = [
+        this.cardMenu = [ 
             {
                 label: 'Save', icon: 'pi pi-fw pi-check'
             },

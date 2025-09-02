@@ -1,7 +1,7 @@
 import {
-    HttpClient,
-    HttpErrorResponse,
-    HttpHeaders,
+  HttpClient,
+  HttpErrorResponse,
+  HttpHeaders,
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable, throwError } from 'rxjs';
@@ -10,117 +10,92 @@ import { UpdateCommandeDto } from 'src/app/demo/models/commande-update.dto';
 import { Commande } from 'src/app/demo/models/commande.model';
 import { environment } from 'src/environements/environment.dev';
 
+type ApiSuccess<T> = { success: boolean; data: T };
+type ApiValidation = { [field: string]: string[] };
+
+export interface ApiErrorShape {
+  status: number;
+  message: string;
+  errors: ApiValidation | null;
+  raw: HttpErrorResponse;
+}
+
 const httpOptions = {
-    headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,DELETE,PUT',
-    }),
+  headers: new HttpHeaders({
+    'Content-Type': 'application/json',
+  }),
 };
 
-@Injectable({
-    providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class CommandeService {
-    private apiUrl = `${environment.apiUrl}/commandes`;
+  private apiUrl = `${environment.apiUrl}/commandes`;
 
-    constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {}
 
-    private handleError(error: HttpErrorResponse) {
-        console.error('Erreur API Commande :', error);
+  private handleError(error: HttpErrorResponse) {
+    // essaie de récupérer un message métier du backend (Laravel)
+    const backend = error?.error as any;
 
-        let errorMessage = 'Une erreur inconnue est survenue';
+    const apiErr: ApiErrorShape = {
+      status: error?.status ?? 0,
+      message:
+        backend?.message ??
+        error?.statusText ??
+        (error.error instanceof ErrorEvent
+          ? `Erreur client : ${error.error.message}`
+          : 'Une erreur inconnue est survenue'),
+      // supporte plusieurs conventions : data (custom), errors (validation Laravel)
+      errors:
+        (backend?.data as ApiValidation) ??
+        (backend?.errors as ApiValidation) ??
+        null,
+      raw: error,
+    };
 
-        if (error.error instanceof ErrorEvent) {
-            errorMessage = `Erreur client : ${error.error.message}`;
-        } else {
-            if (error.status === 422 && error.error?.errors) {
-                if (typeof error.error.errors === 'object') {
-                    errorMessage = Object.keys(error.error.errors)
-                        .map((key) => error.error.errors[key].join(' '))
-                        .join(' ');
-                } else {
-                    errorMessage = JSON.stringify(error.error.errors);
-                }
-            } else if (error.status === 0) {
-                errorMessage = 'Impossible de se connecter au serveur';
-            } else {
-                errorMessage = `Erreur serveur ${error.status} : ${error.message}`;
-            }
-        }
+    return throwError(() => apiErr);
+  }
 
-        return throwError(() => new Error(errorMessage));
-    }
+  getAllCommandes(): Observable<Commande[]> {
+    return this.http
+      .get<ApiSuccess<Commande[]>>(`${this.apiUrl}/all`)
+      .pipe(map((res) => res.data), catchError(this.handleError.bind(this)));
+  }
 
-    getAllCommandes(): Observable<Commande[]> {
-        return this.http
-            .get<{ success: boolean; data: Commande[] }>(`${this.apiUrl}/all`)
-            .pipe(
-                map((res) => res.data),
-                catchError(this.handleError)
-            );
-    }
+  getCommandeByNumero(numero: string): Observable<Commande> {
+    return this.http
+      .get<ApiSuccess<Commande>>(`${this.apiUrl}/showByNumero/${numero}`)
+      .pipe(map((res) => res.data), catchError(this.handleError.bind(this)));
+  }
 
-    getCommandeByNumero(numero: string): Observable<Commande> {
-        return this.http
-            .get<{ success: boolean; data: Commande }>(
-                `${this.apiUrl}/showByNumero/${numero}`
-            )
-            .pipe(
-                map((res) => res.data),
-                catchError(this.handleError)
-            );
-    }
+  createCommande(commande: CreateCommandeDto): Observable<Commande> {
+    return this.http
+      .post<ApiSuccess<Commande>>(`${this.apiUrl}/create`, commande, httpOptions)
+      .pipe(map((res) => res.data), catchError(this.handleError.bind(this)));
+  }
 
-    createCommande(commande: CreateCommandeDto): Observable<Commande> {
-        return this.http
-            .post<{ success: boolean; data: Commande }>(
-                `${this.apiUrl}/create`,
-                commande,
-                httpOptions
-            )
-            .pipe(
-                map((res) => res.data)
-                // catchError(this.handleError)
-            );
-    }
+  updateCommande(numero: string, dto: UpdateCommandeDto): Observable<Commande> {
+    return this.http
+      .put<ApiSuccess<Commande>>(
+        `${this.apiUrl}/updateByNumero/${numero}`,
+        dto,
+        httpOptions
+      )
+      .pipe(map((res) => res.data), catchError(this.handleError.bind(this)));
+  }
 
-    updateCommande(
-        numero: string,
-        dto: UpdateCommandeDto
-    ): Observable<Commande> {
-        return this.http
-            .put<{ success: boolean; data: Commande }>(
-                `${this.apiUrl}/updateByNumero/${numero}`,
-                dto,
-                httpOptions
-            )
-            .pipe(
-                map((res) => res.data),
-                catchError(this.handleError)
-            );
-    }
+  deleteCommande(numero: string): Observable<void> {
+    return this.http
+      .delete<void>(`${this.apiUrl}/deleteByNumero/${numero}`, httpOptions)
+      .pipe(catchError(this.handleError.bind(this)));
+  }
 
-    deleteCommande(numero: string): Observable<void> {
-        return this.http
-            .delete<void>(
-                `${this.apiUrl}/deleteByNumero/${numero}`,
-                httpOptions
-            )
-            .pipe(catchError(this.handleError));
-    }
-
-    validerCommande(numero: string): Observable<Commande> {
-        return this.http
-            .patch<{ success: boolean; commande: Commande }>(
-                `${this.apiUrl}/validation/${numero}`,
-                {}, // corps vide
-                httpOptions
-            )
-            .pipe(
-                map((res) => res.commande),
-                catchError(this.handleError)
-            );
-    }
+  validerCommande(numero: string): Observable<Commande> {
+    return this.http
+      .patch<{ success: boolean; commande: Commande }>(
+        `${this.apiUrl}/validation/${numero}`,
+        {},
+        httpOptions
+      )
+      .pipe(map((res) => res.commande), catchError(this.handleError.bind(this)));
+  }
 }

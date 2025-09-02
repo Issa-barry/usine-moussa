@@ -1,1 +1,66 @@
-<p>packing-new works!</p>
+<div class="grid justify-content-center">
+  <div class="col-12 md:col-10 lg:col-12 xl:col-10">
+    <div class="card px-6 py-6 shadow-4 border-round-xl">
+      <h2 class="text-3xl font-semibold mb-5 text-center text-primary">Nouveau packing</h2>
+
+      <form *ngIf="packing" (ngSubmit)="onSubmit()" #packingForm="ngForm" class="p-fluid">
+        <div class="formgrid grid">
+          <div class="field col-12">
+            <label for="user_id" class="font-semibold">Employé</label>
+            <p-dropdown id="user_id" [options]="contacts" optionLabel="nom_complet" optionValue="id" [(ngModel)]="packing.user_id" name="user_id" placeholder="Sélectionner un employé" class="text-lg"></p-dropdown>
+          </div>
+
+          <div class="field col-12 md:col-6">
+            <label for="date" class="font-semibold">Date</label>
+            <input type="date" pInputText id="date" [(ngModel)]="packing.date" name="date" required class="text-lg" />
+          </div>
+
+          <div class="field col-12 md:col-6">
+            <label for="heure_debut" class="font-semibold">Heure début</label>
+            <input type="time" pInputText id="heure_debut" [(ngModel)]="packing.heure_debut" name="heure_debut" required class="text-lg" />
+          </div>
+
+          <div class="field col-12 md:col-6">
+            <label for="heure_fin" class="font-semibold">Heure fin</label>
+            <input type="time" pInputText id="heure_fin" [(ngModel)]="packing.heure_fin" name="heure_fin" required class="text-lg" />
+          </div>
+
+          <div class="field col-12 md:col-6">
+            <label for="statut" class="font-semibold">Statut</label>
+            <p-dropdown id="statut" [options]="statuts" [(ngModel)]="packing.statut" name="statut" placeholder="Sélectionner un statut" class="text-lg"></p-dropdown>
+          </div>
+        </div>
+ 
+        <div class="mt-5">
+          <h3 class="text-2xl font-semibold mb-3 text-primary">Produits utilisés</h3>
+
+          <div *ngFor="let ligne of packing.lignes; let i = index" class="formgrid grid align-items-end mb-3">
+            <div class="field col-12 md:col-5">
+              <label>Produit</label>
+              <p-dropdown [options]="produits" optionLabel="nom" optionValue="id" [(ngModel)]="ligne.produit_id" name="produit_{{i}}" placeholder="Choisir un produit"></p-dropdown>
+            </div>
+            <div class="field col-6 md:col-3">
+              <label>Quantité</label>
+              <input type="number" pInputText [(ngModel)]="ligne.quantite_packed" name="quantite_{{i}}" />
+            </div>
+            <div class="field col-6 md:col-2">
+              <button type="button" pButton icon="pi pi-trash" class="p-button-rounded p-button-danger mt-1" (click)="removeLigne(i)"></button>
+            </div>
+          </div>
+
+          <div class="flex justify-content-start mt-2">
+            <button type="button" pButton icon="pi pi-plus" label="Ajouter un produit" class="p-button-sm p-button-text p-button-primary" (click)="addLigne()"></button>
+          </div>
+        </div>
+ 
+        <div class="flex justify-content-center gap-3 mt-5">
+          <button type="submit" pButton label="Enregistrer" class="p-button-lg p-button-primary px-5" [disabled]="packingForm.invalid"></button>
+          <button type="button" pButton label="Annuler" class="p-button-lg p-button-secondary px-5" routerLink="/dashboard/packing"></button>
+        </div>
+      </form>
+
+      <p *ngIf="loading" class="text-center mt-4">Chargement...</p>
+      <p *ngIf="errorMessage" class="text-center text-red-500 font-medium mt-4">{{ errorMessage }}</p>
+    </div>
+  </div>
+</div>

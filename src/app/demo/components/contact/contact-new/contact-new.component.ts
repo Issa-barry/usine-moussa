@@ -22,7 +22,7 @@ export class ContactNewComponent implements OnInit {
     errors: { [key: string]: string } = {};
     isGuineeSelected: boolean = false;
     loading = false; 
-   
+    
     constructor(
         private router: Router,
         private contactService: ContactService,
@@ -102,7 +102,7 @@ export class ContactNewComponent implements OnInit {
         // Adapter la validation en fonction du pays sélectionné
         const isGuinee = this.isGuineeSelected; 
 
-        if (
+        if ( 
             !this.contact.role ||
             !this.contact.civilite ||
             !this.contact.nom_complet ||

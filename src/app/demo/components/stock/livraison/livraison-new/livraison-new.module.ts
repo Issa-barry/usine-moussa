@@ -1,17 +1,42 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { CheckboxModule } from 'primeng/checkbox';
+import { InputTextModule } from 'primeng/inputtext';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { ButtonModule } from 'primeng/button';
+import { RippleModule } from 'primeng/ripple';
+import { DropdownModule } from 'primeng/dropdown';
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
+import { InputGroupModule } from 'primeng/inputgroup';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { TableModule } from 'primeng/table';
+import { MessageModule } from 'primeng/message';
 
 import { LivraisonNewRoutingModule } from './livraison-new-routing.module';
 import { LivraisonNewComponent } from './livraison-new.component';
-
+import { ToastModule } from 'primeng/toast';
+import { TagModule } from 'primeng/tag';
 
 @NgModule({
-  declarations: [
-    LivraisonNewComponent
-  ],
-  imports: [
-    CommonModule,
-    LivraisonNewRoutingModule
-  ]
+    declarations: [LivraisonNewComponent],
+    imports: [
+        CommonModule,
+        LivraisonNewRoutingModule,
+        FormsModule,
+        CheckboxModule,
+        DropdownModule,
+        InputTextModule,
+        InputNumberModule,
+        ButtonModule,
+        RippleModule,
+        InputGroupModule,
+        InputGroupAddonModule,
+        MultiSelectModule,
+        TableModule,
+        MessageModule,
+        ToastModule,
+        TagModule,
+    ],
 })
-export class LivraisonNewModule { }
+export class LivraisonNewModule {}

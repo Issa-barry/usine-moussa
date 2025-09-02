@@ -16,7 +16,7 @@ export class CrudComponent implements OnInit {
 
     deleteProductsDialog: boolean = false;
  
-    products: Product[] = [];
+    products: Product[] = []; 
 
     product: Product = {};
 

@@ -49,14 +49,13 @@ export class PackingListeComponent implements OnInit {
       next: (data) => {
         this.packings = data;
         console.log(this.packings);
-        
       },
       error: (err) => this.messageService.add({
         severity: 'error',
         summary: 'Erreur',
         detail: err.message
       })
-    });
+    }); 
   }
 
   openNew(): void {
@@ -95,4 +94,29 @@ export class PackingListeComponent implements OnInit {
   onGlobalFilter(table: Table, event: Event): void {
     table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
+
+
+  validerPackingDepuisListe(packing: Packing): void {
+  if (!packing.id) return;
+
+  this.packingService.valider(packing.id).subscribe({
+    next: () => {
+      packing.statut = 'validé'; // mise à jour locale
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Packing validé',
+        detail: `Le packing ${packing.reference} a été validé.`
+      });
+    },
+    error: (err) => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Erreur',
+        detail: err.error?.message || 'Une erreur est survenue'
+      });
+    }
+  });
+}
+
+
 }

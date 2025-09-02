@@ -4,7 +4,7 @@ export class PackingLigne {
   id?: number;
   packing_id!: number;
   produit_id!: number;
-  quantite_utilisee!: number;
+  quantite_packed!: number;
 
   // Relation (optionnelle)
   produit?: Produit;

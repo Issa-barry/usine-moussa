@@ -2,7 +2,7 @@ import {
     Component,
     Input,
     OnInit,
-    OnDestroy
+    OnDestroy 
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -17,7 +17,7 @@ import { AgenceService } from 'src/app/demo/service/agence/agence.service';
 import { ContactService } from 'src/app/demo/service/contact/contact.service';
 import { RoleService } from 'src/app/demo/service/role/role.service';
 
-@Component({
+@Component({ 
     selector: 'app-contact-detail',
     templateUrl: './contact-detail.component.html',
     styleUrl: './contact-detail.component.scss',
@@ -35,7 +35,7 @@ export class ContactDetailComponent implements OnInit, OnDestroy {
     loading = false;
     loadingAgence = false;
     loadingRoles = false;
-    loadingContact = false;
+    loadingContact = false; 
     loadingAgenceSection = false;
     submitted = false;
     codeRecuperer = false;
@@ -178,7 +178,7 @@ export class ContactDetailComponent implements OnInit, OnDestroy {
         const sub = this.contactService.updateContact(this.id, this.contact).subscribe({
             next: resp => {
                 this.contact = resp;
-                this.submitted = false;
+                this.submitted = false; 
                 this.isEditing = false;
                 this.onGetContact();
                 this.showSuccess('Contact mis à jour avec succès.');

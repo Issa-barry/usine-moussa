@@ -1,6 +1,7 @@
 
 import { CommandeLigne } from './commande-ligne.model';
 import { Contact } from './contact';
+import { Livraison } from './livraison.model';
  
 
 export class Commande {
@@ -9,16 +10,19 @@ export class Commande {
   contact_id: number;
   contact?: Contact;
   lignes: CommandeLigne[];
+  livraisons?: Livraison[];
   created_at?: string;
   updated_at?: string;
   qte_total: number;
-  reduction:number;
+  reduction: number;
+  statut?: string; // ou status
 
-  constructor(){
-      this.numero = '';
-      this.contact_id=0;
-      this.lignes=[];
-      this.qte_total=0;
-      this.reduction=0;
+  constructor() {
+    this.numero = '';
+    this.contact_id = 0;
+    this.lignes = [];
+    this.livraisons = [];
+    this.qte_total = 0;
+    this.reduction = 0;
   }
 }

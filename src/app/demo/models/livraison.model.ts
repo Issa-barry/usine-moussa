@@ -1,25 +1,29 @@
- import { Commande } from './commande.model';
-import { Contact } from './contact';
-import { LivraisonLigne } from './livraison-ligne.model';
- 
+import { Commande } from "./commande.model";
+import { Contact } from "./contact";
+import { LivraisonLigne } from "./livraison-ligne.model";
 
 export class Livraison {
-    id?: number;
-    commande_id!: number;
-    client_id!: number;
-    date_livraison!: string;
-    statut!: 'en_cours' | 'livré' | 'en_attente' | 'annulé';
-    quantite?: number;
-    reference?: string;
-    quantite_total?: number;
+  id?: number;
+  commande_id!: number;
+  date_livraison!: string;
+  quantite_livree?: number;
+  reference?: string;
 
-    // relations
-    commande?: Commande;
-    client?: Contact;
-    livreur?: Contact;
-    lignes: LivraisonLigne[] = [];
+  commande?: Commande;
+  livreur?: Contact;
+  lignes: LivraisonLigne[] = [];
 
-    constructor(init?: Partial<Livraison>) {
-        Object.assign(this, init);
-    }
+  constructor() {
+    this.date_livraison = new Date().toISOString().split('T')[0];
+    this.quantite_livree = 0;
+  }
+
+  /** Ne renvoie que ce que l’API attend pour /livraisons/valider/{numero} */
+  toValidationDto(): { date_livraison: string; quantite_livree: number; livreur_id?: number } {
+    return {
+      date_livraison: this.date_livraison,
+      quantite_livree: Number(this.quantite_livree ?? 0),
+      ...(this.livreur?.id ? { livreur_id: this.livreur.id } : {})
+    };
+  }
 }

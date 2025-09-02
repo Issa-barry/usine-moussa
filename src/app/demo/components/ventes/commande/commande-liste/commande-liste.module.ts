@@ -21,6 +21,7 @@ import { CommandeListeComponent } from './commande-liste.component';
 import { MessageModule } from 'primeng/message';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { SkeletonModule } from 'primeng/skeleton';
 
 
 @NgModule({
@@ -46,8 +47,9 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
         DialogModule,
         MultiSelectModule,
         MessageModule,
-           ConfirmPopupModule,
-              ConfirmDialogModule,
+        ConfirmPopupModule,
+        ConfirmDialogModule,
+        SkeletonModule
   ]
 })
 export class CommandeListeModule { }

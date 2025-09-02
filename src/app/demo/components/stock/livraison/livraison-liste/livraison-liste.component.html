@@ -1,286 +1,195 @@
 <div class="grid">
-    <div class="col-12">
-        <div class="card">
-            <h5>Row Expand</h5>
-            <p-toast></p-toast>
-            <p-table
-                #dt1
-                [value]="livraisons"
-                dataKey="name"
-                [expandedRowKeys]="expandedRows"
-                responsiveLayout="scroll"
-            >
-                <ng-template pTemplate="caption">
-                    <div
-                        class="flex table-header flex justify-content-between flex-column sm:flex-row"
-                    >
-                        <button
-                            pButton
-                            icon="pi pi-fw {{
-                                isExpanded ? 'pi-minus' : 'pi-plus'
-                            }}"
-                            label="{{
-                                isExpanded ? 'Tout réduire' : 'Tout développer'
-                            }}"
-                            (click)="expandAll()"
-                        ></button>
+  <div class="col-12">
+    <div class="card">
+      <h5>Livraisons groupées par commande</h5>
+      <p-toast></p-toast>
 
-                        <button
-                            pButton
-                            label="Effacer"
-                            class="p-button-outlined mb-2"
-                            icon="pi pi-filter-slash"
-                            (click)="clear(dt1)"
-                        ></button>
-                        <span class="p-input-icon-left mb-2">
-                            <i class="pi pi-search"></i>
-                            <input
-                                pInputText
-                                type="text"
-                                #filter
-                                (input)="onGlobalFilter(dt1, $event)"
-                                placeholder="Mot-clé de recherche"
-                                class="w-full"
-                            />
-                        </span>
-                    </div>
 
-                    <!-- <div class="flex justify-content-between flex-column sm:flex-row">
-						
-					</div> -->
-                </ng-template>
-                <ng-template pTemplate="header">
-                    <tr>
-                        <th style="width: 3rem">Commande</th>
-                        <th pSortableColumn="name">
-                            Ref-livraison <p-sortIcon field="name"></p-sortIcon>
-                        </th>
-                         <th pSortableColumn="category">
-                            Livreur <p-sortIcon field="category"></p-sortIcon>
-                        </th>
-						 
-                        <th pSortableColumn="rating">
-                            Qté_total <p-sortIcon field="rating"></p-sortIcon>
-                        </th>
+      <p-table
+        #dt1
+        [value]="loading ? skeletonRows : groupedLivraisons"
+        dataKey="numeroCommande"
+        [expandedRowKeys]="expandedRows"
+        responsiveLayout="scroll"
+      >
+        <ng-template pTemplate="caption">
+          <div class="flex table-header justify-content-between flex-column sm:flex-row">
+            <button
+              pButton
+              icon="pi pi-fw {{ isExpanded ? 'pi-minus' : 'pi-plus' }}"
+              label="{{ isExpanded ? 'Tout réduire' : 'Tout développer' }}"
+              (click)="toggleExpandAll()"
+            ></button>
 
-						<th pSortableColumn="category">
-                            Client <p-sortIcon field="category"></p-sortIcon>
-                        </th>
-						
-                        <th pSortableColumn="inventoryStatus">
-                            Statut
-                            <p-sortIcon field="inventoryStatus"></p-sortIcon>
-                        </th>
-						 <th pSortableColumn="inventoryStatus">
-                            Action
-                            <p-sortIcon field="inventoryStatus"></p-sortIcon>
-                        </th>
-                    </tr> 
-                </ng-template>
-                <ng-template
-                    pTemplate="body"
-                    let-livraison
-                    let-expanded="expanded"
-                >
-                    <tr>
-                        <td>
-							
-                              <button
-                                type="button"
-                                pButton
-                                pRipple
-                                [pRowToggler]="livraison"
-                                class="p-button-text p-button-rounded p-button-plain"
-                                [icon]="
-                                    expanded
-                                        ? 'pi pi-chevron-down'
-                                        : 'pi pi-chevron-right'
-                                "
-                            >{{ livraison.commande.numero }}</button> 
-                        </td>
-                        <td style="min-width: 12rem">{{ livraison.reference }}</td>
-						<td>{{ livraison.commande.contact.nom_complet }}</td>
-						<td>{{ livraison.commande.qte_total }}</td>
-                      
-                        <!-- <td style="min-width: 8rem">
-                            {{ livraison.commande | currency : "USD" }}
-                        </td>
-                        <td style="min-width: 10rem">{{ livraison.commande }}</td>
-					-->
-						<td>{{ livraison.client.nom_complet }}</td>
+            <button
+              pButton
+              label="Effacer"
+              class="p-button-outlined mb-2"
+              icon="pi pi-filter-slash"
+              (click)="clear(dt1)"
+            ></button>
 
-                        <td>
-                             <span
-                                [class]="
-                                    'product-badge status-' +
-                                    livraison.commande.statut.toLowerCase()
-                                "
-                                >{{ livraison.statut }}</span
-                            > 
-							 
-                        </td>
-						<td>
-<ng-container [ngSwitch]="livraison.statut">
-   <!-- Bouton view -->
-   <button
+            <span class="p-input-icon-left mb-2">
+              <i class="pi pi-search"></i>
+              <input
+                pInputText
+                type="text"
+                (input)="onGlobalFilter(dt1, $event)"
+                placeholder="Mot-clé de recherche"
+                class="w-full"
+              />
+            </span>
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Commande</th>
+            <th>Réf Livraison</th>
+            <th>Livreur</th>
+            <th>Qté totale</th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-group let-expanded="expanded">
+          <tr *ngIf="loading">
+            <td><p-skeleton width="6rem" /></td>
+            <td><p-skeleton width="10rem" /></td>
+            <td><p-skeleton width="8rem" /></td>
+            <td><p-skeleton width="5rem" /></td>
+            <td><p-skeleton width="3rem" height="2rem" borderRadius="1rem" /></td>
+          </tr>
+          <tr *ngIf="!loading">
+            <td>
+              <button
+                type="button"
+                pButton
+                pRipple
+                [pRowToggler]="group"
+                class="p-button-text p-button-rounded p-button-plain"
+                [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+              >
+                {{ group.numeroCommande }}
+              </button>
+            </td>
+            <td>{{ group.livraisons[0]?.reference }}</td>
+            <td>{{ group.livreur?.nom_complet }}</td>
+            <td>{{ group.quantite_total }}</td>
+            <td>
+              <button 
                 pButton
                 pRipple
                 icon="pi pi-eye"
-                class="p-button-rounded p-button-suces mr-2"
-                (click)="viewLivraison(livraison)"
+                class="p-button-rounded p-button-success mr-2"
+                (click)="viewLivraison(group)"
               ></button>
-   
-</ng-container>
-						</td>
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="rowexpansion" let-livraison>
-                    <tr>
-                         <td colspan="7">
-                            <div class="p-3">
-                                <p-table
-                                    [value]="livraison.lignes"
-                                    dataKey="id"
-                                    responsiveLayout="scroll"
-                                >
-                                    <ng-template pTemplate="header">
-                                        <tr>
-                                            <th pSortableColumn="id">
-                                                Id
-                                                <p-sortIcon
-                                                    field="price"
-                                                ></p-sortIcon>
-                                            </th>
-                                            <th pSortableColumn="customer">
-                                                Produit
-                                                <p-sortIcon
-                                                    field="customer"
-                                                ></p-sortIcon>
-                                            </th>
-                                            <th pSortableColumn="date">
-                                                Qté
-                                                <p-sortIcon
-                                                    field="date"
-                                                ></p-sortIcon>
-                                            </th>
-                                            <th pSortableColumn="amount">
-                                                Date
-                                                <p-sortIcon
-                                                    field="amount"
-                                                ></p-sortIcon>
-                                            </th> 
-                                            <th style="width: 4rem"></th>
-                                        </tr>
-                                    </ng-template>
-                                    <ng-template pTemplate="body" let-ligne>
-                                        <tr>
-                                            <td>{{ ligne.id }}</td>
-                                             <td>{{ ligne.produit.nom }}</td>
-                                          <td>{{ ligne.quantite }}</td>
-										<td>{{ ligne.updated_at }}</td>
-                                            <!-- <td>
-                                                <p-button
-                                                    type="button"
-                                                    icon="pi pi-search"
-                                                ></p-button>
-                                            </td> -->
-                                        </tr>
-                                    </ng-template>
-                                    <ng-template pTemplate="emptymessage">
-                                        <tr>
-                                            <td colspan="6">
-                                                There are no order for this
-                                                product yet.
-                                            </td>
-                                        </tr>
-                                    </ng-template>
-                                </p-table>
-                            </div>
-                        </td> 
-                    </tr>
-                </ng-template>
-            </p-table>
+            </td>
+          </tr>
+        </ng-template>
 
-			<p-dialog
+        <ng-template pTemplate="rowexpansion" let-group>
+          <tr>
+            <td colspan="5">
+              <div class="p-3">
+                <p-table [value]="group.livraisons" responsiveLayout="scroll">
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th>Client</th>
+                      <th>Réf Livraison</th>
+                      <th>Date livraison</th>
+                      <th>Qté</th>
+                      <th>Statut</th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-liv>
+                    <tr>
+                      <td>{{ liv.client?.nom_complet }}</td>
+                      <td>{{ liv.reference }}</td>
+                      <td>{{ liv.date_livraison | dateFr }}</td>
+                      <td>{{ liv.quantite_total }}</td>
+                      <td>{{ liv.statut }}</td>
+                    </tr>
+                  </ng-template> 
+                </p-table>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5">Aucune livraison trouvée.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      <p-dialog
         [(visible)]="livraisonDetailDialog"
-        [style]="{ width: '600px' }"
-        [header]="'Commande n° : ' + selectedLivraison?.numero"
+        [style]="{ width: '800px' }"
+        [header]="'Commande n° : ' + selectedLivraison?.numeroCommande"
         [modal]="true"
         class="p-fluid"
       >
         <ng-template pTemplate="content">
           <div class="field">
-            <label><strong>Statut :</strong></label>
-            <div>{{ selectedLivraison?.statut }}</div>
+            <label><strong>Statut global :</strong></label>
+            <div>Livré</div>
           </div>
 
           <div class="field">
             <label><strong>Livreur :</strong></label>
-            <div>{{ selectedLivraison?.contact?.nom_complet }}</div>
+            <div>{{ selectedLivraison?.livreur?.nom_complet }}</div>
           </div>
 
           <div class="field">
             <label><strong>Date :</strong></label>
-            <div>{{ selectedLivraison?.created_at | date:'medium' }}</div>
+            <div>{{ selectedLivraison?.livraisons[0]?.created_at | dateFr  }}</div>
           </div>
 
           <hr />
 
-          <div class="formgrid grid mb-4">
-            <div class="field col">
-              <label><strong>Total :</strong></label>
-              <div>{{ selectedLivraison?.montant_total | number }} GNF</div>
-            </div>
-            <div class="field col">
-              <label><strong>Remise :</strong></label>
-              <div>{{ selectedLivraison?.reduction | number }} GNF</div>
-            </div>
-          </div>
+          <div class="field" *ngFor="let liv of selectedLivraison?.livraisons">
+            <h6>Client : {{ liv.client?.nom_complet }}</h6>
 
-          <hr />
-
-          <div class="field">
-            <label><strong>Produits commandés :</strong></label>
-            <p-table [value]="selectedLivraison?.lignes" responsiveLayout="scroll">
+            <p-table [value]="liv.lignes" responsiveLayout="scroll">
               <ng-template pTemplate="header">
                 <tr>
                   <th>Produit</th>
                   <th>Quantité</th>
-                  <th>Prix unitaire</th>
-                  <th>Sous-total</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-ligne>
                 <tr>
                   <td>{{ ligne.produit?.nom }}</td>
                   <td>{{ ligne.quantite }}</td>
-                  <td>{{ ligne.prix_vente | number }} GNF</td>
-                  <td>{{ ligne.quantite * ligne.prix_vente | number }} GNF</td>
                 </tr>
               </ng-template>
+              <ng-template pTemplate="emptymessage">
+                <tr><td colspan="2">Aucun produit livré.</td></tr>
+              </ng-template>
             </p-table>
+            <hr />
           </div>
         </ng-template>
 
         <ng-template pTemplate="footer">
           <button
             pButton
-            pRipple
-            label="Fermer"
+            label="Créer une livraison"
             icon="pi pi-times"
             class="p-button-text"
-            (click)="livraisonDetailDialog = false"
-          ></button>
+            (click)="onGoToNewLivraison(selectedLivraison.numeroCommande)"
+          ></button> 
           <button
             pButton
-            pRipple
-            label="Modifier"
-            icon="pi pi-pencil"
+            label="Détails"
+            icon="pi pi-arrow-right"
             class="p-button-text"
-            (click)="onGoToDetailLivraison(selectedLivraison)"
+            (click)="onGoToDetailLivraison(selectedLivraison.livraisons[0])"
           ></button>
         </ng-template>
       </p-dialog>
-        </div>
     </div>
+  </div>
 </div>

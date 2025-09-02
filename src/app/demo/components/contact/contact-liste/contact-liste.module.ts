@@ -22,6 +22,15 @@ import { PasswordModule } from 'primeng/password';
 import { ContactListeComponent } from './contact-liste.component';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SkeletonModule } from 'primeng/skeleton';
+ 
+  import { SplitButtonModule } from 'primeng/splitbutton';
+import { AccordionModule } from 'primeng/accordion';
+import { TabViewModule } from 'primeng/tabview';
+import { FieldsetModule } from 'primeng/fieldset';
+import { MenuModule } from 'primeng/menu';
+ import { DividerModule } from 'primeng/divider';
+import { SplitterModule } from 'primeng/splitter';
+import { PanelModule } from 'primeng/panel';
 
 
 @NgModule({
@@ -50,6 +59,17 @@ import { SkeletonModule } from 'primeng/skeleton';
         PasswordModule,
         ProgressSpinnerModule,
         SkeletonModule,
+    
+		RippleModule,
+		SplitButtonModule,
+		AccordionModule,
+		TabViewModule,
+		FieldsetModule,
+		MenuModule,
+		InputTextModule,
+		DividerModule,
+		SplitterModule,
+		PanelModule
   ]
 })
 export class ContactListeModule { }

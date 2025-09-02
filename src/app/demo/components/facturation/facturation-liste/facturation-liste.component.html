@@ -1,95 +1,116 @@
-<div class="col-12">
-    <div class="card">
-        <p-toast></p-toast>
+<div class="grid">
+  <div class="col-12">
+    <div class="card px-6 py-6">
+      <p-toast></p-toast>
 
-        <p-toolbar styleClass="mb-4">
-            <ng-template pTemplate="left">
-                <div class="my-2">
-                    <button pButton pRipple label="Paiement" icon="pi pi-money-bill" class="p-button-success mr-2" ></button>
-                 </div>
-            </ng-template>
+      <p-toolbar styleClass="mb-4">
+        <div class="p-toolbar-group-left">
+          <button
+            pButton
+            pRipple
+            label="Paiement"
+            icon="pi pi-money-bill"
+            class="p-button-success mr-2"
+          ></button>
+        </div>
 
-            <ng-template pTemplate="right">
-                <div class="p-toolbar-group-right">
-                    <p-splitButton label="Filtre" icon="pi pi-filter" [model]="itemsFiltre"></p-splitButton>
-                </div>
-             </ng-template>
-        </p-toolbar>
+        <ng-template pTemplate="right">
+          <p-splitButton
+            label="Filtre" 
+            icon="pi pi-filter"
+            [model]="itemsFiltre"
+          ></p-splitButton>
+        </ng-template>
+      </p-toolbar>
 
-        <p-table #dt [value]="products" dataKey="name" [expandedRowKeys]="expandedRows" responsiveLayout="scroll"
-                    [globalFilterFields]="['nom','montant','phone','statut']">
+     <p-table
+  #dt
+  [value]="loading ? skeletonRows : factures"
+  responsiveLayout="scroll"
+  [rows]="10"
+  [paginator]="true"
+  [rowsPerPageOptions]="[10, 20, 30]"
+  [showCurrentPageReport]="true"
+  currentPageReportTemplate="Factures {first} - {last} sur {totalRecords}"
+  [rowHover]="true"
+  dataKey="id"
+>
 
-            <ng-template pTemplate="caption">
-                <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                    <h5 class="m-0">Manage Products</h5>
-                    <span class="block mt-2 md:mt-0 p-input-icon-left">
-                        <i class="pi pi-search"></i>
-                        <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..."  class="w-full sm:w-auto"/>
-                    </span>
-                </div>
-            </ng-template> 
+        <!-- HEADER -->
+        <ng-template pTemplate="caption">
+          <div
+            class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
+          >
+            <h5 class="m-0">Liste des factures</h5>
+            <span class="block mt-2 md:mt-0 p-input-icon-left">
+              <i class="pi pi-search"></i>
+              <input
+                pInputText
+                type="text"
+                (input)="onGlobalFilter(dt, $event)"
+                placeholder="Rechercher..."
+                class="w-full sm:w-auto"
+              />
+            </span>
+          </div>
+        </ng-template>
 
-            <ng-template pTemplate="header">
-                <tr>
-                    <th style="width: 3rem"></th>
-                    <th pSortableColumn="nom">Client <p-sortIcon field="nom"></p-sortIcon></th>
-                    <th pSortableColumn="phone">Phone <p-sortIcon field="phone"></p-sortIcon></th>
-                    <th pSortableColumn="montant">Monatant <p-sortIcon field="montant"></p-sortIcon></th>
-                    <th pSortableColumn="montant">Reste à payer <p-sortIcon field="montant"></p-sortIcon></th>
-                    <th pSortableColumn="inventoryStatus">Status <p-sortIcon field="inventoryStatus"></p-sortIcon></th>
-                    <th>Action</th>
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="numero">N° Facture <p-sortIcon field="numero" /></th>
+            <th pSortableColumn="commande.contact.nom_complet">Client <p-sortIcon field="commande.contact.nom_complet" /></th>
+            <th pSortableColumn="commande.contact.phone">Téléphone <p-sortIcon field="commande.contact.phone" /></th>
+            <th pSortableColumn="commande.numero">Commande <p-sortIcon field="commande.numero" /></th>
+            <th pSortableColumn="total">Montant TTC <p-sortIcon field="total" /></th>
+            <th pSortableColumn="montant_du">Reste à payer <p-sortIcon field="montant_du" /></th>
+            <th pSortableColumn="statut">Statut <p-sortIcon field="statut" /></th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
 
-                </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-product let-expanded="expanded">
-                <tr>
-                    <td>
-                        <button type="button" pButton pRipple [pRowToggler]="product" class="p-button-text p-button-rounded p-button-plain" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
-                    </td>
-                    <td style="min-width: 12rem;">{{product.name}}</td>
-                    <td style="min-width: 10rem;">{{product.category}}</td>
-                    <td style="min-width: 8rem;">{{product.price | currency:'USD'}}</td>
-                    <td style="min-width: 8rem;">{{product.price | currency:'USD'}}</td>
-                    <td><span [class]="'product-badge status-' + product.inventoryStatus.toLowerCase()">{{product.inventoryStatus}}</span></td>
-                    <td>
-                        <div class="flex">
-                            <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-success mr-2" (click)="goToDetail()" ></button>
-                         </div>
-                    </td>
+        <!-- BODY -->
+        <ng-template pTemplate="body" let-facture>
+          <!-- Skeleton row -->
+          <tr *ngIf="loading">
+            <td><p-skeleton width="8rem" /></td>
+            <td><p-skeleton width="12rem" /></td>
+            <td><p-skeleton width="10rem" /></td>
+            <td><p-skeleton width="8rem" /></td>
+            <td><p-skeleton width="7rem" /></td>
+            <td><p-skeleton width="7rem" /></td>
+            <td><p-skeleton width="6rem" /></td>
+            <td>
+              <p-skeleton width="3rem" height="2rem" borderRadius="50%" />
+            </td>
+          </tr>
 
-                </tr>
-            </ng-template>
-            <ng-template pTemplate="rowexpansion" let-product>
-                <tr>
-                    <td colspan="7">
-                        <div class="p-3">
-                            <p-table [value]="product.orders" dataKey="id" responsiveLayout="scroll">
-                                <ng-template pTemplate="header">
-                <tr>
-                    <th pSortableColumn="id">Id <p-sortIcon field="price"></p-sortIcon></th>
-                    <th pSortableColumn="date">Date <p-sortIcon field="date"></p-sortIcon></th>
-                    <th pSortableColumn="amount">Montant-réglé <p-sortIcon field="amount"></p-sortIcon></th>
-                    <th pSortableColumn="status">Moyen-paiement <p-sortIcon field="status"></p-sortIcon></th>
-                    <th style="width: 4rem"></th>
-                </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-order>
-                 <tr>
-                    <td>{{order.id}}</td>
-                    <td>{{order.date}}</td>
-                    <td>{{order.amount | currency:'USD'}}</td>
-                    <td><span [class]="'order-badge order-' + order.status.toLowerCase()">{{order.status}}</span></td>
-                 </tr>
-            </ng-template>
-            <ng-template pTemplate="emptymessage">
-                <tr>
-                    <td colspan="6">There are no order for this product yet.</td>
-                </tr>
-            </ng-template>
-        </p-table>
+          <!-- Normal row -->
+          <tr *ngIf="!loading">
+            <td>{{ facture.numero }}</td>
+            <td>{{ facture.commande.contact.nom_complet }}</td>
+            <td>{{ facture.commande.contact.phone }}</td>
+            <td>{{ facture.commande?.numero }}</td>
+            <td>{{ facture.total }} GNF</td>
+            <td>{{ facture.montant_du }} GNF</td>
+            <td>{{ facture.statut }}</td>
+            <td>
+              <button
+                pButton
+                pRipple
+                icon="pi pi-eye"
+                class="p-button-rounded p-button-success"
+                (click)="goToDetail(facture)"
+              ></button>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="8">Aucune facture trouvée.</td>
+          </tr>
+        </ng-template>
+      </p-table>
     </div>
-    </td>
-    </tr>
-    </ng-template>
-    </p-table>
+  </div>
 </div>

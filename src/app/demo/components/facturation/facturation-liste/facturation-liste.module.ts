@@ -20,6 +20,7 @@ import { FacturationListeComponent } from './facturation-liste.component';
 import { ToolbarModule } from 'primeng/toolbar';
 import { FileUploadModule } from 'primeng/fileupload';
 import { SplitButtonModule } from 'primeng/splitbutton';
+import { SkeletonModule } from 'primeng/skeleton';
  
 
 @NgModule({
@@ -43,6 +44,7 @@ import { SplitButtonModule } from 'primeng/splitbutton';
     ToolbarModule,
     FileUploadModule,
     SplitButtonModule,
+    SkeletonModule,
   ]
 })
 export class FacturationListeModule { }

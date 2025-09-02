@@ -13,7 +13,7 @@
                         class="p-button-primary mr-2"
                         (click)="onGotToNewAgence()"
                     ></button>
-                </ng-template>
+                 </ng-template>
 
                 <ng-template pTemplate="right">
                     <button
@@ -52,7 +52,7 @@
             >
                 <ng-template pTemplate="caption">
                     <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                        <h5 class="m-0">Liste Agences</h5>
+                        <h5 class="m-0">Liste des dépots</h5>
                         <span class="block mt-2 md:mt-0 p-input-icon-left">
                             <i class="pi pi-search"></i>
                             <input
@@ -130,7 +130,7 @@
         <!-- DIALOGUE DÉTAIL -->
         <p-dialog
             [(visible)]="agenceDialog"
-            header="Détails de l'agence"
+            header="Détails du dépot"
             [modal]="true"
             [style]="{ width: '450px' }"
             class="p-fluid"
@@ -189,7 +189,7 @@
             <div class="flex align-items-center justify-content-center">
                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
                 <span *ngIf="agence">
-                    Êtes-vous sûr de vouloir supprimer l'agence :
+                    Êtes-vous sûr de vouloir supprimer le dépot :
                     <b>{{ agence.nom_agence }}</b> ?
                 </span>
             </div>
@@ -219,7 +219,7 @@
         >
             <div class="flex align-items-center justify-content-center">
                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
-                <span>Voulez-vous supprimer les agences sélectionnées ?</span>
+                <span>Voulez-vous supprimer les dépots sélectionnées ?</span>
             </div>
             <ng-template pTemplate="footer">
                 <button pButton icon="pi pi-times" class="p-button-text" label="Non"

@@ -8,8 +8,9 @@ import { Role } from '../../../models/Role';
 import { ContactService } from '../../../service/contact/contact.service';
 import { RoleService } from '../../../service/role/role.service';
 import { Statut } from 'src/app/demo/enums/statut.enum';
+import { MenuItem } from 'primeng/api';
 
-@Component({
+ @Component({
   selector: 'app-contact-liste',
   templateUrl: './contact-liste.component.html',
   styleUrls: ['./contact-liste.component.scss'],
@@ -40,6 +41,10 @@ export class ContactListeComponent implements OnInit {
   isCodePostalDisabled = false;
   isValidPays = true;
 
+  // toolbar
+    items: MenuItem[] = [];
+    cardMenu: MenuItem[] = [];
+
   constructor(
     private contactService: ContactService,
     private roleService: RoleService,
@@ -51,6 +56,22 @@ export class ContactListeComponent implements OnInit {
   ngOnInit(): void {
     this.getAllContacts();
     this.getAllRoles();
+
+      this.items = [
+            { label: 'Client', icon: 'pi pi-external-link', url: '/dashboard/contact/contact-new-client' },
+            { label: 'Employé', icon: 'pi pi-external-link', routerLink: ['/dashboard/contact/contact-new'] }
+        ];
+        this.cardMenu = [ 
+            {
+                label: 'Save', icon: 'pi pi-fw pi-check'
+            },
+            {
+                label: 'Update', icon: 'pi pi-fw pi-refresh'
+            },
+            {
+                label: 'Delete', icon: 'pi pi-fw pi-trash'
+            },
+        ];
   }
 
   getAllContacts(): void {

@@ -74,7 +74,7 @@ export class PackingService {
   create(packing: Packing): Observable<Packing> {
     return this.http
       .post<{ success: boolean; data: Packing }>(
-        `${this.apiUrl}/store`,
+        `${this.apiUrl}/create`,
         packing,
         httpOptions
       )
@@ -99,4 +99,9 @@ export class PackingService {
       )
       .pipe(catchError(this.handleError));
   }
+
+  valider(id: number): Observable<Packing> {
+  return this.http.put<Packing>(`${this.apiUrl}/${id}/valider`, {});
+}
+
 }
