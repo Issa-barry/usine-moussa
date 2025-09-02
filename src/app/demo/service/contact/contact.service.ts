@@ -50,7 +50,7 @@ export class ContactService {
                             .map((key) => error.error.errors[key].join(' '))
                             .join(' ');
                     } else {
-                        errorMessage = JSON.stringify(error.error.errors);
+                        errorMessage = JSON.stringify(error.error.errors); 
                     }
                 } else if (error.error.message) {
                     errorMessage = error.error.message; //  Si l'API renvoie juste un message

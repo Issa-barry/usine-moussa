@@ -50,40 +50,43 @@ export class FactureService {
 
   /** ---- Gestion d'erreurs homogène ---- */
   private handleError = (error: HttpErrorResponse) => {
-    console.error('Erreur API Facture :', error);
+  console.error('Erreur API :', error);
 
-    let message = 'Une erreur inconnue est survenue';
-    let validationErrors: { [key: string]: string[] } = {};
+  let message = 'Une erreur inconnue est survenue';
+  let errors: Record<string, string[]> = {};
 
-    if (error.error instanceof ErrorEvent) {
-      message = `Erreur client : ${error.error.message}`;
-    } else {
-      switch (error.status) {
-        case 400:
-          message = error.error?.message || 'Requête invalide.';
-          break;
-        case 404:
-          message = 'Facture non trouvée.';
-          break;
-        case 409:
-          message = error.error?.message || 'Conflit de ressource.';
-          break;
-        case 422:
-          message = error.error?.message || 'Validation échouée.';
-          if (error.error?.data?.errors) {
-            validationErrors = error.error.data.errors;
-          }
-          break;
-        case 0:
-          message = 'Connexion au serveur impossible.';
-          break;
-        default:
-          message = `Erreur ${error.status} : ${error.message}`;
+  if (error.error instanceof ErrorEvent) {
+    message = `Erreur client : ${error.error.message}`;
+  } else {
+    switch (error.status) {
+      case 400:
+        message = error.error?.message || 'Requête invalide.';
+        break;
+      case 404:
+        message = error.error?.message || 'Ressource introuvable.';
+        break;
+      case 409:
+        message = error.error?.message || 'Conflit de ressource.';
+        break;
+      case 422: {
+        // ⚠️ ton backend (voir capture) renvoie: { success:false, message:"…", data:{ field:[...] } }
+        const be = error.error || {};
+        message = be?.message || 'Données invalides.';
+        errors  = be?.data || be?.errors || {}; // <-- supporte les deux formes
+        break;
       }
+      case 0:
+        message = 'Connexion au serveur impossible.';
+        break;
+      default:
+        message = error.error?.message || `Erreur ${error.status} : ${error.message}`;
     }
+  }
 
-    return throwError(() => ({ message, validationErrors }));
-  };
+  // Toujours renvoyer la même forme d'erreur à l’app
+  return throwError(() => ({ status: error.status, message, errors }));
+};
+
 
   /** ---- CRUD ---- */
 

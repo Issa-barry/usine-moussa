@@ -145,7 +145,7 @@
   (click)="onGoToLivraisonNew(commande)"
 ></button>
 
-
+ 
   <!-- Livré -->
   <button
     *ngSwitchCase="'livré'"
@@ -154,8 +154,8 @@
     icon="pi pi-truck"
     class="p-button-rounded p-button-success mr-2"
     tooltip="Commande livrée"
-    disabled
-    (click)="onGoToLivraisonNew(commande)"
+     
+    (click)="onGoToLivraisonDetail(commande)"
   ></button>
 
   <!-- Payé -->
@@ -179,6 +179,18 @@
     tooltip="Commande annulée"
     disabled
   ></button>
+
+   <!-- Cloturé -->
+  <button
+    *ngSwitchCase="'cloturé'"
+    pButton
+    pRipple
+    icon="pi pi-lock"
+    class="p-button-rounded p-button-secondary mr-2"
+    tooltip="Commande clôturée"
+    disabled
+  ></button>
+
 
   <!-- Statut inconnu -->
   <button

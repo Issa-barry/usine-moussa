@@ -256,5 +256,5 @@ export class LivraisonNewComponent implements OnInit {
   // ------------------ TrackBy ------------------
   trackByLigne(index: number, l: UILigne) {
     return l.produit?.id ?? index;
-  }
+  } 
 }

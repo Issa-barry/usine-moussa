@@ -1,0 +1,242 @@
+<div class="card">
+  <p-toast></p-toast>
+
+  <div class="grid grid-nogutter">
+    <!-- Titre + Statut -->
+    <div class="col-12 px-4 mt-4 md:mt-6 md:px-6">
+      <div class="flex flex-column gap-2">
+        <span class="text-900 block font-bold text-xl">
+          {{ editMode ? 'Modifier la livraison' : 'Détail de la livraison' }}
+        </span>
+
+        <div class="flex align-items-center gap-2">
+          <p-tag *ngIf="commande?.statut as st"
+                 [value]="st | titlecase"
+                 [severity]="getStatutSeverity(st)"
+                 class="text-0"
+                 styleClass="px-2 py-1"
+                 [style]="{ fontSize: '0.95rem', letterSpacing: '0.06rem' }">
+          </p-tag>
+        </div>
+      </div>
+
+      <p-message *ngIf="errorMessage" severity="error" [text]="errorMessage"></p-message>
+    </div>
+
+    <div class="col-12 lg:col-10 h-full px-4 py-4 md:px-6">
+      <!-- Livreur -->
+      <div class="field mb-4">
+        <label class="text-800 text-m block font-normal mb-2">Livreur</label>
+        <input pInputText type="text" class="w-full" [value]="selectedLivreur?.nom_complet" readonly />
+      </div>
+
+      <!-- Lignes (mobile : cartes) -->
+      <div class="md:hidden">
+        <div *ngFor="let ligne of lignes; let i = index" class="surface-card border-1 surface-border border-round p-3 mb-3">
+          <!-- Produit -->
+          <div class="mb-3">
+            <div class="font-semibold mb-1">Produit</div>
+            <p-dropdown
+              [options]="produits"
+              [(ngModel)]="ligne.produit"
+              optionLabel="nom"
+              placeholder="Sélectionner un produit"
+              appendTo="body"
+              (onChange)="onProduitChange(i)"
+              styleClass="w-full"
+              [ngClass]="{ 'p-invalid': apiErrors?.['lignes.' + i + '.produit_id'] }"
+              [disabled]="!editMode">
+            </p-dropdown>
+            <div *ngIf="apiErrors?.['lignes.' + i + '.produit_id']" class="text-red-500 text-xs mt-1">
+              {{ apiErrors['lignes.' + i + '.produit_id'][0] }}
+            </div>
+          </div>
+
+          <!-- Quantités -->
+          <div class="grid">
+            <div class="col-6">
+              <div class="font-semibold text-sm mb-1">Qté commandée</div>
+              <input type="number" pInputText class="w-full text-center" [ngModel]="ligne.quantite_commandee" disabled inputmode="numeric" />
+            </div>
+
+            <div class="col-6 mt-3">
+              <div class="font-semibold text-sm mb-1">Qté livrée</div>
+              <input
+                type="number"
+                pInputText
+                class="w-full text-center"
+                [(ngModel)]="ligne.quantite_livree"
+                (ngModelChange)="onQteLivreeChange(i, $event)"
+                min="0"
+                inputmode="numeric"
+                [disabled]="!editMode || ligne.quantite_restante <= 0"
+                [ngClass]="{
+                  'p-invalid': isQteLivreeInvalid(i) || apiErrors?.['lignes.' + i + '.quantite_livree'] || apiErrors?.['lignes.' + i + '.quantite']
+                }" />
+              <div *ngIf="isQteLivreeInvalid(i)" class="text-red-500 text-xs mt-1">
+                Saisir une quantité livrée supérieur &gt; 0.
+              </div>
+              <div *ngIf="apiErrors?.['lignes.' + i + '.quantite_livree'] || apiErrors?.['lignes.' + i + '.quantite']"
+                   class="text-red-500 text-xs mt-1">
+                {{ (apiErrors['lignes.' + i + '.quantite_livree']?.[0]) || (apiErrors['lignes.' + i + '.quantite']?.[0]) }}
+              </div>
+            </div>
+
+            <div class="col-12 mt-3">
+              <div class="font-semibold text-sm mb-1">Prix unitaire</div>
+              <input
+                type="number"
+                pInputText
+                class="w-full text-right"
+                [(ngModel)]="ligne.prix_vente"
+                min="0"
+                step="0.01"
+                inputmode="decimal"
+                [disabled]="!editMode"
+                [ngClass]="{ 'p-invalid': apiErrors?.['lignes.' + i + '.prix_vente'] }" />
+              <div *ngIf="apiErrors?.['lignes.' + i + '.prix_vente']" class="text-red-500 text-xs mt-1">
+                {{ apiErrors['lignes.' + i + '.prix_vente'][0] }}
+              </div>
+            </div>
+
+            <div class="col-12 mt-3">
+              <div class="font-semibold text-sm mb-1">Sous-total</div>
+              <div class="text-right">
+                {{ getSousTotal(i) | number:'1.0-0' }} GNF
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lignes (desktop : tableau) -->
+      <div class="hidden md:block overflow-auto">
+        <table class="w-full text-sm text-left">
+          <thead class="text-xs text-gray-700 border-b">
+            <tr>
+              <th class="py-2">Produit</th>
+              <th class="py-2 text-center">Qté commandée</th>
+              <th class="py-2 text-center">Qté livrée</th>
+              <th class="py-2 text-right">Prix unitaire</th>
+              <th class="py-2 text-right">Sous-total</th>
+              <th class="py-2"></th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let ligne of lignes; let i = index" class="border-b">
+              <!-- Produit -->
+              <td class="py-2">
+                <p-dropdown
+                  [options]="produits"
+                  [(ngModel)]="ligne.produit"
+                  optionLabel="nom"
+                  placeholder="Sélectionner un produit"
+                  appendTo="body"
+                  (onChange)="onProduitChange(i)"
+                  styleClass="w-full"
+                  [disabled]="!editMode"
+                  [ngClass]="{ 'p-invalid': apiErrors?.['lignes.' + i + '.produit_id'] }">
+                </p-dropdown>
+                <div *ngIf="apiErrors?.['lignes.' + i + '.produit_id']" class="text-red-500 text-xs mt-1">
+                  {{ apiErrors['lignes.' + i + '.produit_id'][0] }}
+                </div>
+              </td>
+
+              <!-- Qté commandée (disabled) -->
+              <td class="py-2">
+                <input type="number" pInputText class="w-full text-center" [ngModel]="ligne.quantite_commandee" disabled inputmode="numeric" />
+              </td>
+
+              <!-- Qté livrée (editable) -->
+              <td class="py-2">
+                <input
+                  type="number"
+                  pInputText
+                  class="w-full text-center"
+                  [(ngModel)]="ligne.quantite_livree"
+                  (ngModelChange)="onQteLivreeChange(i, $event)"
+                  min="0"
+                  inputmode="numeric"
+                  [disabled]="!editMode || ligne.quantite_restante <= 0"
+                  [ngClass]="{
+                    'p-invalid': isQteLivreeInvalid(i) || apiErrors?.['lignes.' + i + '.quantite_livree'] || apiErrors?.['lignes.' + i + '.quantite']
+                  }" />
+                <div *ngIf="isQteLivreeInvalid(i)" class="text-red-500 text-xs mt-1">
+                  Saisir une quantité livrée supérieur &gt; 0.
+                </div>
+                <div *ngIf="apiErrors?.['lignes.' + i + '.quantite_livree'] || apiErrors?.['lignes.' + i + '.quantite']"
+                     class="text-red-500 text-xs mt-1">
+                  {{ (apiErrors['lignes.' + i + '.quantite_livree']?.[0]) || (apiErrors['lignes.' + i + '.quantite']?.[0]) }}
+                </div>
+              </td>
+
+              <!-- Prix unitaire -->
+              <td class="py-2">
+                <input
+                  type="number"
+                  pInputText
+                  class="p-inputtext w-full text-right"
+                  [(ngModel)]="ligne.prix_vente"
+                  min="0"
+                  step="0.01"
+                  inputmode="decimal"
+                  [disabled]="!editMode"
+                  [ngClass]="{ 'p-invalid': apiErrors?.['lignes.' + i + '.prix_vente'] }" />
+                <div *ngIf="apiErrors?.['lignes.' + i + '.prix_vente']" class="text-red-500 text-xs mt-1">
+                  {{ apiErrors['lignes.' + i + '.prix_vente'][0] }}
+                </div>
+              </td>
+
+              <!-- Sous-total -->
+              <td class="py-2 text-right">
+                {{ getSousTotal(i) | number:'1.0-0' }} GNF
+              </td>
+
+              <td class="py-2 text-right">
+                <!-- action optionnelle -->
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Boutons -->
+      <div class="col-12 flex flex-column lg:flex-row justify-content-center align-items-center lg:justify-content-end my-6">
+        <!-- Arrivée : un seul bouton Modifier -->
+        <button
+          *ngIf="!editMode"
+          pButton
+          pRipple
+          class="p-button-primary w-full lg:w-auto"
+          label="Modifier"
+          icon="pi pi-pencil"
+          (click)="onEdit()"
+          [disabled]="!canModify">
+        </button>
+
+        <!-- En édition : Annuler + Valider -->
+        <ng-container *ngIf="editMode">
+          <button
+            pButton
+            pRipple
+            class="p-button-secondary p-button-outlined mt-3 lg:mt-0 w-full lg:w-auto lg:mr-4"
+            label="Annuler"
+            icon="pi pi-times"
+            (click)="onCancelEdit()">
+          </button>
+
+          <button
+            pButton
+            pRipple
+            class="p-button-primary w-full lg:w-auto"
+            [label]="isSaving ? 'Validation…' : 'Valider la livraison'"
+            [icon]="isSaving ? 'pi pi-spinner pi-spin' : 'pi pi-check'"
+            [disabled]="submitDisabled"
+            (click)="onSubmit()">
+          </button>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

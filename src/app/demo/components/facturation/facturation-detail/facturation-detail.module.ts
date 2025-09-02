@@ -7,7 +7,7 @@ import { ButtonModule } from 'primeng/button';
 import { FacturationDetailComponent } from './facturation-detail.component';
 import { SplitButtonModule } from 'primeng/splitbutton';
 import { DialogModule } from 'primeng/dialog';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
@@ -27,6 +27,7 @@ import { SharedModule } from 'src/app/shared/pipes/shared.module';
     SplitButtonModule,
     DialogModule,
     FormsModule,
+    ReactiveFormsModule,
   DropdownModule,
   InputTextModule,
   InputTextareaModule,
@@ -34,8 +35,8 @@ import { SharedModule } from 'src/app/shared/pipes/shared.module';
   ButtonModule,
   ToastModule,
   MessageModule,
-  SharedModule
-
+  SharedModule,
+ 
   ]
 })
 export class FacturationDetailModule { }

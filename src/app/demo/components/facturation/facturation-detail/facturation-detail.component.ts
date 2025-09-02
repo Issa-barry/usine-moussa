@@ -129,9 +129,7 @@ export class FacturationDetailComponent implements OnInit {
 
    saveEncaissement(): void {
       this.submitted = true;
-      this.postErrors = {};
-      
-       console.log(this.encaissement);
+      this.postErrors = {}; 
 
          this.encaissementService.create(this.encaissement).subscribe({
       next: (res) => {
@@ -142,7 +140,7 @@ export class FacturationDetailComponent implements OnInit {
         this.loadFacture(this.id);
       },
       error: (err) => {
-        this.errorMessage = err?.data; 
+        this.errorMessage = err?.message; 
         console.log(this.errorMessage);
         
         this.isSaving = false;
