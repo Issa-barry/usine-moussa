@@ -27,7 +27,7 @@
 
         <p-dropdown
           *ngIf="isEditMode"
-          [options]="contacts"
+          [options]="contacts" 
           [(ngModel)]="commande.contact"
           optionLabel="nom_complet"
           placeholder="Sélectionner un livreur"
@@ -230,13 +230,31 @@
                 label="Enregistrer" icon="pi pi-fw pi-check"
                 (click)="saveCommande()"></button>
 
-        <!-- Modifier -->
+                <!-- Modifier -->
         <button *ngIf="!isEditMode"
                 [disabled]="isDelivered"
                 pButton pRipple
                 class="p-button-primary mt-3 lg:mt-0 w-full lg:w-auto mr-0 lg:mr-3"
                 label="Modifier" icon="pi pi-pencil"
                 (click)="editProduct()"></button>
+
+        <!-- Valider la commande : visible seulement si statut = brouillon -->
+<button *ngIf="!isEditMode && isDraft"
+        pButton pRipple
+        class="p-button-primary mt-3 lg:mt-0 w-full lg:w-auto mr-0 lg:mr-3"
+        label="Valider la commande" icon="pi pi-check"
+        (click)="validerCommandeDetail()">
+</button>
+<!-- Détail livraison -->
+<button *ngIf="!isEditMode && isLivraisonAccessible"
+        pButton pRipple
+        class="p-button-success mt-3 lg:mt-0 w-full lg:w-auto mr-0 lg:mr-3"
+        label="Détail livraison" icon="pi pi-truck"
+        (click)="onGoToLivraisonDetail()">
+</button>
+
+
+        
 
         <!-- Supprimer -->
         <button *ngIf="!isEditMode"

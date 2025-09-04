@@ -9,7 +9,7 @@ import { ContactService } from 'src/app/demo/service/contact/contact.service';
 import { ProduitService } from 'src/app/demo/service/produit/produit.service';
 import { CommandeService, ApiErrorShape } from 'src/app/demo/service/ventes/commande/commande.service';
 import { forkJoin } from 'rxjs';
- 
+
 @Component({
   selector: 'app-commande-detail',
   templateUrl: './commande-detail.component.html',
@@ -220,12 +220,56 @@ export class CommandeDetailComponent implements OnInit {
     });
   }
 
-  // juste après les propriétés
-get isDelivered(): boolean {
-  const s = (this.commande?.statut || '').toLowerCase();
-  return s === 'livré';
-}
+  // ---------- Helpers statut ----------
+  private statusKey(raw?: string): string {
+    if (!raw) return '';
+    return raw
+      .toLowerCase()
+      .trim()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // enlève accents
+      .replace(/\s+/g, '_');           // espaces -> underscore
+  }
 
+  get isDraft(): boolean {
+    return this.statusKey(this.commande?.statut) === 'brouillon';
+  }
+
+  get isDelivered(): boolean {
+    const k = this.statusKey(this.commande?.statut);
+    return k === 'livre' || k === 'paye' || k === 'cloture';
+  }
+
+  // ---------- Action: valider la commande depuis le détail ----------
+  validerCommandeDetail(): void {
+    if (!this.commande?.numero) return;
+
+    this.confirmationService.confirm({
+      message: 'Valider cette commande ?',
+      header: 'Confirmation',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.commandeService.validerCommande(this.commande.numero).subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Succès',
+              detail: 'Commande validée avec succès.',
+            });
+            this.loadCommande(); // rafraîchit le statut
+          },
+          error: (err: ApiErrorShape) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: `Erreur ${err?.status ?? ''}`.trim(),
+              detail: err?.message || 'Échec de la validation.',
+            });
+            console.error('Erreur validation commande:', err);
+          },
+        });
+      },
+    });
+  }
 
   // Optimize ngFor rendering of lignes
   trackByLigne(index: number, _ligne: { produit: Produit | null; quantite: number; prix_vente: number }) {
@@ -242,4 +286,25 @@ get isDelivered(): boolean {
   hasError(field: string, index?: number): boolean {
     return !!this.getError(field, index);
   }
+
+
+  // livraison : 
+  // Accès au détail livraison autorisé pour ces statuts
+// get isLivraisonAccessible(): boolean {
+//   const k = this.statusKey(this.commande?.statut);
+//   return k === 'livraison_en_cours' || k === 'livré' || k === 'cloturé';
+// }
+
+get isLivraisonAccessible(): boolean {
+  const k = this.statusKey(this.commande?.statut);
+  return k !== 'brouillon';
+}
+
+
+// Navigation vers le détail de la livraison
+onGoToLivraisonDetail(): void {
+  if (!this.commande?.numero) return;
+  this.router.navigate(['/dashboard/stock/livraison/livraison-detail', this.commande.numero]);
+}
+
 }
