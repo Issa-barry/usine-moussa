@@ -3,6 +3,7 @@
     <div class="card px-6 py-6">
       <p-toast></p-toast>
       <p-confirmDialog></p-confirmDialog>
+
       <p-toolbar styleClass="mb-4">
         <ng-template pTemplate="left">
           <button
@@ -12,255 +13,278 @@
             icon="pi pi-plus"
             class="p-button-success mr-2"
             (click)="onGoToNewCommande()"
-          ></button>
+            aria-label="Créer une nouvelle commande">
+          </button>
         </ng-template>
 
-        <!-- <ng-template pTemplate="right">
-          <button
-            pButton
-            pRipple
-            label="Exporter"
-            icon="pi pi-upload"
-            class="p-button-help"
-            (click)="dt.exportCSV()"
-          ></button>
-        </ng-template> -->
+        <ng-template pTemplate="right">
+          <!-- Filtre période -->
+          <p-dropdown
+            [options]="periodeOptions"
+            [(ngModel)]="selectedPeriode"
+            placeholder="Période"
+            appendTo="body"
+            (onChange)="onPeriodeChange()"
+            inputId="filtrePeriode"
+            aria-label="Filtrer par période">
+          </p-dropdown>
+        </ng-template>
       </p-toolbar>
 
       <p-table
         #dt
-        [value]=" loading ? skeletonRows : commandes"
+        [value]="loading ? skeletonRows : commandes"
+        [lazy]="true"
+        
         [paginator]="true"
-        [rows]="10"
-        [rowsPerPageOptions]="[10, 20, 30]"
+        [rows]="perPage"
+        [rowsPerPageOptions]="rowsPerPageOptions"
+        [totalRecords]="meta?.total || 0"
         [showCurrentPageReport]="true"
         currentPageReportTemplate="{first} à {last} sur {totalRecords} commandes"
-        [globalFilterFields]="['numero', 'contact.nom_complet', 'statut']"
-        [(selection)]="selectedCommande"
-        selectionMode="multiple"
-        [rowHover]="true"
         dataKey="id"
         responsiveLayout="scroll"
-      >
+        (onPage)="onPageChange($event)"
+        styleClass="p-datatable-sm"
+        [rowHover]="true">
+
         <ng-template pTemplate="caption">
-          <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+          <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center gap-3">
             <h5 class="m-0">Liste des commandes</h5>
-            <span class="block mt-2 md:mt-0 p-input-icon-left">
+
+            <!-- Recherche serveur -->
+            <span class="block mt-2 md:mt-0 p-input-icon-left w-full md:w-20rem">
               <i class="pi pi-search"></i>
               <input
                 pInputText
                 type="text"
-                (input)="onGlobalFilter(dt, $event)" 
+                (input)="onGlobalFilter($event)"
                 placeholder="Recherche..."
-                class="w-full sm:w-auto"
-              />
+                aria-label="Recherche de commandes"
+                class="w-full" />
             </span>
           </div>
         </ng-template>
 
         <ng-template pTemplate="header">
-          <tr>
-            <th style="width: 3rem">
-              <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+          <!-- <tr>
+            <th style="width:3rem">
+              <p-tableHeaderCheckbox aria-label="Sélectionner toutes les commandes"></p-tableHeaderCheckbox>
             </th>
-            <th pSortableColumn="numero">
-              N° Commande <p-sortIcon field="numero"></p-sortIcon>
-            </th>
-            <th pSortableColumn="contact.nom_complet">
-              Livreur <p-sortIcon field="contact.nom_complet"></p-sortIcon>
-            </th>
-            <th pSortableColumn="montant_total">
-              Total <p-sortIcon field="montant_total"></p-sortIcon>
-            </th>
-            <th>
-              Qté commandée
-            </th>
-            <th>
-              Qté livrée
-            </th>
-            <th pSortableColumn="statut">
-              Statut <p-sortIcon field="statut"></p-sortIcon>
-            </th>
-            <th>Actions</th>
+            <th>N° Commande</th>
+            <th>Livreur</th>
+            <th class="text-right">Total</th>
+            <th class="text-right">Qté commandée</th>
+            <th class="text-right">Qté livrée</th>
+            <th>Statut</th>
+            <th style="width: 15rem;">Actions</th>
+          </tr> -->
+            <tr>
+                        <th style="width: 3rem">
+                            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                        </th>
+                        <th pSortableColumn="numero">N° Commande <p-sortIcon field="numero"></p-sortIcon></th>
+                        <th pSortableColumn="contact?.nom_complet">Client <p-sortIcon field="contact?.nom_complet"></p-sortIcon></th>
+                        <th>Total</th>
+                        <th pSortableColumn="qte_total">Qté total <p-sortIcon field="qte_total"></p-sortIcon></th>
+                        <th pSortableColumn="qte_livree">Livrée <p-sortIcon field="qte_livree"></p-sortIcon></th>
+                        <th pSortableColumn="statut">Statut <p-sortIcon field="statut"></p-sortIcon></th>
+                        <th >Action </th>
+                        <th></th>
+                    </tr>
+        </ng-template>
+
+        <!-- Corps : 2 variantes -->
+        <ng-template pTemplate="body" let-commande>
+          <!-- Variante Skeleton pendant le chargement -->
+          <tr *ngIf="loading">
+            <td ><p-skeleton width="1.5rem" height="1.5rem" borderRadius="0.25rem"></p-skeleton></td>
+            <td><p-skeleton width="9rem"></p-skeleton></td>
+            <td><p-skeleton width="12rem"></p-skeleton></td>
+            <td class="text-right"><p-skeleton width="6rem"></p-skeleton></td>
+            <td class="text-right"><p-skeleton width="5rem"></p-skeleton></td>
+            <td class="text-right"><p-skeleton width="5rem"></p-skeleton></td>
+            <td><p-skeleton width="8rem" height="2rem" borderRadius="2rem"></p-skeleton></td>
+            <td class="white-space-nowrap">
+              <p-skeleton width="2rem" height="2rem" styleClass="mr-2" borderRadius="50%"></p-skeleton>
+              <!-- <p-skeleton width="2rem" height="2rem" styleClass="mr-2" borderRadius="50%"></p-skeleton>
+              <p-skeleton width="2rem" height="2rem" borderRadius="50%"></p-skeleton> -->
+            </td>
+          </tr>
+
+          <!-- Variante réelle quand les données sont là -->
+          <tr *ngIf="!loading" >
+            <td >
+              <p-tableCheckbox [value]="commande" [ariaLabel]="'Sélectionner la commande ' + commande.numero"></p-tableCheckbox>
+            </td>
+
+            <td class="white-space-nowrap" (click)="onGoToDetailCommande(commande)" style="cursor: pointer;">{{ commande.numero }}</td>
+            <td (click)="onGoToDetailCommande(commande)" style="cursor: pointer;">{{ commande.contact?.nom_complet || '—' }}</td>
+
+            <td class="white-space-nowrap" (click)="onGoToDetailCommande(commande)" style="cursor: pointer;">{{ commande.montant_total | number:'1.0-0' }} GNF</td>
+            <td class="white-space-nowrap"(click)="onGoToDetailCommande(commande)" style="cursor: pointer;">{{ commande.qte_total }}</td>
+            <td class="white-space-nowrap" (click)="onGoToDetailCommande(commande)" style="cursor: pointer;">{{ commande.qte_livree }}</td>
+
+              <td (click)="onGoToDetailCommande(commande)" style="cursor: pointer;">
+      <span class="status-badge"
+            [ngClass]="'status-' + statusKey(commande.statut)">
+        {{ getStatusLabel(commande.statut) }}
+      </span>
+    </td>
+
+
+            <td class="white-space-nowrap">
+              <!-- Voir -->
+              <!-- <button
+                pButton pRipple icon="pi pi-eye"
+                class="p-button-rounded p-button-success mr-2"
+                pTooltip="Voir la commande"
+                tooltipPosition="top"
+                (click)="onGoToDetailCommande(commande)">
+              </button> -->
+
+              <!-- Brouillon : valider -->
+              <button
+                *ngIf="commande.statut === 'brouillon'"
+                pButton pRipple icon="pi pi-check"
+                class="p-button-rounded p-button-info mr-2"
+                pTooltip="Valider la commande"
+                tooltipPosition="top"
+                (click)="validerCommande(commande)">
+              </button>
+
+              <!-- Livraison en cours -->
+              <button
+                *ngIf="commande.statut === 'livraison_en_cours'"
+                pButton pRipple icon="pi pi-truck"
+                class="p-button-rounded p-button-warning mr-2"
+                pTooltip="Voir / enregistrer la livraison"
+                tooltipPosition="top"
+                (click)="onGoToLivraisonNew(commande)">
+              </button>
+
+              <!-- Livré -->
+              <button
+                *ngIf="commande.statut === 'livré'"
+                pButton pRipple icon="pi pi-truck"
+                class="p-button-rounded p-button-success mr-2"
+                pTooltip="Détails de la livraison"
+                tooltipPosition="top"
+                (click)="onGoToLivraisonDetail(commande)">
+              </button>
+
+              <!-- Payé -->
+              <button
+                *ngIf="commande.statut === 'payé'"
+                pButton pRipple icon="pi pi-credit-card"
+                class="p-button-rounded p-button-success mr-2"
+                pTooltip="Commande payée"
+                tooltipPosition="top"
+                disabled>
+              </button>
+
+              <!-- Annulé -->
+              <button
+                *ngIf="commande.statut === 'annulé'"
+                pButton pRipple icon="pi pi-ban"
+                class="p-button-rounded p-button-secondary mr-2"
+                pTooltip="Commande annulée"
+                tooltipPosition="top"
+                disabled>
+              </button>
+
+              <!-- Clôturé -->
+              <button
+                *ngIf="commande.statut === 'cloturé'"
+                pButton
+                pRipple
+                icon="pi pi-lock"
+                class="p-button-rounded p-button-secondary mr-2"
+                pTooltip="Commande clôturée"
+                tooltipPosition="top"
+                disabled>
+              </button>
+            </td>
           </tr>
         </ng-template>
 
-        <ng-template pTemplate="body" let-commande>
-          <tr *ngIf="loading">
-                        <td><p-skeleton width="6rem" /></td>
-                        <td><p-skeleton width="10rem" /></td>
-                        <td><p-skeleton width="8rem" /></td>
-                        <td><p-skeleton width="12rem" /></td>
-                        <td><p-skeleton width="10rem" /></td>
-                        <td><p-skeleton width="6rem" /></td>
-                        <td>
-                            <p-skeleton
-                                width="5rem"
-                                height="2rem"
-                                borderRadius="1rem"
-                            />
-                        </td>
-                    </tr>
+        <!-- Message vide uniquement si pas en chargement -->
+        <ng-template pTemplate="emptymessage">
           <tr *ngIf="!loading">
-            <td>
-              <p-tableCheckbox [value]="commande"></p-tableCheckbox>
-            </td>
-            <td>{{ commande.numero }}</td>
-            <td>{{ commande.contact?.nom_complet }}</td>
-            <td>{{ commande.montant_total | number: '1.0-0' }} GNF</td>
-            <td>{{ commande.qte_total }}</td>
-            <td>{{ commande.qte_livree }}</td>
-            <td>{{ commande.statut }}</td>
-            <td>
-             <!-- Bouton selon le statut -->
-<ng-container [ngSwitch]="commande.statut">
-   <!-- Bouton view -->
-   <button
-                pButton
-                pRipple
-                icon="pi pi-eye"
-                class="p-button-rounded p-button-suces mr-2"
-                (click)="viewCommande(commande)"
-              ></button>
-  <!-- Brouillon : bouton de validation -->
-  <button
-    *ngSwitchCase="'brouillon'"
-    pButton
-    pRipple 
-    icon="pi pi-check"
-    class="p-button-rounded p-button-info mr-2"
-    tooltip="Valider la commande"
-    (click)="validerCommande(commande)"
-  ></button>
-
-  <!-- Livraison en cours -->
-<!-- Livraison en cours : redirige vers la page de livraison -->
-<button
-  *ngSwitchCase="'livraison_en_cours'"
-  pButton
-  pRipple
-  icon="pi pi-truck"
-  class="p-button-rounded p-button-warning mr-2"
-  tooltip="Voir les livraisons"
-  (click)="onGoToLivraisonNew(commande)"
-></button>
-
- 
-  <!-- Livré -->
-  <button
-    *ngSwitchCase="'livré'"
-    pButton
-    pRipple
-    icon="pi pi-truck"
-    class="p-button-rounded p-button-success mr-2"
-    tooltip="Commande livrée"
-     
-    (click)="onGoToLivraisonDetail(commande)"
-  ></button>
-
-  <!-- Payé -->
-  <button
-    *ngSwitchCase="'payé'"
-    pButton
-    pRipple
-    icon="pi pi-credit-card"
-    class="p-button-rounded p-button-success mr-2"
-    tooltip="Commande payée"
-    disabled
-  ></button>
-
-  <!-- Annulé -->
-  <button
-    *ngSwitchCase="'annulé'"
-    pButton
-    pRipple
-    icon="pi pi-ban"
-    class="p-button-rounded p-button-secondary mr-2"
-    tooltip="Commande annulée"
-    disabled
-  ></button>
-
-   <!-- Cloturée -->
-  <button
-    *ngSwitchCase="'cloturé'"
-    pButton
-    pRipple
-    icon="pi pi-lock"
-    class="p-button-rounded p-button-secondary mr-2"
-    tooltip="Commande clôturée"
-    disabled
-  ></button>
-
-
-  <!-- Statut inconnu -->
-  <button
-    *ngSwitchDefault
-    pButton
-    pRipple
-    icon="pi pi-question"
-    class="p-button-rounded p-button-help mr-2"
-    tooltip="Statut inconnu"
-    disabled
-  ></button>
-
-</ng-container>
-
-            </td>
+            <td colspan="8" class="text-center py-6 text-600">Aucune commande trouvée.</td>
           </tr>
         </ng-template>
       </p-table>
 
+      <!-- Dialog détail (inchangé) -->
       <p-dialog
         [(visible)]="commandeDetailDialog"
-        [style]="{ width: '600px' }"
-        [header]="'Commande n° : ' + selectedCommande?.numero"
+        [style]="{ width: '640px' }"
+        [header]="'Commande n° : ' + (selectedCommande?.numero || '')"
         [modal]="true"
-        class="p-fluid"
-      >
+        class="p-fluid">
+
         <ng-template pTemplate="content">
-          <div class="field">
-            <label><strong>Statut :</strong></label>
-            <div>{{ selectedCommande?.statut }}</div>
-          </div>
+          <div class="grid">
+            <div class="col-12 md:col-4">
+              <label class="block font-medium mb-1">Statut</label>
+             <span class="status-badge"
+      [ngClass]="'status-' + statusKey(selectedCommande?.statut)">
+  {{ getStatusLabel(selectedCommande?.statut) }}
+</span>
 
-          <div class="field">
-            <label><strong>Livreur :</strong></label>
-            <div>{{ selectedCommande?.contact?.nom_complet }}</div>
-          </div>
+            </div>
 
-          <div class="field">
-            <label><strong>Date :</strong></label>
-            <div>{{ selectedCommande?.created_at | date:'medium' }}</div>
-          </div>
+            <div class="col-12 md:col-4">
+              <label class="block font-medium mb-1">Livreur</label>
+              <div>{{ selectedCommande?.contact?.nom_complet || '—' }}</div>
+            </div>
 
-          <hr />
-
-          <div class="formgrid grid mb-4">
-            <div class="field col">
-              <label><strong>Total :</strong></label>
-              <div>{{ selectedCommande?.montant_total | number }} GNF</div>
+            <div class="col-12 md:col-4">
+              <label class="block font-medium mb-1">Date</label>
+              <div>{{ selectedCommande?.created_at | date:'medium' }}</div>
             </div>
           </div>
 
-          <hr />
+          <hr class="my-3" />
+
+          <div class="grid mb-3">
+            <div class="col-12 md:col-4">
+              <label class="block font-medium mb-1">Total</label>
+              <div>{{ selectedCommande?.montant_total | number:'1.0-0' }} GNF</div>
+            </div>
+            <div class="col-12 md:col-4">
+              <label class="block font-medium mb-1">Qté commandée</label>
+              <div>{{ selectedCommande?.qte_total }}</div>
+            </div>
+            <div class="col-12 md:col-4">
+              <label class="block font-medium mb-1">Qté livrée</label>
+              <div>{{ selectedCommande?.qte_livree }}</div>
+            </div>
+          </div>
 
           <div class="field">
-            <label><strong>Produits commandés :</strong></label>
-            <p-table [value]="selectedCommande?.lignes" responsiveLayout="scroll">
+            <label class="block font-medium mb-2">Produits commandés</label>
+            <p-table [value]="selectedLignes" responsiveLayout="scroll" styleClass="p-datatable-sm">
               <ng-template pTemplate="header">
                 <tr>
                   <th>Produit</th>
-                  <th>Quantité</th>
-                  <th>Prix unitaire</th>
-                  <th>Sous-total</th>
+                  <th class="text-right">Quantité</th>
+                  <th class="text-right">Prix unitaire</th>
+                  <th class="text-right">Sous-total</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-ligne>
                 <tr>
                   <td>{{ ligne.produit?.nom }}</td>
-                  <td>{{ ligne.quantite_commandee }}</td>
-                  <td>{{ ligne.prix_vente | number }} GNF</td>
-                  <td>{{ ligne.quantite_commandee * ligne.prix_vente | number }} GNF</td>
+                  <td class="text-right">{{ ligne.quantite_commandee }}</td>
+                  <td class="text-right">{{ ligne.prix_vente | number:'1.0-0' }} GNF</td>
+                  <td class="text-right">{{ (ligne.quantite_commandee * ligne.prix_vente) | number:'1.0-0' }} GNF</td>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="4" class="text-center py-4 text-600">Aucune ligne.</td>
                 </tr>
               </ng-template>
             </p-table>
@@ -269,23 +293,17 @@
 
         <ng-template pTemplate="footer">
           <button
-            pButton
-            pRipple
-            label="Fermer"
-            icon="pi pi-times"
+            pButton pRipple label="Fermer" icon="pi pi-times"
             class="p-button-text"
-            (click)="commandeDetailDialog = false"
-          ></button>
+            (click)="commandeDetailDialog = false">
+          </button>
           <button
-            pButton
-            pRipple
-            label="Detail"
-            icon="pi pi-pencil"
+            pButton pRipple label="Détail" icon="pi pi-pencil"
             class="p-button-text"
-            (click)="onGoToDetailCommande(selectedCommande)"
-          ></button>
+            (click)="onGoToDetailCommande(selectedCommande!)">
+          </button>
         </ng-template>
-      </p-dialog> 
+      </p-dialog>
     </div>
   </div>
 </div>

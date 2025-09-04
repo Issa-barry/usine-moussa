@@ -22,6 +22,7 @@ import { MessageModule } from 'primeng/message';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SkeletonModule } from 'primeng/skeleton';
+import { TagModule } from 'primeng/tag';
 
 
 @NgModule({
@@ -49,7 +50,8 @@ import { SkeletonModule } from 'primeng/skeleton';
         MessageModule,
         ConfirmPopupModule,
         ConfirmDialogModule,
-        SkeletonModule
+        SkeletonModule,
+        TagModule
   ]
 })
 export class CommandeListeModule { }

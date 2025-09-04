@@ -1,0 +1,18 @@
+:host ::ng-deep .status-badge {
+  border-radius: 12px;
+  padding: .25rem .75rem;
+  font-weight: 600;
+  font-size: .75rem;
+  display: inline-block;
+  line-height: 1.25rem;
+}
+
+/* Couleurs inspirées du demo CRUD PrimeNG (vert/orange/rouge) + variantes */
+:host ::ng-deep .status-brouillon            { background:#E0E7FF; color:#3730A3; } /* indigo doux */
+:host ::ng-deep .status-livraison_en_cours   { background:#FEF3C7; color:#92400E; } /* amber */
+:host ::ng-deep .status-livre                { background:#DCFCE7; color:#065F46; } /* green */
+:host ::ng-deep .status-paye                 { background:#D1FAE5; color:#065F46; } /* green pale */
+:host ::ng-deep .status-annule               { background:#FEE2E2; color:#991B1B; } /* red */
+:host ::ng-deep .status-a_facturer           { background:#DBEAFE; color:#1E40AF; } /* blue */
+:host ::ng-deep .status-facturation_en_cours { background:#E0F2FE; color:#075985; } /* sky */
+:host ::ng-deep .status-cloture              { background:#E5E7EB; color:#374151; } /* GRIS demandé */
