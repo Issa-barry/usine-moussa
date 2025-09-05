@@ -14,6 +14,7 @@ export class Commande {
   id?: number;
 
   numero: string;
+  count: number;
 
   contact_id: number;
   contact?: Contact;
@@ -38,6 +39,7 @@ export class Commande {
 
   constructor() {
     this.numero = '';
+    this.count = 0;
     this.contact_id = 0;
     this.lignes = [];
     this.livraisons = [];

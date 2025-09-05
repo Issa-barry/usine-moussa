@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { environment } from 'src/environements/environment.dev';
 import { CreateEncaissementDto, Encaissement, EncaissementMode } from 'src/app/demo/models/Encaissement';
+import { EncaissementStatsQueryType, EncaissementStatsType } from 'src/app/demo/components/types/EncaissementStats.type';
 
 type ApiSuccess<T> = { success: boolean; data: T };
 
@@ -17,6 +18,7 @@ type ApiErrors = { [key: string]: string[] };
 @Injectable({ providedIn: 'root' })
 export class EncaissementService {
   private apiUrl = `${environment.apiUrl}/encaissements`;
+  private apiDashboardUrl = `${environment.apiUrl}/dashboards`;
 
   constructor(private http: HttpClient) {}
 
@@ -68,4 +70,24 @@ export class EncaissementService {
         catchError(this.handleError)
       );
   }
+
+  /** GET /dashboards/statistiques/encaissements */
+  getStats(q: EncaissementStatsQueryType): Observable<EncaissementStatsType> {
+    let params = new HttpParams();
+    if (q.periode)   params = params.set('periode', q.periode);
+    if (q.date_from) params = params.set('date_from', q.date_from);
+    if (q.date_to)   params = params.set('date_to', q.date_to);
+
+    return this.http
+      .get<ApiSuccess<EncaissementStatsType>>(
+        `${this.apiDashboardUrl}/statistiques/encaissements`,
+        { params }
+      )
+      .pipe(
+        map(res => res.data),
+        catchError(this.handleError.bind(this))
+      );
+  }
+
 }
+ 

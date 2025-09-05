@@ -2,6 +2,7 @@ import {
   HttpClient,
   HttpErrorResponse,
   HttpHeaders,
+  HttpParams,
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
@@ -11,7 +12,8 @@ import { environment } from 'src/environements/environment.dev';
 import { Commande } from 'src/app/demo/models/commande.model';
 import { CreateCommandeDto } from 'src/app/demo/models/commande-create.dto';
 import { UpdateCommandeDto } from 'src/app/demo/models/commande-update.dto';
-
+import { CommandeStatsQueryType, CommandeStatsType } from 'src/app/demo/components/types/CommandeStats.type';
+ 
 /** ---- Types communs ---- */
 type ApiValidation = { [field: string]: string[] };
 
@@ -64,6 +66,8 @@ const httpOptions = {
 @Injectable({ providedIn: 'root' })
 export class CommandeService {
   private apiUrl = `${environment.apiUrl}/commandes`;
+    private apiDashboardUrl = `${environment.apiUrl}/dashboards`;
+
 
   constructor(private http: HttpClient) {}
 
@@ -138,5 +142,24 @@ export class CommandeService {
         httpOptions
       )
       .pipe(map((res) => res.commande), catchError(this.handleError));
+  }
+
+
+   /** GET /dashboards/statistiques/commandes */
+  getStats(q: CommandeStatsQueryType): Observable<CommandeStatsType> {
+    let params = new HttpParams();
+    if (q.periode)   params = params.set('periode', q.periode);
+    if (q.date_from) params = params.set('date_from', q.date_from);
+    if (q.date_to)   params = params.set('date_to', q.date_to);
+
+    return this.http
+      .get<ApiSuccess<CommandeStatsType>>(
+        `${this.apiDashboardUrl}/statistiques/commandes`,
+        { params }
+      )
+      .pipe(
+        map(res => res.data),
+        catchError(this.handleError)
+      );
   }
 }
