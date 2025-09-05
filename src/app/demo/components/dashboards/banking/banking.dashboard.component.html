@@ -43,15 +43,17 @@
                     class="p-button-rounded"
                 ></button>
                 <!-- Filtre période -->
-          <!-- <p-dropdown
-            [options]="cmdPeriodeOptions"
-            [(ngModel)]="selectedPeriode"
-            placeholder="Période"
-            appendTo="body"
-            (onChange)="onPeriodeChange()"
-            inputId="filtrePeriode"
-            aria-label="Filtrer par période">
-          </p-dropdown> -->
+                 <!-- ▼▼ Sélecteur de période global ▼▼ -->
+  <p-dropdown
+    [options]="cmdPeriodeOptions"           
+    [(ngModel)]="periode"                   
+    placeholder="Période"
+    appendTo="body"
+    styleClass="w-12rem"
+    [showClear]="false"
+    (onChange)="onGlobalPeriodeChange($event.value)">
+  </p-dropdown>
+        
             </div>
         </div>
     </div>

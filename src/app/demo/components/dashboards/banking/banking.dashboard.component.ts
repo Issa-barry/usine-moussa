@@ -110,6 +110,13 @@ export class BankingDashboardComponent implements OnInit, OnDestroy {
   }
 
   // -------------------- Encaissements --------------------
+  onGlobalPeriodeChange(p: Periode) {
+  this.periode = p;        // utilisé par encaissements
+  this.cmdPeriode = p;     // synchronise commandes
+  this.loadEncaissementStats();
+  this.loadCommandeStats();
+}
+
   onPeriodeChange(p: Periode) {
     this.periode = p;
     this.loadEncaissementStats();

@@ -10,6 +10,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { BankingDashboardComponent } from './banking.dashboard.component';
 import { BankingDashboardRoutingModule } from './banking.dashboard-routing.module';
 import { DropdownModule } from 'primeng/dropdown';
+import { FormsModule } from '@angular/forms';
  
 @NgModule({
     imports: [
@@ -22,7 +23,8 @@ import { DropdownModule } from 'primeng/dropdown';
         InputNumberModule,
         ChartModule,
         BankingDashboardRoutingModule,
-        DropdownModule
+        DropdownModule,
+        FormsModule
     ],
     declarations: [BankingDashboardComponent],
     providers: [ ]
