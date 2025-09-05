@@ -159,7 +159,7 @@ export class CommandeService {
       )
       .pipe(
         map(res => res.data),
-        catchError(this.handleError)
+        catchError(this.handleError) 
       );
   }
 }

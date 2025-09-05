@@ -152,10 +152,6 @@
                 </ng-template>
                 <ng-template pTemplate="body" let-row>
                     <tr>
-                        <!-- <td class="text-left">
-                            <p-tag *ngIf="payment.montant " value="COMPLETED" severity="success"></p-tag>
-                            <p-tag *ngIf="!payment.paid" value="PENDING" severity="warning"></p-tag>
-                        </td>   -->
 
                        <td><p-tag [value]="row.label"         [severity]="row.severity"></p-tag></td>
                         <td>{{ row.nombre | number : "1.0-0" }}</td>
@@ -175,38 +171,32 @@
     <div class="col-12 lg:col-6">
         <div class="card">
             <div class="text-900 text-xl font-semibold mb-3">Factures</div>
-            <p-table [value]="payments" responsiveLayout="scroll">
+            <p-table [value]="facturesList" responsiveLayout="scroll">
                 <ng-template pTemplate="header">
                     <tr>
-                        <th class="white-space-nowrap w-4">Name</th>
-                        <th class="white-space-nowrap w-4">Amount</th>
+                        <th class="white-space-nowrap w-3">Statut</th>
+                        <th class="white-space-nowrap w-2">Nombre</th>
+                        <th class="white-space-nowrap w-4">Total TTC</th>
                         <th class="white-space-nowrap w-4">Date</th>
-                        <th class="white-space-nowrap w-4">Status</th>
-                    </tr>
+                     </tr>
                 </ng-template>
-                <ng-template pTemplate="body" let-payment>
+                <ng-template pTemplate="body" let-row>
                     <tr>
-                        <td>{{ payment.name }}</td>
-                        <td>{{ payment.amount | currency }}</td>
-                        <td>{{ payment.date }}</td>
-                        <td class="text-right">
-                            <p-tag
-                                *ngIf="payment.paid"
-                                value="COMPLETED"
-                                severity="success"
-                            ></p-tag>
-                            <p-tag
-                                *ngIf="!payment.paid"
-                                value="PENDING"
-                                severity="warning"
-                            ></p-tag>
+                        <td><p-tag [value]="row.label" [severity]="row.severity"></p-tag></td>
+                         <td>{{ row.nombre | number:'1.0-0' }}</td>
+                       <td>
+                            <ng-container *ngIf="row.montant != null; else dash">
+                            {{ row.montant | number:'1.0-0' }} GNF
+                            </ng-container>
+                            <ng-template #dash>—</ng-template>
                         </td>
+                              <td>{{ row.date }}</td>
                     </tr>
                 </ng-template>
             </p-table>
         </div>
     </div>
-
+ 
     <!-- <div class="col-12 lg:col-6">
         <div class="card h-full">
             <div class="flex align-items-center justify-content-between mb-3">

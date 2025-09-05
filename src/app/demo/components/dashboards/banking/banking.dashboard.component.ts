@@ -9,11 +9,13 @@ import { TransfertService } from 'src/app/demo/service/transfert/transfert.servi
 
 import { EncaissementService } from 'src/app/demo/service/comptabilite/encaissement/encaissement.service';
 import { CommandeService } from 'src/app/demo/service/ventes/commande/commande.service';
+import { FactureService } from 'src/app/demo/service/comptabilite/facturation/facturation.service';
 
 // ✅ Types
 import { EncaissementStatsType } from 'src/app/demo/components/types/EncaissementStats.type';
 import { PERIODES, Periode, PERIODE_LABELS } from 'src/app/demo/components/types/periode.type';
 import { CommandeStatsType } from 'src/app/demo/components/types/CommandeStats.type';
+import { FactureStatsType } from 'src/app/demo/components/types/FactureStats.type';
 
 interface MonthlyPayment {
   name?: string;
@@ -22,14 +24,14 @@ interface MonthlyPayment {
   date?: string;
 }
 
-/** Sévérités PrimeNG (union inline, pas d'import) */
+/** Sévérités PrimeNG (inline) */
 type TagSeverity = 'success' | 'info' | 'warning' | 'danger' | 'secondary' | 'contrast';
 
-/** Ligne prête pour l'UI des commandes */
-type CommandeRow = {
-  statut: string;               // valeur brute renvoyée par le back
-  label: string;                // libellé final (avec accents)
-  severity: TagSeverity;        // couleur p-tag
+/** Ligne prête pour l'UI (réutilisable pour commandes/factures) */
+type RowUI = {
+  statut: string;
+  label: string;
+  severity: TagSeverity;
   nombre: number;
   montant: number | null;
   date: string | null;
@@ -51,14 +53,6 @@ export class BankingDashboardComponent implements OnInit, OnDestroy {
   errors: { [key: string]: string } = {};
   contact: Contact = new Contact();
 
-  // --------- Stats Transferts ----------
-  stats = {
-    total_envoye: 0,
-    total_recu: 0,
-    total_general: 0,
-    nb_transferts: 0,
-  };
-
   // --------- Stats Encaissements ----------
   encStats?: EncaissementStatsType;
   encLoading = false;
@@ -69,10 +63,17 @@ export class BankingDashboardComponent implements OnInit, OnDestroy {
   cmdLoading = false;
   cmdError = '';
 
+  // --------- Stats Factures ----------
+  facStats?: FactureStatsType;
+  facLoading = false;
+  facError = '';
+
   // --------- Périodes ----------
   periodes = PERIODES;
-  periode: Periode = 'aujourdhui';        // encaissements
-  cmdPeriode: Periode = 'cette_semaine';  // commandes
+  periode: Periode = 'aujourdhui';             // ✅ source unique
+  get cmdPeriode(): Periode { return this.periode; }
+  set cmdPeriode(p: Periode) { this.periode = p; }
+
   periodeLabel = PERIODE_LABELS;
   cmdPeriodeOptions = PERIODES.map((p) => ({ label: PERIODE_LABELS[p], value: p }));
 
@@ -82,7 +83,8 @@ export class BankingDashboardComponent implements OnInit, OnDestroy {
     private messageService: MessageService,
     private transfertService: TransfertService,
     private encaissementService: EncaissementService,
-    private commandeService: CommandeService
+    private commandeService: CommandeService,
+    private factureService: FactureService,
   ) {
     this.subscription = this.layoutService.configUpdate$
       .pipe(debounceTime(25))
@@ -91,11 +93,12 @@ export class BankingDashboardComponent implements OnInit, OnDestroy {
 
   // -------------------- Lifecycle --------------------
   ngOnInit() {
-    this.loadEncaissementStats();  // période par défaut
-    this.loadCommandeStats();      // période par défaut
-
+    this.loadEncaissementStats();
+    this.loadCommandeStats();
+    this.loadFactureStats();
     this.initChart();
 
+    // démo
     this.payments = [
       { name: 'Electric Bill', amount: 75.6, paid: true, date: '06/04/2022' },
       { name: 'Water Bill', amount: 45.5, paid: true, date: '07/04/2022' },
@@ -109,29 +112,27 @@ export class BankingDashboardComponent implements OnInit, OnDestroy {
     if (this.subscription) this.subscription.unsubscribe();
   }
 
-  // -------------------- Encaissements --------------------
+  // -------------------- Période --------------------
   onGlobalPeriodeChange(p: Periode) {
-  this.periode = p;        // utilisé par encaissements
-  this.cmdPeriode = p;     // synchronise commandes
-  this.loadEncaissementStats();
-  this.loadCommandeStats();
-}
-
+    this.periode = p;
+    this.loadEncaissementStats();
+    this.loadCommandeStats();
+    this.loadFactureStats();
+  }
   onPeriodeChange(p: Periode) {
     this.periode = p;
     this.loadEncaissementStats();
-    this.loadCommandeStats(); // rafraîchir les deux panneaux
+    this.loadCommandeStats();
+    this.loadFactureStats();
   }
 
+  // -------------------- Encaissements --------------------
   loadEncaissementStats(): void {
     this.encLoading = true;
     this.encError = '';
 
     this.encaissementService.getStats({ periode: this.periode }).subscribe({
-      next: (data) => {
-        this.encStats = data;
-        this.encLoading = false;
-      },
+      next: (data) => { this.encStats = data; this.encLoading = false; },
       error: (err) => {
         this.encLoading = false;
         this.encError = err?.message || 'Erreur lors du chargement des encaissements.';
@@ -149,11 +150,8 @@ export class BankingDashboardComponent implements OnInit, OnDestroy {
   loadCommandeStats() {
     this.cmdLoading = true;
     this.cmdError = '';
-    this.commandeService.getStats({ periode: this.cmdPeriode }).subscribe({
-      next: (d) => {
-        this.cmdStats = d;
-        this.cmdLoading = false;
-      },
+    this.commandeService.getStats({ periode: this.periode }).subscribe({
+      next: (d) => { this.cmdStats = d; this.cmdLoading = false; },
       error: (err) => {
         this.cmdError = err?.message || 'Erreur lors du chargement des commandes.';
         this.cmdLoading = false;
@@ -162,28 +160,20 @@ export class BankingDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  // --- Statuts: normalisation + mapping (accents/underscores pris en charge) ---
-  /** Normalise la clé de statut provenant du back (minuscule, sans accents, '_' normalisés). */
+  // normalisation commune (accents/espaces/traits -> _ ; minuscule)
   private normalizeStatut(key: string): string {
     return (key ?? '')
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // supprime diacritiques
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
       .toLowerCase()
       .replace(/[\s-]+/g, '_')
       .replace(/_+/g, '_')
       .trim();
   }
 
-  /** Ordre d'affichage conseillé (clés normalisées). */
-  private readonly ORDERED_KEYS = [
-    'brouillon',
-    'livraison_en_cours',
-    'livre',
-    'cloture',
-    'annule',
-  ] as const;
+  // ----- Commandes : libellés + couleurs -----
+  private readonly ORDERED_CMD = ['brouillon','livraison_en_cours','livre','cloture','annule'] as const;
 
-  /** Libellés officiels (avec accents) — indexés par clé normalisée */
-  private readonly KNOWN_LABEL: Record<string, string> = {
+  private readonly KNOWN_CMD_LABEL: Record<string, string> = {
     brouillon:           'Brouillon',
     annule:              'Annulée',
     livraison_en_cours:  'En cours de livraison',
@@ -191,8 +181,7 @@ export class BankingDashboardComponent implements OnInit, OnDestroy {
     cloture:             'Clôturée',
   };
 
-  /** Sévérités PrimeNG — indexées par clé normalisée */
-  private readonly KNOWN_SEVERITY: Record<string, TagSeverity> = {
+  private readonly KNOWN_CMD_SEVERITY: Record<string, TagSeverity> = {
     brouillon:           'warning',
     annule:              'danger',
     livraison_en_cours:  'info',
@@ -200,54 +189,38 @@ export class BankingDashboardComponent implements OnInit, OnDestroy {
     cloture:             'secondary',
   };
 
-  /** Label UI final (utilise les libellés officiels, sinon fallback Title Case). */
-  private toLabel(statut: string): string {
+  private toCmdLabel(statut: string): string {
     const k = this.normalizeStatut(statut);
-    if (this.KNOWN_LABEL[k]) return this.KNOWN_LABEL[k];
-
-    // Fallback: "foo_bar" -> "Foo Bar"
+    if (this.KNOWN_CMD_LABEL[k]) return this.KNOWN_CMD_LABEL[k];
     const pretty = (statut || '').replace(/_/g, ' ').trim();
-    return pretty
-      .split(' ')
-      .map(w => (w ? w.charAt(0).toUpperCase() + w.slice(1) : w))
-      .join(' ');
+    return pretty.split(' ').map(w => w ? w[0].toUpperCase() + w.slice(1) : w).join(' ');
   }
 
-  /** Couleur PrimeNG (mapping connu + heuristiques si statut inconnu). */
-  private getSeverity(statut: string): TagSeverity {
+  private getCmdSeverity(statut: string): TagSeverity {
     const k = this.normalizeStatut(statut);
-    if (this.KNOWN_SEVERITY[k]) return this.KNOWN_SEVERITY[k];
-
-    // heuristiques génériques
+    if (this.KNOWN_CMD_SEVERITY[k]) return this.KNOWN_CMD_SEVERITY[k];
     if (k.includes('annul')) return 'danger';
     if (k.includes('brouillon') || k.includes('draft')) return 'warning';
     if (k.includes('factur') || k.includes('en_cours') || k.includes('pending') || k.includes('process')) return 'info';
     if (k.includes('livre') || k.includes('paye') || k.includes('regle') || k.includes('complete') || k.includes('done')) return 'success';
-    if (k.includes('clot') || k.includes('cloturé') || k.includes('close') || k.includes('archive')) return 'secondary';
-
+    if (k.includes('clot') || k.includes('close') || k.includes('archive')) return 'secondary';
     return 'secondary';
   }
 
-  /** Liste prête pour *ngFor */
-  get commandesList(): CommandeRow[] {
-    const parStatut = this.cmdStats?.commandes?.par_statut;
-    if (!parStatut) return [];
-
-    const rows = Object.entries(parStatut).map(([rawKey, infos]: [string, any]): CommandeRow => {
-      return {
-        statut: rawKey,
-        label: this.toLabel(rawKey),
-        severity: this.getSeverity(rawKey),
-        nombre: infos?.count ?? 0,
-        montant: infos?.montant ?? null,
-        date: this.cmdStats?.range?.to ?? this.cmdStats?.range?.from ?? null,
-      };
-    });
-
-    // Tri selon l'ordre conseillé, sinon ordre alpha par label
+  get commandesList(): RowUI[] {
+    const by = this.cmdStats?.commandes?.par_statut as Record<string, { count: number; montant?: number }> | undefined;
+    if (!by) return [];
+    const rows = Object.entries(by).map(([rawKey, infos]): RowUI => ({
+      statut: rawKey,
+      label: this.toCmdLabel(rawKey),
+      severity: this.getCmdSeverity(rawKey),
+      nombre: infos?.count ?? 0,
+      montant: infos?.montant ?? null,
+      date: this.cmdStats?.range?.to ?? this.cmdStats?.range?.from ?? null,
+    }));
     return rows.sort((a, b) => {
-      const ia = this.ORDERED_KEYS.indexOf(this.normalizeStatut(a.statut) as any);
-      const ib = this.ORDERED_KEYS.indexOf(this.normalizeStatut(b.statut) as any);
+      const ia = this.ORDERED_CMD.indexOf(this.normalizeStatut(a.statut) as any);
+      const ib = this.ORDERED_CMD.indexOf(this.normalizeStatut(b.statut) as any);
       if (ia !== -1 && ib !== -1) return ia - ib;
       if (ia !== -1) return -1;
       if (ib !== -1) return 1;
@@ -255,8 +228,79 @@ export class BankingDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** Optimisation rendu table */
-  trackByStatut = (_: number, row: CommandeRow) => this.normalizeStatut(row.statut);
+  // -------------------- Factures (par_statut : brouillon | partiel | payé | impayé) --------------------
+  loadFactureStats() {
+    this.facLoading = true;
+    this.facError = '';
+    this.factureService.getStats({ periode: this.periode }).subscribe({
+      next: (d) => { this.facStats = d; this.facLoading = false; console.log('dashboard.factures', d);
+      },
+      error: (err) => {
+        this.facError = err?.message || 'Erreur lors du chargement des factures.';
+        this.facLoading = false;
+        this.messageService.add({ severity: 'error', summary: 'Factures', detail: this.facError });
+      },
+    });
+  }
+
+  /** Ordre d’affichage conseillé pour factures */
+  private readonly ORDERED_FACT = ['brouillon','partiel','impaye','paye'] as const;
+
+  /** Libellés officiels (avec accents) — indexés par clé normalisée */
+  private readonly KNOWN_FACT_LABEL: Record<string, string> = {
+    brouillon: 'Brouillon',
+    partiel:   'Partiel',
+    paye:      'Payé',
+    impaye:    'Impayé',
+  };
+
+  /** Couleurs PrimeNG — indexées par clé normalisée */
+  private readonly KNOWN_FACT_SEVERITY: Record<string, TagSeverity> = {
+    brouillon: 'warning',
+    partiel:   'info',
+    paye:      'success',
+    impaye:    'danger',
+  };
+
+  private toFactLabel(statut: string): string {
+    const k = this.normalizeStatut(statut); // "payé" -> "paye", "impayé" -> "impaye"
+    if (this.KNOWN_FACT_LABEL[k]) return this.KNOWN_FACT_LABEL[k];
+    const pretty = (statut || '').replace(/_/g, ' ').trim();
+    return pretty.split(' ').map(w => w ? w[0].toUpperCase() + w.slice(1) : w).join(' ');
+  }
+
+  private getFactSeverity(statut: string): TagSeverity {
+    const k = this.normalizeStatut(statut);
+    return this.KNOWN_FACT_SEVERITY[k] ?? 'secondary';
+  }
+
+  get facturesList(): RowUI[] {
+    // back: { factures: { total_ttc, montant_du_total, par_statut: { 'brouillon'| 'partiel'| 'payé'| 'impayé': { count, total_ttc } } } }
+    const ps = (this.facStats as any)?.factures?.par_statut as Record<string, { count: number; total_ttc?: number }> | undefined;
+    if (!ps) return [];
+    const date = this.facStats?.range?.to ?? this.facStats?.range?.from ?? null;
+
+    const rows = Object.entries(ps).map(([rawKey, val]): RowUI => ({
+      statut: rawKey,
+      label: this.toFactLabel(rawKey),
+      severity: this.getFactSeverity(rawKey),
+      nombre: Number(val?.count ?? 0),
+      montant: Number(val?.total_ttc ?? 0),
+      date,
+    }));
+
+    return rows.sort((a, b) => {
+      const ia = this.ORDERED_FACT.indexOf(this.normalizeStatut(a.statut) as any);
+      const ib = this.ORDERED_FACT.indexOf(this.normalizeStatut(b.statut) as any);
+      if (ia !== -1 && ib !== -1) return ia - ib;
+      if (ia !== -1) return -1;
+      if (ib !== -1) return 1;
+      return a.label.localeCompare(b.label);
+    });
+  }
+
+  // partagée
+  trackByStatut = (_: number, row: RowUI) => this.normalizeStatut(row.statut);
 
   // -------------------- Chart --------------------
   initChart() {

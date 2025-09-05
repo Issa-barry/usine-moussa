@@ -3,10 +3,12 @@ import {
   HttpClient,
   HttpErrorResponse,
   HttpHeaders,
+  HttpParams,
 } from '@angular/common/http';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { environment } from 'src/environements/environment.dev';
 import { Facture } from 'src/app/demo/models/Facture';
+import { FactureStatsQueryType, FactureStatsType } from 'src/app/demo/components/types/FactureStats.type';
 
 /** ---- Modèles (adapte selon tes interfaces backend) ---- */
  
@@ -45,6 +47,8 @@ const httpOptions = {
 })
 export class FactureService {
   private apiUrl = `${environment.apiUrl}/factures`;
+      private apiDashboardUrl = `${environment.apiUrl}/dashboards`;
+
 
   constructor(private http: HttpClient) {}
 
@@ -107,7 +111,7 @@ export class FactureService {
       .post<{ success: boolean; data: Facture }>( 
         `${this.apiUrl}/create`,
         payload,
-        httpOptions
+        httpOptions 
       )
       .pipe(map((res) => res.data), catchError(this.handleError));
   }
@@ -154,4 +158,24 @@ export class FactureService {
       .post<{ success: boolean; data: any }>(url, payload, httpOptions)
       .pipe(map((res) => res.data), catchError(this.handleError));
   }
+
+  /** GET /dashboards/statistiques/factures */
+  getStats(q: FactureStatsQueryType): Observable<FactureStatsType> {
+    let params = new HttpParams();
+    if (q.periode)   params = params.set('periode', q.periode);
+    if (q.date_from) params = params.set('date_from', q.date_from);
+    if (q.date_to)   params = params.set('date_to', q.date_to);
+
+    return this.http
+      .get<{ success: boolean; data: FactureStatsType }>(
+        `${this.apiDashboardUrl}/statistiques/factures`,
+        { params }
+      )
+      .pipe(
+        map(res => res.data),
+        catchError(this.handleError)
+      );
+  }
+
+
 }
