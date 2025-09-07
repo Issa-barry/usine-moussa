@@ -18,7 +18,7 @@ export class LoginComponent implements OnInit {
         private layoutService: LayoutService
     ) {}
 
-    ngOnInit(): void {} 
+    ngOnInit(): void {}
 
     get dark(): boolean {
         return this.layoutService.config().colorScheme !== 'light';
@@ -35,8 +35,22 @@ export class LoginComponent implements OnInit {
                 console.clear();
             },
             error: (err) => {
-                console.error('Erreur de connexion :', err);
-                this.errorMessage = err.error.error.email || 'Identifiants incorrects.'; 
+                const b = err?.error;
+
+                this.errorMessage =
+                    (typeof b === 'string' && b) ||
+                    (typeof b?.error === 'string' && b.error) ||
+                    (typeof b?.message === 'string' && b.message) ||
+                    // Laravel validation: { errors: { email: ['...'], password: ['...'] } }
+                    (b?.errors &&
+                        Array.isArray(Object.values(b.errors)) &&
+                        (Object.values(b.errors) as any[]).flat().join('\n')) ||
+                    // Si l'API renvoie encore un objet (rare), on l'affiche en texte
+                    (b?.error &&
+                        typeof b.error === 'object' &&
+                        JSON.stringify(b.error)) ||
+                    (b && typeof b === 'object' && JSON.stringify(b)) ||
+                    '';
             },
         });
     }

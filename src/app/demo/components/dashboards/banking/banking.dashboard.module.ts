@@ -11,6 +11,7 @@ import { BankingDashboardComponent } from './banking.dashboard.component';
 import { BankingDashboardRoutingModule } from './banking.dashboard-routing.module';
 import { DropdownModule } from 'primeng/dropdown';
 import { FormsModule } from '@angular/forms';
+import { SharedModule } from 'src/app/shared/pipes/shared.module';
  
 @NgModule({
     imports: [
@@ -24,7 +25,8 @@ import { FormsModule } from '@angular/forms';
         ChartModule,
         BankingDashboardRoutingModule,
         DropdownModule,
-        FormsModule
+        FormsModule,
+        SharedModule
     ],
     declarations: [BankingDashboardComponent],
     providers: [ ]

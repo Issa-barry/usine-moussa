@@ -1,4 +1,6 @@
 import { Civilite } from "../enums/civilite.enum";
+import { TypeClientEnum } from "../enums/typeClient.enum";
+import { VehiculeEnum } from "../enums/vehicule.enum";
 import { Adresse } from "./adresse";
 import { Role } from "./Role";
 
@@ -18,11 +20,18 @@ import { Role } from "./Role";
     agence_id?:number;
     statut: string;
     role?: any;
-    adresse: Adresse;  
+    role_name:string;
+    
+    adresse: Adresse; 
+    
+      /** Nouveaux champs alignés backend */
+  type_client?: TypeClientEnum;                 // 'specifique' | 'vehicule'
+  type_vehicule?: VehiculeEnum | null; 
 
     constructor()
     {
         this.role ="";
+        this.role_name ="";
         this.nom_complet = "";
         this.civilite=Civilite.Autre;
         this.date_naissance="1999-01-01";
@@ -33,5 +42,20 @@ import { Role } from "./Role";
         this.statut="attente";
         this.adresse = new Adresse();
         this.roles= new Role();
+        this.type_client = TypeClientEnum.Specifique;
+        this.type_vehicule = null;
     }
+
+    
+  
+
+  /** Helpers pratiques pour l’UI */
+  get isVehicule(): boolean {
+    return this.type_client === TypeClientEnum.Vehicule;
+  }
+
+//   setVehicule(type?: VehiculeEnum | null) {
+//     this.type_client = type ? TypeClientEnum.Vehicule : TypeClientEnum.Specifique;
+//     this.type_vehicule = type ?? null;
+//   }
 }  

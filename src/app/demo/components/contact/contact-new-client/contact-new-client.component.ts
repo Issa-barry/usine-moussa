@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Civilite } from 'src/app/demo/enums/civilite.enum';
+import { TypeClientEnum } from 'src/app/demo/enums/typeClient.enum';
+import { VehiculeEnum } from 'src/app/demo/enums/vehicule.enum';
 import { Contact } from 'src/app/demo/models/contact';
 import { Role } from 'src/app/demo/models/Role';
 import { ContactService } from 'src/app/demo/service/contact/contact.service';
@@ -56,97 +58,21 @@ export class ContactNewClientComponent implements OnInit {
         value: civ,
     }));
 
-    // Vérifier si le pays Guinée est sélectionné
-    // onCountryChange() {
+     clientOptions = [
+  { label: 'Spécifique', value: TypeClientEnum.Specifique },
+  { label: 'Véhicule',   value: TypeClientEnum.Vehicule },
+];
 
-    //     console.log('this.contact.adresse.pays:', this.contact.adresse.pays);
-        
-    //     if (this.contact.adresse.pays && typeof this.contact.adresse.pays === 'object') {
-    //         this.isGuineeSelected = this.contact.adresse.pays === 'GUINEE-CONAKRY';
+        vehiculeOptions = Object.values(VehiculeEnum).map((vehicule) => ({
+        label: vehicule,
+        value: vehicule,
+    }));
 
-            
-    //         console.log('isGuineeSelected:', this.isGuineeSelected);
-            
-    //         // Réinitialiser les champs en fonction du pays
-    //         if (this.isGuineeSelected) {
-    //             this.contact.adresse.code_postal = 'null';
-    //             this.contact.adresse.quartier = '';
-    //         } else {
-    //             this.contact.adresse.quartier = 'null';
-    //         }
-    //     }
-    // }
-
-   
-
-    // saveContact() {
-    //     this.submitted = true;
-    //     this.errors = {};
-
-    //     // Adapter la validation en fonction du pays sélectionné
-    //     const isGuinee = this.isGuineeSelected; 
-
-    //     if (
-    //         !this.contact.role ||
-    //         !this.contact.civilite ||
-    //         !this.contact.nom_complet ||
-    //         !this.contact.email ||
-    //         !this.contact.phone ||
-    //         !this.contact.password ||
-    //         !this.contact.password_confirmation ||
-    //         !this.contact.adresse ||
-    //         !this.contact.adresse.pays ||
-    //         !this.contact.adresse.ville 
-    //         // (isGuinee ? !this.contact.adresse.quartier : !this.contact.adresse.code_postal)
-    //     ) {
-    //         this.messageService.add({
-    //             severity: 'warn',
-    //             summary: 'Attention',
-    //             detail: 'Veuillez remplir tous les champs obligatoires.',
-    //             life: 3000,
-    //         });
-    //         return;
-    //     }
-
-    //     this.contact.role = String(this.contact.role.name);
-    //     this.contact.adresse.pays = String(this.contact.adresse.pays);
-        
-    //     if (!isGuinee) {
-    //         this.contact.adresse.code_postal = String(this.contact.adresse.code_postal);
-    //     }
-
-    //     this.contactService.createContact(this.contact).subscribe({
-    //         next: () => {
-    //             this.messageService.add({
-    //                 severity: 'success',
-    //                 summary: 'Succès',
-    //                 detail: 'Contact créé avec succès',
-    //                 life: 3000,
-    //             });
-
-    //             this.contact = new Contact();
-    //             this.submitted = false;
-    //             this.errors = {};
-                 
-    //             this.router.navigate(['/dashboard/contact']);
-    //         },
-    //         error: (err) => {
-    //             console.error('Erreur lors de la création du contact:', err);
-
-    //             if (err.error && err.error.errors) {
-    //                 this.errors = err.error.errors;
-    //             }
-
-    //             this.messageService.add({
-    //                 severity: 'error',
-    //                 summary: 'Erreur',
-    //                 detail: 'Création du contact échouée. Vérifiez les champs.',
-    //                 life: 5000,
-    //             });
-    //         },
-    //     }); 
-    // }
-
+    onTypeClientChange(val: TypeClientEnum) {
+  if (val !== TypeClientEnum.Vehicule) {
+    this.contact.type_vehicule = null;
+  }
+}
 
     // iba
 
@@ -196,7 +122,7 @@ export class ContactNewClientComponent implements OnInit {
                 if (err.error && err.error.errors) {
                     this.errors = err.error.errors;
                 }
-
+ 
                 this.messageService.add({
                     severity: 'error',
                     summary: 'Erreur',

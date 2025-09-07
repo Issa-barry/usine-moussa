@@ -106,6 +106,19 @@ export class ContactService {
         );
 }
 
+     createEmploye(contact: any): Observable<Contact> {
+    return this.http
+        .post<{ success: boolean; data: Contact }>(
+            `${environment.apiUrl}/users/employes/create`,
+            contact,
+            httpOption
+        )
+        .pipe( 
+            map((res) => res.data),
+            catchError(this.handleError)
+        );
+}
+
     updateClient(id: number, contact: Contact): Observable<Contact> {
         return this.http
             .put<Contact>(
