@@ -1,0 +1,10 @@
+/* réserve ~1 ligne (ajuste si multi-lignes) */
+.error-slot {
+  min-height: 20px;     /* évite le décalage quand le message apparaît/disparaît */
+  margin-top: .5rem;
+}
+
+/* affiche correctement les retours à la ligne si tu concatènes plusieurs erreurs */
+.error-text {
+  white-space: pre-line;
+}
